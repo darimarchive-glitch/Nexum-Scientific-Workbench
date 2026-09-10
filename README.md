@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/images/nexum-banner.jpg" alt="Nexum Scientific Workbench — banner com identidade visual molecular em azul e turquesa" width="100%">
+
 # Nexum · Scientific Workbench
 
 ### Da equação à descoberta.
@@ -228,6 +230,8 @@ Distribuído sob a [licença MIT](LICENSE), conforme definida pelo mantenedor ne
 ---
 
 <div align="center">
+
+<img src="docs/images/nexum-logo.jpg" alt="Logotipo do Nexum em formato de N com ligações moleculares" width="120">
 
 **Nexum Scientific Workbench · Windows e Fedora · 6.6**
 

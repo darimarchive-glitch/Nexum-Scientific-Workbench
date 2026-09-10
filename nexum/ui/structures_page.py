@@ -125,7 +125,7 @@ class StructurePage(Gtk.Box):
         chooser=Gtk.FileChooserNative.new("Importar estrutura",self.window,Gtk.FileChooserAction.OPEN,"Abrir","Cancelar");f=Gtk.FileFilter();f.set_name("Estruturas químicas");[f.add_pattern(x) for x in ("*.sdf","*.mol","*.pdb","*.cif","*.mmcif")];chooser.add_filter(f);chooser.connect("response",self._file_response);chooser.show()
     def _file_response(self,chooser,response):
         if response!=Gtk.ResponseType.ACCEPT:return
-        file=chooser.get_file();path=Path(file.get_path());txt=path.read_text(errors="replace")
+        file=chooser.get_file();path=Path(file.get_path());txt=path.read_text(encoding="utf-8",errors="replace")
         try:
             suf=path.suffix.lower();mol=parse_mmcif(txt,path.stem) if suf in (".cif",".mmcif") else parse_pdb(txt,path.stem) if suf==".pdb" else parse_sdf(txt,path.stem);self._apply_molecule(mol)
         except Exception as exc:self.window.toast(f"Arquivo inválido: {exc}")

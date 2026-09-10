@@ -51,7 +51,7 @@ class PathsTests(unittest.TestCase):
             self.assertEqual(paths.cache_dir(), Path.home() / ".cache/nexum-lab")
 
     def test_windows_without_localappdata(self):
-        with patch.object(paths.sys, "platform", "win32"), patch.dict(os.environ, {}, clear=True):
+        with patch.object(paths.sys, "platform", "win32"), patch.dict(os.environ, {"LOCALAPPDATA": ""}):
             self.assertEqual(paths.data_dir(), Path.home() / "AppData/Local/Nexum")
 
 

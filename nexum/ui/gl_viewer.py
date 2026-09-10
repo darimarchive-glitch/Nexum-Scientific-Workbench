@@ -177,6 +177,7 @@ class GLMoleculeView(Gtk.GLArea):
         super().__init__()
         self.set_hexpand(True);self.set_vexpand(True);self.set_auto_render(True)
         self.set_required_version(3,3)
+        self.set_use_es(False)
         # Gtk.GLArea does not guarantee a depth attachment unless explicitly requested.
         # Without it, rotation looks flat because later fragments can paint over nearer ones.
         self.set_has_depth_buffer(True)
@@ -317,7 +318,8 @@ class GLMoleculeView(Gtk.GLArea):
 
     def _render(self,area,context):
         if self.get_error():return False
-        GL.glViewport(0,0,max(1,self.get_allocated_width()),max(1,self.get_allocated_height()))
+        scale=self.get_scale_factor()
+        GL.glViewport(0,0,max(1,self.get_allocated_width()*scale),max(1,self.get_allocated_height()*scale))
         GL.glClearColor(*self.bg,1);GL.glClear(GL.GL_COLOR_BUFFER_BIT|GL.GL_DEPTH_BUFFER_BIT)
         if not self.molecule:return True
         model,view,proj=self._matrices()
@@ -348,7 +350,7 @@ class GLMoleculeView(Gtk.GLArea):
         pp=self.scene.get("point_pos")
         if pp is not None and len(pp) and self.representation not in ("sticks","lines","backbone"):
             prog=self.programs["points"];GL.glUseProgram(prog);self._uniform_common(prog,model,view,proj)
-            h=max(1,self.get_allocated_height());scale=h/(2*math.tan(math.radians(self.fov_deg)/2));GL.glUniform1f(GL.glGetUniformLocation(prog,"u_point_scale"),float(scale))
+            h=max(1,self.get_allocated_height()*self.get_scale_factor());scale=h/(2*math.tan(math.radians(self.fov_deg)/2));GL.glUniform1f(GL.glGetUniformLocation(prog,"u_point_scale"),float(scale))
             vao=GL.glGenVertexArrays(1);GL.glBindVertexArray(vao);temp.append(("vao",vao));
             b1=self._array_buffer(pp,0,3);b2=self._array_buffer(self.scene["point_col"],1,3);b3=self._array_buffer(self.scene["point_rad"],2,1);temp.extend(("buf",b) for b in (b1,b2,b3) if b);GL.glDrawArrays(GL.GL_POINTS,0,len(pp))
         GL.glBindVertexArray(0);GL.glBindBuffer(GL.GL_ARRAY_BUFFER,0)

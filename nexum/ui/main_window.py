@@ -1,5 +1,5 @@
 from __future__ import annotations
-from pathlib import Path
+from nexum.paths import data_dir
 import gi
 gi.require_version("Gtk","4.0");gi.require_version("Adw","1")
 from gi.repository import Gtk,Adw,Gdk
@@ -29,7 +29,7 @@ class MainWindow(Adw.ApplicationWindow):
     def __init__(self,application):
         super().__init__(application=application);self.set_title("Nexum");self.set_default_size(1440,900);self.set_size_request(860,600)
         provider=Gtk.CssProvider();provider.load_from_data(CSS);Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(),provider,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-        self.history=HistoryStore(Path.home()/".local/share/nexum-lab/history.sqlite3")
+        self.history=HistoryStore(data_dir()/"history.sqlite3")
         self.overlay=Adw.ToastOverlay();toolbar=Adw.ToolbarView();self.overlay.set_child(toolbar);self.set_content(self.overlay)
         header=Adw.HeaderBar();brand=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=0);b=Gtk.Label(label="NEXUM",xalign=0);b.add_css_class("heading");sub=Gtk.Label(label="Scientific Workbench",xalign=0);sub.add_css_class("caption");brand.append(b);brand.append(sub);header.pack_start(brand)
         self.stack=Adw.ViewStack();self.stack.set_hexpand(True);self.stack.set_vexpand(True);switcher=Adw.ViewSwitcher();switcher.set_stack(self.stack);switcher.set_policy(Adw.ViewSwitcherPolicy.WIDE);header.set_title_widget(switcher);toolbar.add_top_bar(header)

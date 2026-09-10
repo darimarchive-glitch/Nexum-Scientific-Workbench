@@ -4,7 +4,7 @@
 
 ### Da equação à descoberta.
 
-Química computacional, estruturas 3D e experimentos em uma bancada nativa para o desktop GNOME.
+Química computacional, estruturas 3D e experimentos em uma bancada nativa para Windows e Linux.
 
 ![Versão 6.6](https://img.shields.io/badge/vers%C3%A3o-6.6-3584e4?style=for-the-badge)
 ![GTK4 e libadwaita](https://img.shields.io/badge/desktop-GTK4%20%2B%20libadwaita-9141ac?style=for-the-badge)
@@ -32,6 +32,16 @@ A ideia central é simples: **você fornece as condições; o motor resolve o mo
 Os cálculos são locais. A instalação e a busca de estruturas em **PubChem/RCSB** precisam de conexão. Os módulos científicos avançados também podem ser usados diretamente em Python; nem todos possuem formulário próprio na interface.
 
 > **Edição GNOME/Fedora 6.6:** aplicação desktop nativa. Este repositório reúne o código, os testes e a documentação desta edição.
+
+## Começar no Windows
+
+Instale **MSYS2** e **Python 3.12 x64**, extraia o projeto em uma pasta gravável e
+abra `install-windows.cmd`. Depois, use `run-windows.cmd` ou o atalho **Nexum**.
+O instalador prepara a interface nativa, as dependências científicas e executa
+diagnóstico e testes. Requer Windows 10/11 x64 e OpenGL 3.3.
+
+Consulte o [guia completo para Windows](docs/WINDOWS.md), com comandos de
+instalação, caminhos personalizados, diagnóstico e limites de validação.
 
 ## Começar no Fedora
 

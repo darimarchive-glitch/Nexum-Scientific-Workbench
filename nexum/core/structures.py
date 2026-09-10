@@ -7,6 +7,7 @@ from urllib.error import HTTPError, URLError
 import json, math, re, time
 
 import numpy as np
+from nexum import chemistry_worker
 
 
 @dataclass
@@ -155,6 +156,8 @@ def parse_pdb(text,name="PDB"):
 
 
 def parse_mmcif(text,name="mmCIF"):
+    if chemistry_worker.configured():
+        return chemistry_worker.call("mmcif", text, name)
     try:
         import gemmi
     except Exception as exc:
@@ -488,6 +491,8 @@ def _rdkit_embed(mol,title,cid):
 
 
 def _rdkit_conformer_from_smiles(smiles,title,cid):
+    if chemistry_worker.configured():
+        return chemistry_worker.call("smiles", smiles, title, cid)
     try:
         from rdkit import Chem
     except Exception as exc:
@@ -496,6 +501,8 @@ def _rdkit_conformer_from_smiles(smiles,title,cid):
 
 
 def _rdkit_conformer_from_molblock(block,title,cid):
+    if chemistry_worker.configured():
+        return chemistry_worker.call("molblock", block, title, cid)
     try:
         from rdkit import Chem
     except Exception as exc:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
+from nexum.paths import cache_dir
 import threading
 
 import gi
@@ -25,7 +26,7 @@ class StructurePage(Gtk.Box):
     def __init__(self, window):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.set_hexpand(True);self.set_vexpand(True)
-        self.window=window;self.cache=Path.home()/".cache/nexum-lab/structures";self.selected_suggestion=None;self.search_source="Todos";self.search_timer=0;self._fullscreen=False
+        self.window=window;self.cache=cache_dir()/"structures";self.selected_suggestion=None;self.search_source="Todos";self.search_timer=0;self._fullscreen=False
         self.viewer=GLMoleculeView();self.viewer.selection_callback=self._atom_selected
         style=Adw.StyleManager.get_default();self.viewer.set_dark(style.get_dark());style.connect("notify::dark",lambda *_:self.viewer.set_dark(style.get_dark()))
         self._build_searchbar();self._build_workspace()

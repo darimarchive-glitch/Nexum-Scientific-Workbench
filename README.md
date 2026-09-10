@@ -8,12 +8,13 @@ Química computacional, estruturas 3D e experimentos em uma bancada nativa para 
 
 ![Versão 6.6](https://img.shields.io/badge/vers%C3%A3o-6.6-3584e4?style=for-the-badge)
 ![GTK4 e libadwaita](https://img.shields.io/badge/desktop-GTK4%20%2B%20libadwaita-9141ac?style=for-the-badge)
+![Windows 10/11 x64](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078d4?style=for-the-badge)
 ![Fedora](https://img.shields.io/badge/Linux-Fedora-51a2da?style=for-the-badge)
 ![Python](https://img.shields.io/badge/motor-Python-26a269?style=for-the-badge)
 
 **35 calculadoras · 12 áreas da química · 8 bancadas · 14 modelos no registro avançado**
 
-[Começar](#começar-no-fedora) · [Experimentos](#uma-bancada-que-responde-aos-seus-dados) · [Motor científico](#o-cérebro-científico) · [Documentação](#documentação) · [Contribuir](CONTRIBUTING.md)
+[Instalar no Windows](#começar-no-windows) · [Instalar no Fedora](#começar-no-fedora) · [Experimentos](#uma-bancada-que-responde-aos-seus-dados) · [Motor científico](#o-cérebro-científico) · [Documentação](#documentação)
 
 </div>
 
@@ -31,17 +32,36 @@ A ideia central é simples: **você fornece as condições; o motor resolve o mo
 
 Os cálculos são locais. A instalação e a busca de estruturas em **PubChem/RCSB** precisam de conexão. Os módulos científicos avançados também podem ser usados diretamente em Python; nem todos possuem formulário próprio na interface.
 
-> **Edição GNOME/Fedora 6.6:** aplicação desktop nativa. Este repositório reúne o código, os testes e a documentação desta edição.
+> **Nexum 6.6 · Windows e Fedora:** aplicação desktop nativa com o mesmo motor científico, calculadoras, bancadas e visualizador molecular. A versão Windows funciona sem WSL.
 
 ## Começar no Windows
 
-Instale **MSYS2** e **Python 3.12 x64**, extraia o projeto em uma pasta gravável e
-abra `install-windows.cmd`. Depois, use `run-windows.cmd` ou o atalho **Nexum**.
-O instalador prepara a interface nativa, as dependências científicas e executa
-diagnóstico e testes. Requer Windows 10/11 x64 e OpenGL 3.3.
+**Requisitos:** Windows 10/11 de 64 bits, driver com suporte a **OpenGL 3.3** e conexão para instalar as dependências.
 
-Consulte o [guia completo para Windows](docs/WINDOWS.md), com comandos de
-instalação, caminhos personalizados, diagnóstico e limites de validação.
+1. Instale [MSYS2](https://www.msys2.org/) na pasta padrão `C:\msys64` e [Python 3.12 x64](https://www.python.org/downloads/windows/), incluindo o launcher `py`. Se tiver WinGet, pode usar o Terminal:
+
+   ```powershell
+   winget install --exact --id MSYS2.MSYS2
+   winget install --exact --id Python.Python.3.12
+   ```
+
+2. [Baixe o projeto em ZIP](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/archive/refs/heads/main.zip), clique com o botão direito e escolha **Extrair tudo**. Use uma pasta gravável, como `Documentos\Nexum`.
+3. Após instalar os pré-requisitos, abra **`install-windows.cmd`** na pasta extraída. Aguarde a instalação, o diagnóstico e os testes.
+4. Abra **`run-windows.cmd`** ou o atalho **Nexum** criado na Área de Trabalho.
+
+O instalador prepara GTK4/libadwaita, as bibliotecas científicas e o suporte 3D. Ele verifica a leitura mmCIF, a geração de conformadores, o histórico SQLite e a renderização antes de concluir. A distribuição usa o código-fonte com dependências instaladas; **não é um `.exe` independente**.
+
+| Arquivo | O que faz |
+| :--- | :--- |
+| `install-windows.cmd` | Instala dependências, executa diagnóstico e testes e cria o atalho. |
+| `run-windows.cmd` | Abre o aplicativo. |
+| `test-windows.cmd` | Executa o diagnóstico completo e a suíte de testes. |
+| `diagnose-windows.cmd` | Verifica dependências, química, SQLite e OpenGL. |
+| `install-windows-shortcut.cmd` | Recria o atalho na Área de Trabalho. |
+
+**Dados locais:** histórico em `%LOCALAPPDATA%\Nexum\history.sqlite3` e cache de estruturas em `%LOCALAPPDATA%\Nexum\Cache\structures`. Atualizar o código não apaga o histórico.
+
+Se a atualização do próprio MSYS2 encerrar a instalação, execute `install-windows.cmd` novamente. Se ocorrer outro erro, a janela permanece aberta para mostrar a mensagem. Caminhos personalizados, reinstalação e diagnóstico estão no [guia completo para Windows](docs/WINDOWS.md).
 
 ## Começar no Fedora
 
@@ -133,7 +153,15 @@ print(trace.diagnostics)                # RMSE e número de condição
 print(engine.keys())                   # Modelos registrados
 ```
 
-O [exemplo completo](examples/beer_multicomponente.py) pode ser executado com:
+O [exemplo completo](examples/beer_multicomponente.py) pode ser executado após a instalação, a partir da raiz do projeto.
+
+No Windows, pelo PowerShell:
+
+```powershell
+.\.venv-science\Scripts\python.exe -m examples.beer_multicomponente
+```
+
+No Fedora:
 
 ```bash
 .venv/bin/python -m examples.beer_multicomponente
@@ -143,7 +171,19 @@ Esse exemplo foi executado nesta publicação e recuperou as concentrações com
 
 ## Validação e limites científicos
 
-**A suíte contém 170 testes.** O resultado reproduzido para esta publicação, o ambiente e as verificações não executadas estão em [docs/VALIDACAO-PUBLICACAO.md](docs/VALIDACAO-PUBLICACAO.md). Os testes cobrem cálculos, conservação, benchmarks, mudanças de entradas, sessões experimentais, renderização Cairo e integração GTK. Dependências ou display ausentes podem causar `skipped`; esses casos não contam como testes aprovados.
+**A suíte contém 179 testes.** Na [validação automatizada da adaptação Windows](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/34487381888), o commit `ade6fa1` obteve:
+
+| Ambiente | Resultado |
+| :--- | :--- |
+| Windows com GTK/Cairo e Mesa | **179 aprovados, nenhum ignorado.** |
+| Backend CPython 3.12 no Windows | 167 aprovados; 12 ignorados por ausência de GTK/Cairo. |
+| Backend CPython 3.12 no Ubuntu | 167 aprovados; 12 ignorados por ausência de GTK/Cairo. |
+
+A etapa desktop também instalou as dependências em uma pasta com espaços, compilou os shaders, abriu a janela completa, renderizou uma molécula, criou o atalho e repetiu o diagnóstico pelo lançador CMD. O contexto gráfico foi **OpenGL 4.6 Core Profile com Mesa 26.0.3 por software**.
+
+Os testes cobrem cálculos, conservação, benchmarks, mudanças de entradas, sessões experimentais, renderização Cairo, integração GTK, comunicação com RDKit/gemmi e persistência do histórico. Testes `skipped` não contam como aprovados. O diagnóstico registrou avisos GObject no encerramento, sem falha da execução. A verificação manual com GPU física, buscas remotas e escalas de tela 100%, 150% e 200% continua pendente.
+
+Consulte o [escopo de validação Windows](docs/VALIDACAO-WINDOWS.md) e o [registro da publicação original no Fedora](docs/VALIDACAO-PUBLICACAO.md), que documenta a suíte anterior de 170 testes.
 
 Precisão numérica e adequação física precisam ser avaliadas juntas. O projeto declara limites relevantes:
 
@@ -161,6 +201,9 @@ Precisão numérica e adequação física precisam ser avaliadas juntas. O proje
 | [`nexum/core/advanced/`](nexum/core/advanced/) | Solvers científicos e registro auditável, independentes de GTK. |
 | [`nexum/ui/`](nexum/ui/) | Interface GTK, renderização OpenGL e desenhos/gráficos Cairo. |
 | [`nexum/history.py`](nexum/history.py) | Histórico local em SQLite. |
+| [`nexum/paths.py`](nexum/paths.py) | Pastas de dados e cache por sistema operacional. |
+| [`nexum/chemistry_worker.py`](nexum/chemistry_worker.py) | Integração local com RDKit/gemmi no ambiente Windows. |
+| [`scripts/windows/`](scripts/windows/) | Instalação, execução, diagnóstico e atalho no Windows. |
 | [`tests/`](tests/) | Testes científicos, numéricos e de interface. |
 | [`examples/`](examples/) | Exemplos de uso programático. |
 
@@ -172,6 +215,8 @@ Distribuído sob a [licença MIT](LICENSE), conforme definida pelo mantenedor ne
 
 | Documento | Para que serve |
 | :--- | :--- |
+| [Windows](docs/WINDOWS.md) | Instalação, execução, dados locais e solução de problemas. |
+| [Validação Windows](docs/VALIDACAO-WINDOWS.md) | Escopo dos testes e verificações manuais pendentes. |
 | [Experimentos v6.6](EXPERIMENTOS-v6.6.md) | Controles, leitura das bancadas e limites de cada modelo. |
 | [Arquitetura do backend](BACKEND-ARCHITECTURE.md) | Contratos, solvers, traces e separação da interface. |
 | [Auditoria científica](SCIENTIFIC-AUDIT.md) | Hipóteses, equações e decisões de modelagem. |
@@ -184,7 +229,8 @@ Distribuído sob a [licença MIT](LICENSE), conforme definida pelo mantenedor ne
 
 <div align="center">
 
-**Nexum Scientific Workbench · GNOME/Fedora 6.6**  
+**Nexum Scientific Workbench · Windows e Fedora · 6.6**
+
 Projeto de [DarimArchive](https://github.com/darimarchive-glitch)
 
 *Entradas explícitas. Modelos declarados. Resultados calculados.*

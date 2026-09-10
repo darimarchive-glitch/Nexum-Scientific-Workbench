@@ -1,0 +1,56 @@
+name: Windows and scientific regressions
+on:
+  push:
+    branches: [main, 'feat/windows-native']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scientific:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: 'python -m pip install --only-binary=:all: -r requirements.txt'
+      - run: python -m unittest discover -s tests -v
+      - run: python -m compileall -q nexum
+  windows-desktop:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Nexum Windows
+      - uses: actions/setup-python@v5
+        id: python
+        with:
+          python-version: '3.12'
+      - uses: msys2/setup-msys2@v2
+        id: msys2
+        with:
+          msystem: UCRT64
+          update: true
+      # CI has no physical GPU. This driver is installed ONLY on the runner.
+      - uses: ssciwr/setup-mesa-dist-win@v3
+      - name: Install, verify OpenGL shaders, chemistry, GTK and tests
+        shell: powershell
+        working-directory: Nexum Windows
+        env:
+          NEXUM_MSYS_ROOT: ${{ steps.msys2.outputs.msys2-location }}
+          NEXUM_CPYTHON: ${{ steps.python.outputs.python-path }}
+          GTK_A11Y: test
+        run: |
+          & .\scripts\windows\nexum.ps1 -Action Install -MsysRoot $env:NEXUM_MSYS_ROOT -PythonExe $env:NEXUM_CPYTHON
+          exit $LASTEXITCODE
+      - name: Reuse persisted configuration through the CMD launcher
+        shell: cmd
+        working-directory: Nexum Windows
+        run: diagnose-windows.cmd

@@ -1,4 +1,7 @@
 .venv/
+.venv-science/
+.windows-config.json
+pip-*/
 __pycache__/
 *.py[cod]
 .pytest_cache/

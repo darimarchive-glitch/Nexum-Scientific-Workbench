@@ -7,6 +7,7 @@ from urllib.error import HTTPError, URLError
 import json, math, re, time
 
 import numpy as np
+from nexum import chemistry_worker
 
 
 @dataclass
@@ -155,6 +156,8 @@ def parse_pdb(text,name="PDB"):
 
 
 def parse_mmcif(text,name="mmCIF"):
+    if chemistry_worker.configured():
+        return chemistry_worker.call("mmcif", text, name)
     try:
         import gemmi
     except Exception as exc:
@@ -488,6 +491,8 @@ def _rdkit_embed(mol,title,cid):
 
 
 def _rdkit_conformer_from_smiles(smiles,title,cid):
+    if chemistry_worker.configured():
+        return chemistry_worker.call("smiles", smiles, title, cid)
     try:
         from rdkit import Chem
     except Exception as exc:
@@ -496,6 +501,8 @@ def _rdkit_conformer_from_smiles(smiles,title,cid):
 
 
 def _rdkit_conformer_from_molblock(block,title,cid):
+    if chemistry_worker.configured():
+        return chemistry_worker.call("molblock", block, title, cid)
     try:
         from rdkit import Chem
     except Exception as exc:
@@ -511,11 +518,11 @@ def pubchem(identifier,cache:Path):
     title=props.get("Title") or str(identifier);p=cache/f"pubchem_{cid}_3d.sdf"
     txt=None
     if p.exists() and p.stat().st_size>=50:
-        txt=p.read_text(errors="replace")
+        txt=p.read_text(encoding="utf-8",errors="replace")
     else:
         try:
             txt=_get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/SDF?record_type=3d")
-            if len(txt)>=50:p.write_text(txt)
+            if len(txt)>=50:p.write_text(txt,encoding="utf-8")
         except HTTPError as exc:
             if exc.code!=404:raise
             txt=None
@@ -545,8 +552,8 @@ def rcsb(pdb_id,cache:Path):
     if not cif.exists() or cif.stat().st_size<100:
         txt=_get(f"https://files.rcsb.org/download/{pid}.cif",timeout=90)
         if len(txt)<100:raise RuntimeError("Resposta mmCIF vazia.")
-        cif.write_text(txt)
-    m=parse_mmcif(cif.read_text(errors="replace"),pid);m.source="RCSB PDB";m.identifier=pid
+        cif.write_text(txt,encoding="utf-8")
+    m=parse_mmcif(cif.read_text(encoding="utf-8",errors="replace"),pid);m.source="RCSB PDB";m.identifier=pid
     try:
         meta=json.loads(_get(f"https://data.rcsb.org/rest/v1/core/entry/{pid}",timeout=20));m.description=(meta.get("struct") or {}).get("title","");m.metadata["experimental_methods"]=[x.get("method") for x in (meta.get("exptl") or []) if x.get("method")]
     except Exception:pass

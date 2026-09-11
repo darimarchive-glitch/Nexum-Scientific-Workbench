@@ -235,8 +235,9 @@ Distribuído sob a [licença MIT](LICENSE), conforme definida pelo mantenedor ne
 
 **Nexum Scientific Workbench · Windows e Fedora · 6.6**
 
-Projeto de [DarimArchive](https://github.com/darimarchive-glitch)
+Projeto de [darimarchive-glitch](https://github.com/darimarchive-glitch)
 
 *Entradas explícitas. Modelos declarados. Resultados calculados.*
 
+copyright© 2026 [Davi P Souza](https://github.com/darimarchive-glitch)
 </div>

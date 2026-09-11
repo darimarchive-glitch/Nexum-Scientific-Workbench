@@ -231,7 +231,7 @@ Distribuído sob a [licença MIT](LICENSE), conforme definida pelo mantenedor ne
 
 <div align="center">
 
-<img src="docs/images/nexum-logo.jpg" alt="Logotipo do Nexum em formato de N com ligações moleculares" width="120">
+<img src="docs/images/logo-nexum.png" alt="Logotipo do Nexum em formato de N com ligações moleculares" width="120">
 
 **Nexum Scientific Workbench · Windows e Fedora · 6.6**
 

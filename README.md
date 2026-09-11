@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/images/nexum-banner.jpg" alt="Nexum Scientific Workbench — banner com identidade visual molecular em azul e turquesa" width="100%">
+<img src="docs/images/banner-nexum.png" alt="Nexum Scientific Workbench — banner com identidade visual molecular em azul e turquesa" width="100%">
 
 # Nexum · Scientific Workbench
 

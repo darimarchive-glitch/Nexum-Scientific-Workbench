@@ -2,7 +2,7 @@
   #define BundleDir "..\..\dist\Nexum"
 #endif
 #ifndef AppVersion
-  #define AppVersion "6.7.0"
+  #define AppVersion "6.8.0"
 #endif
 [Setup]
 AppId={{863F9039-AC62-4E2D-A848-E14474B9C09E}
@@ -18,6 +18,7 @@ OutputBaseFilename=Nexum-Setup-{#AppVersion}-x64
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
+SetupIconFile=..\..\build\icons\nexum.ico
 UninstallDisplayIcon={app}\Nexum.exe
 [Languages]
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
@@ -30,3 +31,4 @@ Name: "{autodesktop}\Nexum"; Filename: "{app}\Nexum.exe"; Tasks: desktopicon
 Name: "desktopicon"; Description: "Criar atalho na área de trabalho"; Flags: unchecked
 [Run]
 Filename: "{app}\Nexum.exe"; Description: "Abrir Nexum"; Flags: nowait postinstall skipifsilent
+

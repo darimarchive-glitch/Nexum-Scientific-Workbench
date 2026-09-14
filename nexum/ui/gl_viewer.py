@@ -49,6 +49,7 @@ uniform float u_fog_near;
 uniform float u_fog_far;
 uniform bool u_fog;
 uniform float u_alpha;
+uniform bool u_influence;
 uniform bool u_clip; uniform float u_clip_depth;
 out vec4 frag;
 void main(){
@@ -73,7 +74,15 @@ void main(){
     float depth = -eye_z;
     if(u_clip && depth<u_clip_depth)discard;
     if(u_fog){ float f=smoothstep(u_fog_near,u_fog_far,depth); c=mix(c,u_bg,f); }
-    frag=vec4(c,u_alpha);
+    float alpha=u_alpha;
+    if(u_influence){
+        float rim=smoothstep(0.55,0.98,rr);
+        bool dark=dot(u_bg,vec3(.2126,.7152,.0722))<.45;
+        vec3 outline=dark?vec3(.30,.78,.90):vec3(.06,.25,.38);
+        c=mix(c,outline,rim*.85);
+        alpha=mix(u_alpha,min(.90,u_alpha+.38),rim);
+    }
+    frag=vec4(c,alpha);
 }
 """
 LINE_VS = r"""
@@ -118,7 +127,7 @@ void main(){
   vec3 n=normalize(v_normal); if(!gl_FrontFacing)n=-n;
   vec3 light=normalize(vec3(-0.3,0.6,0.75));
   float d=.34+.66*max(0,dot(n,light)); vec3 c=v_color*d;
-  if(u_fog){float f=smoothstep(u_fog_near,u_fog_far,v_depth);c=mix(c,u_bg,f);} frag=vec4(c,1);
+  if(u_fog){float f=smoothstep(u_fog_near,u_fog_far,v_depth);c=mix(c,u_bg,f);} frag=vec4(c,u_alpha);
 }
 """
 
@@ -326,6 +335,7 @@ class GLMoleculeView(Gtk.GLArea):
         return model,view,proj
 
     def _uniform_common(self,prog,model,view,proj):
+        GL.glUniform1i(GL.glGetUniformLocation(prog,"u_influence"),0)
         GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),1.)
         GL.glUniform1i(GL.glGetUniformLocation(prog,"u_clip"),int(self.clip_enabled))
         GL.glUniform1f(GL.glGetUniformLocation(prog,"u_clip_depth"),float(self.distance*self.zoom+self.radius*(2*self.clip_fraction-1)))
@@ -392,6 +402,7 @@ class GLMoleculeView(Gtk.GLArea):
             eye=(view@model)
             order=np.argsort(influence@eye[2,:3]+eye[2,3],kind="stable")
             prog=self.programs["points"];GL.glUseProgram(prog);self._uniform_common(prog,model,view,proj)
+            GL.glUniform1i(GL.glGetUniformLocation(prog,"u_influence"),1)
             GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),self.influence_opacity)
             h=self._viewport_size()[1]
             GL.glUniform1f(GL.glGetUniformLocation(prog,"u_point_scale"),float(h/(2*math.tan(math.radians(self.fov_deg)/2))))
@@ -510,3 +521,4 @@ class GLMoleculeView(Gtk.GLArea):
             self.queue_render()
 
 def clamp_float(x,a,b):return max(a,min(b,x))
+

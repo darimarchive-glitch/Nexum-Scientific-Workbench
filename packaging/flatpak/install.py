@@ -14,5 +14,7 @@ with zipfile.ZipFile(target/'nexum.zip','w',zipfile.ZIP_DEFLATED) as archive:
     for path in stage.rglob('*.pyc'):
         if '__pycache__' not in path.parts:
             archive.write(path,path.relative_to(stage))
+    archive.write('nexum/assets/logo.svg','nexum/assets/logo.svg')
 shutil.copyfile('LICENSE',target/'LICENSE')
 shutil.copyfile('WHEELS.sha256',target/'WHEELS.sha256')
+

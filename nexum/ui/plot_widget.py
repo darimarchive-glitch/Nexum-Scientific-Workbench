@@ -13,7 +13,8 @@ class ScientificPlot(Gtk.DrawingArea):
     """
     def __init__(self):
         super().__init__()
-        self.data=None
+        self.data=None;self.on_point=None;self._bounds=None
+        click=Gtk.GestureClick.new();click.connect("released",self._clicked);self.add_controller(click)
         self.set_content_height(300)
         self.set_hexpand(True); self.set_vexpand(False)
         self.set_draw_func(self._draw)
@@ -31,7 +32,8 @@ class ScientificPlot(Gtk.DrawingArea):
     def _draw(self,area,cr,w,h):
         d=self.data
         if not d:return
-        left,right,top,bottom=62,22,30,48
+        legend_rows=(len(d.get("series",[]))+2)//3
+        left,right,top,bottom=62,22,30,48+legend_rows*20
         pw=max(10,w-left-right);ph=max(10,h-top-bottom)
         pts=[]
         for s in d.get('series',[]):
@@ -45,6 +47,7 @@ class ScientificPlot(Gtk.DrawingArea):
         # modest padding; preserve pH 0-14 if naturally present
         ypad=(ymax-ymin)*.05;ypad=ypad or 1
         ymin-=ypad;ymax+=ypad
+        self._bounds=(xmin,xmax,ymin,ymax,left,top,pw,ph)
         def xy(x,y):return left+(x-xmin)/(xmax-xmin)*pw, top+(1-(y-ymin)/(ymax-ymin))*ph
         cr.set_line_width(1);cr.set_source_rgba(.5,.5,.5,.22)
         cr.rectangle(left,top,pw,ph);cr.stroke()
@@ -57,7 +60,7 @@ class ScientificPlot(Gtk.DrawingArea):
         for si,s in enumerate(d.get('series',[])):
             color=palette[si%len(palette)];valid=[(float(x),float(y)) for x,y in s.get('points',[]) if math.isfinite(float(x)) and math.isfinite(float(y))]
             if not valid:continue
-            cr.set_source_rgba(*color);cr.set_line_width(2.2)
+            cr.set_source_rgba(*color);cr.set_line_width(2.2);cr.set_dash([6,3] if si%3==1 else [2,3] if si%3==2 else [])
             if not s.get('scatter'):
                 first=True
                 for x,y in valid:
@@ -68,8 +71,28 @@ class ScientificPlot(Gtk.DrawingArea):
             if s.get('scatter') or len(valid)<40:
                 for x,y in valid:
                     px,py=xy(x,y);cr.arc(px,py,2.7,0,2*math.pi);cr.fill()
+        cr.set_dash([])
+        for si,series in enumerate(d.get('series',[])):
+            lx=left+(si%3)*pw/3;ly=top+ph+43+(si//3)*20
+            cr.set_source_rgba(*palette[si%len(palette)]);cr.rectangle(lx,ly-8,10,3);cr.fill()
+            self._text(cr,lx+14,ly,series.get('name','')[:28],10)
         for m in d.get('markers',[]):
             x=float(m.get('x',0))
             if xmin<=x<=xmax:
                 px,_=xy(x,ymin);cr.set_source_rgba(.72,.28,.22,.72);cr.set_line_width(1.2);cr.move_to(px,top);cr.line_to(px,top+ph);cr.stroke();self._text(cr,min(px+4,w-130),top+15,m.get('label',''),10)
         self._text(cr,left,18,d.get('title',''),13,True);self._text(cr,left+pw/2-30,h-9,d.get('xlabel',''),11);self._text(cr,5,16,d.get('ylabel',''),10)
+
+
+    def _clicked(self,gesture,n,x,y):
+        if not self.on_point or not self._bounds:return
+        xmin,xmax,ymin,ymax,left,top,pw,ph=self._bounds
+        if left<=x<=left+pw and top<=y<=top+ph:
+            self.on_point(xmin+(x-left)/pw*(xmax-xmin),ymax-(y-top)/ph*(ymax-ymin))
+
+    def export(self,path,kind='svg'):
+        import cairo
+        if not self.data:raise ValueError('Nenhum gráfico para exportar.')
+        surface=cairo.SVGSurface(str(path),1200,720) if kind=='svg' else cairo.PDFSurface(str(path),1200,720)
+        cr=cairo.Context(surface)
+        dark=Adw.StyleManager.get_default().get_dark();bg=.105 if dark else 1.
+        cr.set_source_rgb(bg,bg,bg);cr.paint();self._draw(self,cr,1200,720);surface.finish()

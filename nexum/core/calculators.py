@@ -383,3 +383,6 @@ CALCS={
 
 from .additional_calculators import ADDITIONAL_CALCS
 CALCS.update(ADDITIONAL_CALCS)
+
+from .process_calculators import PROCESS_CALCS
+CALCS.update(PROCESS_CALCS)

@@ -21,7 +21,7 @@
         "python3 packaging/flatpak/install.py",
         "install -Dm755 packaging/flatpak/nexum /app/bin/nexum",
         "install -Dm644 packaging/flatpak/io.github.nexum.ScientificWorkbench.desktop /app/share/applications/io.github.nexum.ScientificWorkbench.desktop",
-        "install -Dm644 packaging/flatpak/io.github.nexum.ScientificWorkbench.svg /app/share/icons/hicolor/scalable/apps/io.github.nexum.ScientificWorkbench.svg"
+        "install -Dm644 nexum/assets/logo.svg /app/share/icons/hicolor/scalable/apps/io.github.nexum.ScientificWorkbench.svg"
       ],
       "sources": [
         {
@@ -32,3 +32,4 @@
     }
   ]
 }
+

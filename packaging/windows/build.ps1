@@ -10,6 +10,8 @@ function Checked([string]$Exe,[string[]]$Arguments) {
 }
 $gtkPython=Join-Path $MsysRoot 'ucrt64\bin\python.exe'
 $env:PATH="$(Join-Path $MsysRoot 'ucrt64\bin');$env:PATH"
+Checked $SciencePython @('-m','pip','install','CairoSVG==2.9.1','Pillow==12.3.0')
+Checked $SciencePython @('packaging/build_icons.py')
 Checked $SciencePython @('-m','PyInstaller','--noconfirm','--clean','--onedir','--name','NexumChemistry','--paths','.', '--collect-all','rdkit','--collect-all','gemmi','packaging/worker_entry.py')
 Checked $gtkPython @('-m','PyInstaller','--noconfirm','--clean','packaging/windows/desktop.spec')
 Copy-Item -Recurse -Force 'dist/NexumChemistry' 'dist/Nexum/chemistry'
@@ -44,3 +46,4 @@ try {
 } finally {
     $env:PATH=$buildSearchPath
 }
+

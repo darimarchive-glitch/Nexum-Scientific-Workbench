@@ -66,7 +66,7 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
         original_hook = sys.excepthook
         sys.excepthook = lambda *error: errors.append(error)
         try:
-            window.struct.viewer.set_molecule(molecule)
+            window.struct._apply_molecule(molecule)
             window.struct.influence.set_active(True)
             window.struct.influence_opacity.set_value(35)
             assert window.struct.viewer.show_influence
@@ -85,6 +85,30 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
             window.struct.viewer.make_current()
             assert GL.glGetError() == GL.GL_NO_ERROR
             print("OpenGL:", GL.glGetString(GL.GL_VERSION), flush=True)
+            from nexum.core.molecular_analysis import molecular_surface
+            from nexum.ui.session_actions import snapshot,restore
+            output=Path("build/visual-checks");output.mkdir(parents=True,exist_ok=True)
+            viewer=window.struct.viewer
+            viewer.set_dark(False);viewer.export_png(output/"vdw-light.png")
+            viewer.set_dark(True);viewer.export_png(output/"vdw-dark.png")
+            viewer.surface_mesh=molecular_surface(molecule,"vdw",resolution=24)
+            viewer.clip_enabled=True;viewer.export_png(output/"surface-cut.png")
+            viewer.make_current();assert GL.glGetError()==GL.GL_NO_ERROR
+            panel=window.struct.analysis;panel.mode.set_selected(1);panel.selected(0);panel.selected(1)
+            assert "Distância" in panel.result.get_text()
+            window.analysis.mode.set_selected(1);window.analysis.simulate();window.analysis.analyze()
+            assert "Concentração" in window.analysis.report.get_text()
+            window.analysis.plot.export(output/"calibration.svg")
+            state=snapshot(window);restore(window,state)
+            assert window.struct.viewer.surface_mesh is not None
+            assert window.analysis.dataset["origin"]=="Simulado"
+            window.analysis.mode.set_selected(3);window.analysis.analyze()
+            assert window.analysis.tertiary.data
+            from nexum.branding import APP_ID
+            assert Gtk.IconTheme.get_for_display(Gdk.Display.get_default()).has_icon(APP_ID)
+            if errors:raise RuntimeError("Falha no fluxo integrado") from errors[0][1]
+            print("Medições/superfícies/PNG/SVG/calibração/titulação/sessão/logo: OK",flush=True)
+
             window.struct.influence.set_active(False)
             assert not window.struct.viewer.show_influence
             assert len(window.struct.viewer.scene["influence_pos"]) == 0
@@ -96,3 +120,4 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
 
 if __name__ == "__main__":
     main()
+

@@ -85,6 +85,8 @@ class StructurePage(Gtk.Box):
         chain_group=Adw.PreferencesGroup(title="Cadeias");self.chain_box=Gtk.FlowBox();self.chain_box.set_selection_mode(Gtk.SelectionMode.NONE);self.chain_box.set_column_spacing(6);self.chain_box.set_row_spacing(6);chain_group.add(self.chain_box);box.append(chain_group)
         sel_group=Adw.PreferencesGroup(title="Seleção");self.atom_info=Adw.ActionRow(title="Clique em um átomo",subtitle="Elemento, resíduo e cadeia aparecerão aqui.");sel_group.add(self.atom_info);box.append(sel_group)
         info=Adw.PreferencesGroup(title="Método");method=Adw.ActionRow(title="Macromoléculas",subtitle="mmCIF → backbone CA/P → fita 3D nativa; ligantes renderizados separadamente.");method.set_subtitle_lines(3);info.add(method);box.append(info)
+        from .molecular_tools import MolecularTools
+        self.analysis=MolecularTools(self);box.append(self.analysis)
         sw.set_child(box);return sw
 
     def _source_changed(self,*_):
@@ -129,6 +131,7 @@ class StructurePage(Gtk.Box):
             GLib.idle_add(self._apply_molecule,mol)
         except Exception as exc:GLib.idle_add(self.window.toast,f"Não foi possível carregar a estrutura: {exc}")
     def _apply_molecule(self,mol):
+        self.analysis.reset()
         self.empty.set_visible(False);self.title.set_text(mol.name);md=mol.metadata;kind="Macromolécula / complexo" if md.get("polymer_backbone_atoms",0)>2 else "Molécula"
         self.meta.set_text(f"{kind}\n{len(mol.atoms):,} átomos · {md.get('residue_count',0)} resíduos · {md.get('chain_count',0)} cadeias".replace(",","."))
         self.provenance_text.set_text(f"Fonte: {mol.source}\nIdentificador: {mol.identifier}\n{mol.description}")
@@ -148,6 +151,7 @@ class StructurePage(Gtk.Box):
     def _viewer_options_changed(self,*_):
         rep=REPRESENTATIONS[self.rep.get_selected()][1];self.viewer.configure(representation=rep,show_hydrogens=self.hydrogen.get_active(),show_ligands=self.ligands.get_active(),fog=self.fog.get_active())
     def _atom_selected(self,idx,a):
+        self.analysis.selected(idx)
         title=f"{a.element} · {a.name or 'átomo'}";sub=f"{a.residue} {a.residue_id} · cadeia {a.chain}" if a.residue else f"índice {idx+1}";self.atom_info.set_title(title);self.atom_info.set_subtitle(sub)
 
     def _import_file(self,*_):
@@ -163,4 +167,5 @@ class StructurePage(Gtk.Box):
         self.search_area.set_visible(not self._fullscreen);self.inspector.set_visible(not self._fullscreen)
         if self._fullscreen:self.window.fullscreen();self.full_btn.set_icon_name("view-restore-symbolic")
         else:self.window.unfullscreen();self.full_btn.set_icon_name("view-fullscreen-symbolic")
+
 

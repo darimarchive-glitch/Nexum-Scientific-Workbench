@@ -22,6 +22,7 @@ jobs:
       - run: 'python -m pip install --only-binary=:all: -r requirements.txt'
       - run: python -m unittest discover -s tests -v
       - run: python -m compileall -q nexum
+      - run: python scripts/update_catalog.py --check
   windows-desktop:
     runs-on: windows-latest
     timeout-minutes: 30
@@ -54,3 +55,10 @@ jobs:
         shell: cmd
         working-directory: Nexum Windows
         run: diagnose-windows.cmd
+
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Nexum-visual-checks
+          path: Nexum Windows/build/visual-checks/*
+          if-no-files-found: error

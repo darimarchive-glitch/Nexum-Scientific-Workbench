@@ -95,3 +95,14 @@ TOOL_SCOPE.update({
  'spectral_units':('QUANTITATIVO','Conversões no vácuo com constantes SI definidas.'),
  'mass_spectrum':('QUANTITATIVO','Mesmo íon e carga; resolução definida por FWHM.'),
 })
+
+
+TOOLS += [
+('pipe_loss','industrial','Perda de carga em tubulações','Darcy–Weisbach, Reynolds e Haaland',[F('rho','Densidade (kg/m³)','1000'),F('mu','Viscosidade (Pa·s)','0.001'),F('diam','Diâmetro interno (m)','0.05'),F('length','Comprimento (m)','10'),F('velocity','Velocidade média (m/s)','1'),F('rough','Rugosidade absoluta (m)','0.00001')]),
+('exchanger','industrial','Trocador de calor em contracorrente','Diferença média logarítmica e potência térmica',[F('hot_in','T quente entrada (°C)','100'),F('hot_out','T quente saída (°C)','60'),F('cold_in','T fria entrada (°C)','20'),F('cold_out','T fria saída (°C)','40'),F('u','U (W/m²·K)','500'),F('area','Área (m²)','2')]),
+('chromatography','spectro','Resolução cromatográfica','Retenção, seletividade e separação entre picos',[F('dead','Tempo morto (min)','1'),F('first','tR primeiro pico (min)','4'),F('second','tR segundo pico (min)','5'),F('w1','Largura na base 1 (min)','0.5'),F('w2','Largura na base 2 (min)','0.6')]),
+]
+TOOL_SCOPE.update({key:('MODELO',note) for key,note in {
+'pipe_loss':'Darcy–Weisbach; laminar ou Haaland turbulento; sem transição nem perdas localizadas.',
+'exchanger':'Contracorrente ideal, coeficiente global constante e F=1.',
+'chromatography':'Larguras na base e tempos na mesma unidade; sem identificação química.'}.items()})

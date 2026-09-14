@@ -15,3 +15,9 @@ htmlcov/
 *.db
 *.log
 .DS_Store
+
+
+# Desktop distribution intermediates
+/build/
+/dist/
+*.spec.bak

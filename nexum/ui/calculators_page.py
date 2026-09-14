@@ -74,7 +74,9 @@ class CalculatorPage(Gtk.Box):
         result=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=12);result.set_margin_start(16);result.set_margin_top(4);result.set_margin_bottom(16)
         rg=Adw.PreferencesGroup(title='Resultado');self.value=Gtk.Label(label='—',xalign=0);self.value.add_css_class('numeric-result');self.value.set_selectable(True);self.value.set_wrap(True);rg.add(self.value);result.append(rg)
         dg=Adw.PreferencesGroup(title='Desenvolvimento, unidades e hipóteses');self.details=Gtk.Label(label='Calcule para ver o desenvolvimento.',xalign=0);self.details.set_selectable(True);self.details.set_wrap(True);self.details.set_wrap_mode(2);self.details.add_css_class('monospace');dg.add(self.details);result.append(dg)
-        self.plot=ScientificPlot();self.plot.set_visible(False);result.append(self.plot)
+        self.plots=[ScientificPlot() for _ in range(3)]
+        for chart in self.plots:chart.set_visible(False);result.append(chart)
+        self.plot=self.plots[0]
         copy=Gtk.Button(label='Copiar resultado',icon_name='edit-copy-symbolic');copy.set_halign(Gtk.Align.START);copy.connect('clicked',self._copy);result.append(copy);result_sw.set_child(result)
         self.paned.set_start_child(form_sw);self.paned.set_end_child(result_sw);self.paned.set_position(470)
 
@@ -87,10 +89,15 @@ class CalculatorPage(Gtk.Box):
         return out
     def _calculate(self,*_):
         try:
-            data=self._getdata();r=CALCS[self.tool[0]](data);self.value.set_text(r.value);self.details.set_text(r.details);self.plot.set_plot((r.data or {}).get('plot'));self.history.add(self.tool[0],data,{'value':r.value,'data':r.data or {}});self.window.toast('Cálculo concluído')
+            data=self._getdata();r=CALCS[self.tool[0]](data);self.value.set_text(r.value);self.details.set_text(r.details);self._set_plots(r.data or {});self.history.add(self.tool[0],data,{'value':r.value,'data':r.data or {}});self.window.toast('Cálculo concluído')
         except Exception as exc:self.window.toast(f'Entrada ou modelo inválido: {exc}')
+    def _set_plots(self,data):
+        graphs=data.get("plots") or [data.get("plot")]
+        for i,chart in enumerate(self.plots):chart.set_plot(graphs[i] if i<len(graphs) else None)
+
     def _clear(self,*_):
         for row,_ in self.inputs.values():
             if isinstance(row,Adw.EntryRow):row.set_text('')
     def _copy(self,*_):
         Gdk.Display.get_default().get_clipboard().set((self.value.get_text()+'\n\n'+self.details.get_text()).strip());self.window.toast('Resultado copiado')
+

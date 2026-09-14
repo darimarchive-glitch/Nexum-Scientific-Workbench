@@ -69,6 +69,17 @@ CONFIGS = {
 }
 
 
+CONFIGS.update({
+ 'cstr': [('volume_l','Volume (L)','10'),('flow_l_s','Vazão (L/s)','1'),
+          ('feed_m','Concentração de entrada (mol/L)','1'),('initial_m','Concentração inicial (mol/L)','0'),
+          ('k_s','k (s⁻¹)','0.1'),('duration_s','Duração (s)','40')],
+ 'spectro_kinetics': [('concentration0_m','Concentração inicial (mol/L)','0.002'),
+          ('k_s','k (s⁻¹)','0.0693147'),('epsilon_l_mol_cm','ε (L mol⁻¹ cm⁻¹)','100'),
+          ('path_length_cm','Caminho óptico (cm)','1'),('incident','Intensidade incidente','1'),
+          ('duration_s','Duração (s)','40')],
+})
+
+
 def default_config(experiment_id):
     return {key: ("strong-strong" if key == "mode" else value[0])
             if isinstance(value, tuple) else float(value)
@@ -154,7 +165,14 @@ class ExperimentSession:
 
     def _sample(self, t):
         c, eid = self.config, self.exp.id
-        if eid == "gas":
+        if eid == "cstr":
+            from .process_models import cstr_startup
+            s=cstr_startup(**{k:v for k,v in c.items() if k!='duration_s'},time_s=t)
+        elif eid == "spectro_kinetics":
+            s=first_order_state(concentration0_m=c['concentration0_m'],k_s=c['k_s'],time_s=t)
+            s.update(beer_lambert_state(epsilon_l_mol_cm=c['epsilon_l_mol_cm'],
+                concentration_m=s['concentration_m'],path_length_cm=c['path_length_cm'],incident=c['incident']))
+        elif eid == "gas":
             s = ideal_gas_path(**c, time_s=t)
         elif eid == "titration":
             v = min(c["max_volume_ml"], c["flow_ml_s"] * t)
@@ -200,14 +218,14 @@ class ExperimentSession:
         if eid == "titration":
             return s["base_added_ml"], s["ph"]
         key = {"gas": "pressure_bar", "electro": "e_rev_v", "calorimetry": "temperature_c",
-               "kinetics": "concentration_m", "nuclear": "remaining"}[eid]
+               "kinetics": "concentration_m", "nuclear": "remaining", "cstr":"concentration_m", "spectro_kinetics":"absorbance"}[eid]
         return None if s[key] is None else (s["time_s"], s[key])
 
     def _build_curve(self):
         eid, c = self.exp.id, self.config
         self.ylabel = {"gas": "P / bar", "titration": "pH", "electro": "E reversível / V",
                        "calorimetry": "T / °C", "haber": "Quantidade / mol", "spectro": "Absorbância A",
-                       "kinetics": "[A] / mol L⁻¹", "nuclear": "N esperado"}[eid]
+                       "kinetics": "[A] / mol L⁻¹", "nuclear": "N esperado", "cstr":"C / mol L⁻¹", "spectro_kinetics":"Absorbância A"}[eid]
         if eid == "haber":
             self.xlabel = "Composição inicial e no equilíbrio"
             return
@@ -268,7 +286,15 @@ class ExperimentSession:
         s, c, eid = self.state, self.config, self.exp.id
         n = number
         metrics = [("Tempo", n(self.elapsed)+" s")] if self.dynamic else []
-        if eid == "gas":
+        if eid == "cstr":
+            metrics += [('Concentração no tanque',n(s['concentration_m'])+' mol/L'),
+                        ('Regime permanente',n(s['steady_m'])+' mol/L'),('Constante de tempo',n(s['time_constant_s'])+' s')]
+            guide='A alimentação e a saída mantêm o volume constante. A concentração converge para o equilíbrio entre escoamento e consumo químico, que é um regime permanente e não um equilíbrio químico.'
+        elif eid == "spectro_kinetics":
+            metrics += [('Concentração',n(s['concentration_m'])+' mol/L'),('Absorbância',n(s['absorbance'])),
+                        ('Transmitância',n(100*s['transmittance'])+' %')]
+            guide='O reagente é consumido e a absorbância diminui exponencialmente. O produto é considerado transparente no comprimento de onda escolhido.'
+        elif eid == "gas":
             metrics += [("Volume", n(s["volume_l"])+" L"), ("Pressão", n(s["pressure_bar"])+" bar"),
                         ("Trabalho pelo gás", n(s["work_by_gas_j"])+" J")]
             guide = "A temperatura permanece constante. Ao diminuir o volume, a pressão aumenta; ao expandir, ela diminui."
@@ -320,3 +346,4 @@ class ExperimentSession:
                         ("Atividade esperada", n(s["activity_bq"])+" Bq"), ("Meias-vidas decorridas", n(self.elapsed/c["half_life_s"]))]
             guide = "O painel representa uma população virtual: marcas coloridas são núcleos restantes e marcas cinza são transformados. Cada marca resume 1% de N₀. A curva mostra a média esperada, sem prever eventos individuais."
         return metrics, guide
+

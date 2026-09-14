@@ -87,6 +87,14 @@ EXPERIMENTS = [
         ("Modelo estatístico macroscópico.", "A animação não tenta prever qual núcleo individual decai."),
     ),
 ]
+EXPERIMENTS += [
+    ExperimentDefinition('cstr','Partida de reator CSTR','Alimentação e reação de primeira ordem em tanque agitado','dynamic',
+        'dC/dt = (Q/V)(Centrada−C) − kC',
+        ('Mistura perfeita; volume e vazão constantes.', 'Reação irreversível isotérmica de primeira ordem.')),
+    ExperimentDefinition('spectro_kinetics','Cinética por espectrofotometria','Acompanhe a absorbância durante uma reação','dynamic',
+        'C(t)=C₀exp(−kt); A(t)=εbC(t)',
+        ('Somente o reagente absorve no comprimento de onda escolhido.', 'Beer–Lambert linear; sem ruído instrumental; temperatura constante.')),
+]
 EXPERIMENT_BY_ID = {x.id: x for x in EXPERIMENTS}
 
 
@@ -323,3 +331,4 @@ def run_benchmarks():
         "nuclear_fraction": nuc["fraction_remaining"],
         "haber_log10_kp_298": hab["log10_kp"],
     }
+

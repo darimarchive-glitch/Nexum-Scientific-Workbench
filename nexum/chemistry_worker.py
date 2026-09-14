@@ -12,27 +12,31 @@ import sys
 
 
 def configured():
-    return bool(os.environ.get("NEXUM_CHEMISTRY_PYTHON"))
+    return bool(os.environ.get("NEXUM_CHEMISTRY_PYTHON") or os.environ.get("NEXUM_CHEMISTRY_EXECUTABLE"))
 
 
 def call(operation, *args):
     from nexum.core.structures import Atom, Molecule
 
     env = os.environ.copy()
-    executable = env.pop("NEXUM_CHEMISTRY_PYTHON")
+    bundled = env.pop("NEXUM_CHEMISTRY_EXECUTABLE", None)
+    executable = bundled or env.pop("NEXUM_CHEMISTRY_PYTHON")
+    env.pop("NEXUM_CHEMISTRY_PYTHON", None)
+    # A frozen child needs its own PyInstaller runtime, not the parent GTK bundle.
+    env["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
     # Do not inject the MinGW interpreter's Python modules into CPython.
     for key in ("PYTHONHOME", "PYTHONPATH"):
         env.pop(key, None)
     try:
         result = subprocess.run(
-            [executable, "-I", str(Path(__file__).resolve())],
+            [executable] if bundled else [executable, "-I", str(Path(__file__).resolve())],
             input=json.dumps({"operation": operation, "args": args}, ensure_ascii=False),
             capture_output=True, text=True, encoding="utf-8", env=env,
             timeout=180, check=False,
             creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
-        raise RuntimeError("Não foi possível executar o motor químico. Execute install-windows.cmd novamente.") from exc
+        raise RuntimeError("Não foi possível executar o motor químico. Reinstale o Nexum ou confira o diagnóstico da instalação.") from exc
     try:
         response = json.loads(result.stdout)
     except ValueError as exc:
@@ -46,10 +50,12 @@ def call(operation, *args):
 
 def main():
     # -I disables cwd imports; use only the source tree containing this worker.
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    if not getattr(sys, "frozen", False):
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     sys.stdin.reconfigure(encoding="utf-8")
     sys.stdout.reconfigure(encoding="utf-8")
     os.environ.pop("NEXUM_CHEMISTRY_PYTHON", None)
+    os.environ.pop("NEXUM_CHEMISTRY_EXECUTABLE", None)
     from nexum.core import structures
     operations = {
         "mmcif": structures.parse_mmcif,
@@ -68,3 +74,4 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

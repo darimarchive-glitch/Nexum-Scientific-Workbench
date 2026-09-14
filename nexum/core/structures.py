@@ -392,9 +392,14 @@ def _post_json(url,payload,timeout=35):
     with urlopen(req,timeout=timeout) as r:return json.loads(r.read().decode())
 
 
+from .molecule_names import exact_compound, local_candidates, display_name
+
+
 def resolve_pubchem_cid(identifier):
     raw=str(identifier).strip()
     if raw.isdigit():return raw
+    local = exact_compound(raw)
+    if local:return local[0]
     data=json.loads(_get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{quote(raw)}/cids/JSON"))
     cids=data.get("IdentifierList",{}).get("CID",[])
     if not cids:raise ValueError(f"Nenhum CID do PubChem corresponde a ‘{raw}’.")
@@ -403,21 +408,29 @@ def resolve_pubchem_cid(identifier):
 
 def pubchem_suggestions(term,limit=4):
     term=term.strip()
-    if len(term)<2:return []
-    data=json.loads(_get(f"https://pubchem.ncbi.nlm.nih.gov/rest/autocomplete/compound/{quote(term)}/json?limit={int(max(limit,4))}"))
+    if len(term)<2 or limit<=0:return []
+    out=[StructureSuggestion("PubChem",cid,title,f"CID {cid} · {formula}")
+         for cid,title,formula,_ in local_candidates(term,limit)]
+    # Exact localized identifiers need no autocomplete round-trip.
+    if exact_compound(term):return out
+    seen={x.identifier for x in out}
+    try:
+        data=json.loads(_get(f"https://pubchem.ncbi.nlm.nih.gov/rest/autocomplete/compound/{quote(term)}/json?limit={int(max(limit,4))}"))
+    except Exception:
+        if out:return out
+        raise
     names=data.get("dictionary_terms",{}).get("compound",[])[:max(limit,4)]
-    out=[];seen=set()
-    # Resolve suggestions to canonical CIDs before exposing them to the UI. This
-    # prevents the selected autocomplete text from becoming a second ambiguous name lookup.
     for n in names:
         if len(out)>=limit:break
         try:
             cid=resolve_pubchem_cid(n)
             if cid in seen:continue
             props=_pubchem_properties(cid)
-            title=props.get("Title") or n
+            original=props.get("Title") or n
             formula=props.get("MolecularFormula") or ""
-            out.append(StructureSuggestion("PubChem",cid,title,f"CID {cid}"+(f" · {formula}" if formula else "")))
+            title=display_name(cid,original,formula)
+            subtitle=f"CID {cid}"+(f" · {formula}" if formula else "")+f" · Nome original: {original}"
+            out.append(StructureSuggestion("PubChem",cid,title,subtitle))
             seen.add(cid)
         except Exception:
             continue
@@ -451,6 +464,7 @@ def suggestions(term,source="Todos",limit=4):
     if source.startswith("PubChem"):return pubchem_suggestions(term,limit)
     if source.startswith("RCSB"):return rcsb_suggestions(term,limit)
     q=term.strip().lower()
+    if exact_compound(term):return pubchem_suggestions(term,limit)
     # Biological/macromolecular wording is deliberately routed to RCSB first.
     macro_words=("protein","proteína","enzyme","enzima","hemo","hemoglo","hemoglobin","hemoglobina","dna","rna","ribosom","antibody","anticorpo","receptor","kinase","quinase")
     macro_hint=bool(re.fullmatch(r"[a-z0-9]{4}",q)) or any(k in q for k in macro_words)
@@ -464,10 +478,13 @@ def suggestions(term,source="Todos",limit=4):
 
 
 def _pubchem_properties(cid):
-    props="Title,MolecularFormula,IsomericSMILES,CanonicalSMILES"
+    props="Title,MolecularFormula,ConnectivitySMILES,SMILES"
     data=json.loads(_get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/property/{props}/JSON"))
     rows=data.get("PropertyTable",{}).get("Properties",[])
-    return rows[0] if rows else {}
+    row=rows[0] if rows else {}
+    row.setdefault("IsomericSMILES",row.get("SMILES"))
+    row.setdefault("CanonicalSMILES",row.get("ConnectivitySMILES"))
+    return row
 
 
 def _rdkit_embed(mol,title,cid):
@@ -515,7 +532,7 @@ def pubchem(identifier,cache:Path):
     cache.mkdir(parents=True,exist_ok=True);cid=resolve_pubchem_cid(identifier);props={}
     try:props=_pubchem_properties(cid)
     except Exception:pass
-    title=props.get("Title") or str(identifier);p=cache/f"pubchem_{cid}_3d.sdf"
+    title=display_name(cid,props.get("Title", ""),props.get("MolecularFormula", ""));p=cache/f"pubchem_{cid}_3d.sdf"
     txt=None
     if p.exists() and p.stat().st_size>=50:
         txt=p.read_text(encoding="utf-8",errors="replace")
@@ -527,20 +544,20 @@ def pubchem(identifier,cache:Path):
             if exc.code!=404:raise
             txt=None
     if txt and len(txt)>=50:
-        m=parse_sdf(txt,title);m.source="PubChem";m.identifier=cid;m.description=props.get("MolecularFormula","");m.metadata.update({"conformer":"PubChem 3D"});return m
+        m=parse_sdf(txt,title);m.source="PubChem";m.identifier=cid;m.description=props.get("MolecularFormula","")+" · Nome original: "+props.get("Title",str(identifier));m.metadata.update({"conformer":"PubChem 3D"});return m
     smiles=props.get("IsomericSMILES") or props.get("CanonicalSMILES")
     if not smiles:
         try:
             props=_pubchem_properties(cid);smiles=props.get("IsomericSMILES") or props.get("CanonicalSMILES")
         except Exception:pass
     if smiles:
-        m=_rdkit_conformer_from_smiles(smiles,title,cid);m.description=props.get("MolecularFormula","");return m
+        m=_rdkit_conformer_from_smiles(smiles,title,cid);m.description=props.get("MolecularFormula","")+" · Nome original: "+props.get("Title",str(identifier));return m
     # A minority of PubChem records have no useful SMILES/3-D record (notably
     # some salts/coordination records).  A 2-D SDF still contains connectivity,
     # which RDKit can use as the input graph for a local 3-D conformer.
     try:
         block2d=_get(f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/SDF?record_type=2d")
-        m=_rdkit_conformer_from_molblock(block2d,title,cid);m.description=props.get("MolecularFormula","");return m
+        m=_rdkit_conformer_from_molblock(block2d,title,cid);m.description=props.get("MolecularFormula","")+" · Nome original: "+props.get("Title",str(identifier));return m
     except Exception as exc:
         raise RuntimeError("O PubChem não forneceu um conformador 3D e não foi possível gerar um conformador local a partir deste registro.") from exc
 
@@ -558,3 +575,4 @@ def rcsb(pdb_id,cache:Path):
         meta=json.loads(_get(f"https://data.rcsb.org/rest/v1/core/entry/{pid}",timeout=20));m.description=(meta.get("struct") or {}).get("title","");m.metadata["experimental_methods"]=[x.get("method") for x in (meta.get("exptl") or []) if x.get("method")]
     except Exception:pass
     return m
+

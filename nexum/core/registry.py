@@ -79,3 +79,19 @@ TOOL_SCOPE = {
     'ethanol': ('MODELO', 'Balanço ideal em equivalente de glicose e eficiência informada.'),
     'brix': ('MODELO', '°Brix tratado como fração mássica idealizada de sólidos solúveis.'),
 }
+
+
+TOOLS += [
+('titration_derivatives','sto','Derivadas da titulação','Dados experimentais, primeira e segunda derivadas',[F('points','Volume (mL),pH; use ponto decimal','20,2.65;23,3.05;24,3.39;24.5,3.69;25,7;25.5,10.99;26,11.29;27,11.59;30,11.96')]),
+('combustion','industrial','Combustão de hidrocarbonetos','Ar teórico, excesso de ar e composição de saída',[F('carbon','Átomos de C','8'),F('hydrogen','Átomos de H','18'),F('feed_kg_h','Alimentação (kg/h)','1700'),F('conversion','Conversão (%)','72'),F('excess_air','Excesso de ar (%)','20')]),
+('reactor','industrial','Dimensionamento CSTR e PFR','Reatores ideais de primeira ordem',[F('k','k (s⁻¹)','0.1'),F('flow','Vazão (L/s)','2'),F('conversion','Conversão (%)','80')]),
+('spectral_units','spectro','Conversão de unidades espectrais','Comprimento de onda, número de onda e energia',[F('wavelength_nm','Comprimento de onda no vácuo (nm)','500')]),
+('mass_spectrum','spectro','Espectrometria de massas','Erro em ppm e poder de resolução',[F('reference','m/z de referência (Th)','195.0877'),F('observed','m/z observado (Th)','195.0880'),F('width','Largura FWHM (Th)','0.002')]),
+]
+TOOL_SCOPE.update({
+ 'titration_derivatives':('NUMÉRICO','Diferenças divididas; derivação amplifica ruído; inflexão não certifica equivalência.'),
+ 'combustion':('MODELO','Hidrocarboneto puro; fração convertida queima a CO₂ e H₂O; ar seco 21/79.'),
+ 'reactor':('MODELO','Reação de primeira ordem; regime permanente; densidade e temperatura constantes.'),
+ 'spectral_units':('QUANTITATIVO','Conversões no vácuo com constantes SI definidas.'),
+ 'mass_spectrum':('QUANTITATIVO','Mesmo íon e carga; resolução definida por FWHM.'),
+})

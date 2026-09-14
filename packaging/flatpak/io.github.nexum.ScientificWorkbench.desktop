@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Nexum Scientific Workbench
+Comment=Calculadoras, estruturas moleculares e experimentos de química
+Exec=nexum
+Icon=io.github.nexum.ScientificWorkbench
+Terminal=false
+Categories=Education;Science;Chemistry;
+StartupNotify=true

@@ -404,6 +404,26 @@ class LaboratoryDrawing:
         self.text(482, 332, "B: "+number(s["product_m"])+" mol/L", 14, width=250)
         self.text(462, 379, "t½ = "+number(s["half_life_s"])+" s", 19, BLUE, True, width=270)
 
+    def _spectro_kinetics(self, session, running):
+        from types import SimpleNamespace
+        view=SimpleNamespace(state=session.state,config={**session.config,'concentration_m':session.state['concentration_m']})
+        self._spectro(view,running)
+
+    def _cstr(self, session, running):
+        s,c=session.state,session.config
+        self.text(44,48,'REATOR CONTÍNUO · MISTURA PERFEITA',13,self.muted,True)
+        self.rect(275,110,245,225,stroke=self.edge,radius=12)
+        scale=max(c['feed_m'],c['initial_m'],1e-12)
+        self.rect(280,175,235,155,fill=(.15,.49,.86,.1+.5*min(1,s['concentration_m']/scale)))
+        self.arrow((95,170),(275,170),BLUE,3)
+        self.arrow((520,290),(705,290),BLUE,3)
+        self.line([(398,85),(398,260)],self.edge,4)
+        self.line([(355,260),(440,260)],self.edge,5)
+        self.text(175,130,'Entrada: '+number(c['feed_m'])+' mol/L',14,align='center',width=230)
+        self.text(660,335,'Saída: '+number(s['concentration_m'])+' mol/L',14,align='center',width=230)
+        self.text(397,365,'V = '+number(c['volume_l'])+' L · Q = '+number(c['flow_l_s'])+' L/s',16,align='center')
+        self.text(400,400,'A cor representa concentração; o volume permanece constante.',12,self.muted,align='center')
+
     def _nuclear(self, session, running):
         s, c = session.state, session.config
         self.text(44, 48, "POPULAÇÃO VIRTUAL · DECAIMENTO", 13, self.muted, True)
@@ -515,3 +535,4 @@ class LaboratoryDrawing:
                 self.rect(left, yy, (right-left)*value/maximum, 12, fill=color[:3]+(alpha,), radius=2)
                 self.text(left-7, yy+10, "inicial" if j == 0 else "eq.", 10, self.muted, align="right")
                 self.text(right+10, yy+11, number(value)+" mol", 11, self.muted, width=85)
+

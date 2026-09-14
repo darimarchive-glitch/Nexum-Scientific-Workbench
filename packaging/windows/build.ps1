@@ -26,3 +26,21 @@ if ($check.ExitCode -ne 0) {
 $iscc=(Get-Command ISCC.exe -ErrorAction SilentlyContinue)
 if ($iscc) { $compiler=$iscc.Source } else { $compiler="${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" }
 Checked $compiler @("/DBundleDir=$root\dist\Nexum",'packaging/windows/nexum.iss')
+
+# Install the produced setup and exercise the installed copy without MSYS2
+# or Python on PATH, matching an end user's launch environment.
+$setupFiles=@(Get-ChildItem -LiteralPath 'dist/installer' -Filter 'Nexum-Setup-*-x64.exe')
+if ($setupFiles.Count -ne 1) { throw 'Expected exactly one generated installer.' }
+$installDir=Join-Path $root 'build/installed Nexum'
+$install=Start-Process -FilePath $setupFiles[0].FullName -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',('/DIR="{0}"' -f $installDir)) -Wait -PassThru
+if ($install.ExitCode -ne 0) { throw "Installer failed: $($install.ExitCode)" }
+$buildSearchPath=$env:PATH
+try {
+    $env:PATH="$env:SystemRoot\System32;$env:SystemRoot"
+    $env:NEXUM_SELF_TEST_LOG=Join-Path $root 'build/installed-self-test.log'
+    $installed=Start-Process -FilePath (Join-Path $installDir 'Nexum.exe') -WorkingDirectory $installDir -ArgumentList '--self-test' -Wait -PassThru
+    if (Test-Path $env:NEXUM_SELF_TEST_LOG) { Get-Content $env:NEXUM_SELF_TEST_LOG }
+    if ($installed.ExitCode -ne 0) { throw "Installed application self-test failed: $($installed.ExitCode)" }
+} finally {
+    $env:PATH=$buildSearchPath
+}

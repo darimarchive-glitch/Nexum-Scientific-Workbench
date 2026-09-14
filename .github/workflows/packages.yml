@@ -52,12 +52,12 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y flatpak flatpak-builder xvfb
+      - run: sudo apt-get update && sudo apt-get install -y flatpak flatpak-builder xvfb dbus-x11
       - run: bash packaging/flatpak/build.sh
       - name: Install and test the actual Flatpak bundle
         run: |
           flatpak install --user --noninteractive dist/Nexum-x86_64.flatpak
-          xvfb-run -a flatpak run --command=python3 io.github.nexum.ScientificWorkbench -c "import sys; sys.path.insert(0, '/app/share/nexum/nexum.zip'); from nexum.windows_check import main; main()"
+          dbus-run-session -- xvfb-run -a flatpak run --command=python3 io.github.nexum.ScientificWorkbench -u -X faulthandler -c "import sys; sys.path.insert(0, '/app/share/nexum/nexum.zip'); from nexum.windows_check import main; main()"
       - uses: actions/upload-artifact@v4
         with:
           name: Nexum-Linux-flatpak

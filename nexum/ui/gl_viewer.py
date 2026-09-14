@@ -49,6 +49,7 @@ uniform float u_fog_near;
 uniform float u_fog_far;
 uniform bool u_fog;
 uniform float u_alpha;
+uniform bool u_clip; uniform float u_clip_depth;
 out vec4 frag;
 void main(){
     vec2 q = gl_PointCoord*2.0-1.0;
@@ -70,6 +71,7 @@ void main(){
     gl_FragDepth = clamp(ndc_z*0.5+0.5,0.0,1.0);
 
     float depth = -eye_z;
+    if(u_clip && depth<u_clip_depth)discard;
     if(u_fog){ float f=smoothstep(u_fog_near,u_fog_far,depth); c=mix(c,u_bg,f); }
     frag=vec4(c,u_alpha);
 }
@@ -89,8 +91,9 @@ LINE_FS = r"""
 #version 330 core
 in vec3 v_color; in float v_depth;
 uniform vec3 u_bg; uniform float u_fog_near; uniform float u_fog_far; uniform bool u_fog;
+uniform bool u_clip; uniform float u_clip_depth;
 out vec4 frag;
-void main(){ vec3 c=v_color; if(u_fog){float f=smoothstep(u_fog_near,u_fog_far,v_depth); c=mix(c,u_bg,f);} frag=vec4(c,1); }
+void main(){ if(u_clip && v_depth<u_clip_depth)discard; vec3 c=v_color; if(u_fog){float f=smoothstep(u_fog_near,u_fog_far,v_depth); c=mix(c,u_bg,f);} frag=vec4(c,1.0); }
 """
 RIBBON_VS = r"""
 #version 330 core
@@ -108,8 +111,10 @@ RIBBON_FS = r"""
 #version 330 core
 in vec3 v_color; in vec3 v_normal; in float v_depth;
 uniform vec3 u_bg; uniform float u_fog_near; uniform float u_fog_far; uniform bool u_fog;
+uniform float u_alpha; uniform bool u_clip; uniform float u_clip_depth;
 out vec4 frag;
 void main(){
+  if(u_clip && v_depth<u_clip_depth)discard;
   vec3 n=normalize(v_normal); if(!gl_FrontFacing)n=-n;
   vec3 light=normalize(vec3(-0.3,0.6,0.75));
   float d=.34+.66*max(0,dot(n,light)); vec3 c=v_color*d;
@@ -186,6 +191,8 @@ class GLMoleculeView(Gtk.GLArea):
         self.representation="ribbon";self.show_hydrogens=False;self.show_ligands=True;self.fog=True
         self.show_influence=False;self.influence_opacity=0.22
         self.visible_chains=None
+        self.selection=set();self.color_mode="element";self.surface_mesh=None;self.surface_opacity=.35
+        self.clip_enabled=False;self.clip_fraction=.5;self.camera_callback=None;self._export_size=None
         self.dark=False;self.bg=(0.965,0.961,0.949)
         self.center=np.zeros(3,dtype=np.float32);self.radius=10.0;self.distance=28.0;self.zoom=1.0
         self.rot_x=-0.22;self.rot_y=0.52;self.drag_base=(0,0);self.fov_deg=38.0
@@ -203,6 +210,7 @@ class GLMoleculeView(Gtk.GLArea):
         self.fov_deg=clamp_float(float(degrees),26.0,62.0);self.queue_render()
 
     def set_molecule(self,mol:Molecule):
+        self.selection=set();self.surface_mesh=None
         self.molecule=mol;self.center,self.radius=molecule_center_radius(mol);self.fit();self.rebuild_scene();self.queue_render()
 
     def fit(self):
@@ -246,6 +254,13 @@ class GLMoleculeView(Gtk.GLArea):
     def rebuild_scene(self):
         if not self.molecule:return
         m=self.molecule;rep=self.representation
+        self._atom_indices={id(a):i for i,a in enumerate(m.atoms)}
+        self._chain_colors={v:CHAIN_COLORS[i%len(CHAIN_COLORS)] for i,v in enumerate(sorted({a.chain for a in m.atoms}))}
+        self._residue_colors={v:CHAIN_COLORS[i%len(CHAIN_COLORS)] for i,v in enumerate(sorted({a.residue for a in m.atoms}))}
+        self._charge_colors=None
+        if self.color_mode=="charge" and len(m.metadata.get("partial_charges",[]))==len(m.atoms):
+            from nexum.core.molecular_analysis import scalar_colors
+            self._charge_colors=scalar_colors(m.metadata["partial_charges"])[0]
         idx=[]
         polymer=m.metadata.get("polymer_backbone_atoms",0)>2
         for i,a in enumerate(m.atoms):
@@ -255,7 +270,7 @@ class GLMoleculeView(Gtk.GLArea):
             idx.append(i)
         pos=[];col=[];rad=[]
         for i in idx:
-            a=m.atoms[i];pos.append((a.x,a.y,a.z));col.append(element_color(a.element))
+            a=m.atoms[i];pos.append((a.x,a.y,a.z));col.append(self._atom_color(a))
             if rep=="spacefill":r=vdw_radius(a.element)
             elif polymer and a.hetero:r=0.38*vdw_radius(a.element)
             else:r=0.30*vdw_radius(a.element)
@@ -265,7 +280,7 @@ class GLMoleculeView(Gtk.GLArea):
         # representation, including polymer atoms when ribbons are selected.
         visible=[a for a in m.atoms if self._atom_visible(a)] if self.show_influence else []
         self.scene["influence_pos"]=np.asarray([(a.x,a.y,a.z) for a in visible],dtype=np.float32).reshape((-1,3))
-        self.scene["influence_col"]=np.asarray([element_color(a.element) for a in visible],dtype=np.float32).reshape((-1,3))
+        self.scene["influence_col"]=np.asarray([self._atom_color(a) for a in visible],dtype=np.float32).reshape((-1,3))
         self.scene["influence_rad"]=np.asarray([vdw_radius(a.element) for a in visible],dtype=np.float32)
         # Bonds: real cylinders for normal ball/stick views; GL lines remain the
         # scalable fallback for very large scenes and the explicit Lines mode.
@@ -275,7 +290,7 @@ class GLMoleculeView(Gtk.GLArea):
         use_cylinders=rep in ("ball-stick","sticks","ribbon","backbone") and len(visible_bonds)<=6000
         cylinder_radius=.16 if rep=="sticks" else .105 if rep=="ball-stick" else .09
         for i,j,_order in visible_bonds:
-            atom_i,atom_j=m.atoms[i],m.atoms[j];ci,cj=element_color(atom_i.element),element_color(atom_j.element)
+            atom_i,atom_j=m.atoms[i],m.atoms[j];ci,cj=self._atom_color(atom_i),self._atom_color(atom_j)
             p1=np.array((atom_i.x,atom_i.y,atom_i.z),dtype=np.float32);p2=np.array((atom_j.x,atom_j.y,atom_j.z),dtype=np.float32);mid=(p1+p2)*.5
             if use_cylinders:
                 for a,b,c in ((p1,mid,ci),(mid,p2,cj)):
@@ -303,7 +318,7 @@ class GLMoleculeView(Gtk.GLArea):
                 self.scene["backbone_pos"]=np.asarray(bp,dtype=np.float32);self.scene["backbone_col"]=np.asarray(bc,dtype=np.float32)
 
     def _matrices(self):
-        w=max(1,self.get_allocated_width());h=max(1,self.get_allocated_height());aspect=w/h
+        w,h=self._viewport_size();aspect=w/h
         near=max(.05,self.radius*.01);far=max(100.0,self.distance*self.zoom+self.radius*6)
         proj=_perspective(math.radians(self.fov_deg),aspect,near,far)
         view=_translate(0,0,-self.distance*self.zoom)
@@ -311,6 +326,9 @@ class GLMoleculeView(Gtk.GLArea):
         return model,view,proj
 
     def _uniform_common(self,prog,model,view,proj):
+        GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),1.)
+        GL.glUniform1i(GL.glGetUniformLocation(prog,"u_clip"),int(self.clip_enabled))
+        GL.glUniform1f(GL.glGetUniformLocation(prog,"u_clip_depth"),float(self.distance*self.zoom+self.radius*(2*self.clip_fraction-1)))
         GL.glUniformMatrix4fv(GL.glGetUniformLocation(prog,"u_model"),1,False,_glmat(model))
         GL.glUniformMatrix4fv(GL.glGetUniformLocation(prog,"u_view"),1,False,_glmat(view))
         GL.glUniformMatrix4fv(GL.glGetUniformLocation(prog,"u_proj"),1,False,_glmat(proj))
@@ -332,7 +350,7 @@ class GLMoleculeView(Gtk.GLArea):
     def _render(self,area,context):
         if self.get_error():return False
         scale=self.get_scale_factor()
-        GL.glViewport(0,0,max(1,self.get_allocated_width()*scale),max(1,self.get_allocated_height()*scale))
+        GL.glViewport(0,0,*self._viewport_size())
         GL.glClearColor(*self.bg,1);GL.glClear(GL.GL_COLOR_BUFFER_BIT|GL.GL_DEPTH_BUFFER_BIT)
         if not self.molecule:return True
         model,view,proj=self._matrices()
@@ -364,7 +382,7 @@ class GLMoleculeView(Gtk.GLArea):
         if pp is not None and len(pp) and self.representation not in ("sticks","lines","backbone"):
             prog=self.programs["points"];GL.glUseProgram(prog);self._uniform_common(prog,model,view,proj)
             GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),1.0)
-            h=max(1,self.get_allocated_height()*self.get_scale_factor());scale=h/(2*math.tan(math.radians(self.fov_deg)/2));GL.glUniform1f(GL.glGetUniformLocation(prog,"u_point_scale"),float(scale))
+            h=self._viewport_size()[1];scale=h/(2*math.tan(math.radians(self.fov_deg)/2));GL.glUniform1f(GL.glGetUniformLocation(prog,"u_point_scale"),float(scale))
             vao=GL.glGenVertexArrays(1);GL.glBindVertexArray(vao);temp.append(("vao",vao));
             b1=self._array_buffer(pp,0,3);b2=self._array_buffer(self.scene["point_col"],1,3);b3=self._array_buffer(self.scene["point_rad"],2,1);temp.extend(("buf",b) for b in (b1,b2,b3) if b);GL.glDrawArrays(GL.GL_POINTS,0,len(pp))
         # Draw transparent spheres after opaque geometry, back-to-front.
@@ -375,7 +393,7 @@ class GLMoleculeView(Gtk.GLArea):
             order=np.argsort(influence@eye[2,:3]+eye[2,3],kind="stable")
             prog=self.programs["points"];GL.glUseProgram(prog);self._uniform_common(prog,model,view,proj)
             GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),self.influence_opacity)
-            h=max(1,self.get_allocated_height()*self.get_scale_factor())
+            h=self._viewport_size()[1]
             GL.glUniform1f(GL.glGetUniformLocation(prog,"u_point_scale"),float(h/(2*math.tan(math.radians(self.fov_deg)/2))))
             vao=GL.glGenVertexArrays(1);GL.glBindVertexArray(vao);temp.append(("vao",vao))
             bufs=[self._array_buffer(np.ascontiguousarray(influence[order]),0,3),
@@ -388,6 +406,29 @@ class GLMoleculeView(Gtk.GLArea):
             finally:
                 GL.glDepthMask(True);GL.glDisable(GL.GL_BLEND)
                 GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),1.0)
+        mesh=self.surface_mesh
+        if mesh is not None and len(mesh["vertices"]):
+            prog=self.programs["ribbon"];GL.glUseProgram(prog);self._uniform_common(prog,model,view,proj)
+            vertices=mesh["vertices"].reshape(-1,3,3)
+            eye=view@model
+            order=np.argsort(vertices.mean(axis=1)@eye[2,:3]+eye[2,3])
+            vao=GL.glGenVertexArrays(1);GL.glBindVertexArray(vao);temp.append(("vao",vao))
+            for attribute,key in enumerate(("vertices","normals","colors")):
+                data=np.ascontiguousarray(mesh[key].reshape(-1,3,3)[order].reshape(-1,3))
+                buf=self._array_buffer(data,attribute,3);temp.append(("buf",buf))
+            GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),self.surface_opacity)
+            GL.glEnable(GL.GL_BLEND);GL.glBlendFunc(GL.GL_SRC_ALPHA,GL.GL_ONE_MINUS_SRC_ALPHA);GL.glDepthMask(False)
+            try:GL.glDrawArrays(GL.GL_TRIANGLES,0,len(mesh["vertices"]))
+            finally:
+                GL.glDepthMask(True);GL.glDisable(GL.GL_BLEND);GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),1.)
+        if len(self.selection)>1:
+            chosen=[i for i in sorted(self.selection) if self._atom_visible(self.molecule.atoms[i])]
+            positions=np.array([self.molecule.atoms[i].position for i in chosen],dtype=np.float32)
+            if len(positions)>1:
+                prog=self.programs["lines"];GL.glUseProgram(prog);self._uniform_common(prog,model,view,proj)
+                vao=GL.glGenVertexArrays(1);GL.glBindVertexArray(vao);temp.append(("vao",vao))
+                temp.extend(("buf",b) for b in (self._array_buffer(positions,0,3),self._array_buffer(np.tile(np.array([1.,.6,.05],dtype=np.float32),(len(positions),1)),1,3)) if b)
+                GL.glDrawArrays(GL.GL_LINE_STRIP,0,len(positions))
         GL.glBindVertexArray(0);GL.glBindBuffer(GL.GL_ARRAY_BUFFER,0)
         for typ,obj in temp:
             try:
@@ -398,9 +439,9 @@ class GLMoleculeView(Gtk.GLArea):
 
     def _drag_begin(self,gesture,x,y):self.drag_base=(self.rot_x,self.rot_y)
     def _drag_update(self,gesture,dx,dy):
-        self.rot_x=self.drag_base[0]+dy*.008;self.rot_y=self.drag_base[1]+dx*.008;self.queue_render()
+        self.rot_x=self.drag_base[0]+dy*.008;self.rot_y=self.drag_base[1]+dx*.008;self.queue_render();self._camera_changed()
     def _scroll(self,controller,dx,dy):
-        self.zoom=clamp_float(self.zoom*math.exp(dy*.10),.25,5.0);self.queue_render();return True
+        self.zoom=clamp_float(self.zoom*math.exp(dy*.10),.25,5.0);self.queue_render();self._camera_changed();return True
 
     def _click(self,gesture,n_press,x,y):
         if not self.molecule:return
@@ -414,15 +455,58 @@ class GLMoleculeView(Gtk.GLArea):
         if not m:return None
         model,view,proj=self._matrices();mvp=proj@view@model;w=max(1,self.get_allocated_width());h=max(1,self.get_allocated_height())
         best=None;bestd=22.0**2
-        indices=self.scene.get("point_indices") or range(len(m.atoms))
+        indices=self.scene.get("point_indices",[])
         for i in indices:
             a=m.atoms[i];v=mvp@np.array((a.x,a.y,a.z,1),dtype=np.float32)
             if abs(float(v[3]))<1e-8:continue
             ndc=v[:3]/v[3]
             if ndc[2]<-1 or ndc[2]>1:continue
+            eye=view@model@np.array((a.x,a.y,a.z,1),dtype=np.float32)
+            if self.clip_enabled and -eye[2]<self.distance*self.zoom+self.radius*(2*self.clip_fraction-1):continue
             sx=(ndc[0]*.5+.5)*w;sy=(1-(ndc[1]*.5+.5))*h;d=(sx-x)**2+(sy-y)**2
             if d<bestd:bestd=d;best=i
         return best
 
+
+    def _viewport_size(self):
+        return self._export_size or (max(1,self.get_allocated_width()*self.get_scale_factor()),max(1,self.get_allocated_height()*self.get_scale_factor()))
+
+    def _atom_color(self,a):
+        i=self._atom_indices.get(id(a),-1)
+        if i in self.selection:return (1.,.6,.05)
+        if self.color_mode=="chain":
+            return self._chain_colors[a.chain]
+        if self.color_mode=="residue":
+            return self._residue_colors[a.residue]
+        if self.color_mode=="charge" and self._charge_colors is not None:return tuple(self._charge_colors[i])
+        return element_color(a.element)
+
+    def _camera_changed(self):
+        if self.camera_callback:self.camera_callback(self)
+
+    def export_png(self,path,scale=2):
+        import cairo
+        self.make_current()
+        if self.get_error():raise RuntimeError(str(self.get_error()))
+        old=GL.glGetIntegerv(GL.GL_FRAMEBUFFER_BINDING)
+        w,h=self._viewport_size();factor=min(float(scale),4096/max(w,h))
+        w,h=max(1,int(w*factor)),max(1,int(h*factor))
+        fbo=GL.glGenFramebuffers(1);color=GL.glGenRenderbuffers(1);depth=GL.glGenRenderbuffers(1)
+        try:
+            GL.glBindFramebuffer(GL.GL_FRAMEBUFFER,fbo)
+            GL.glBindRenderbuffer(GL.GL_RENDERBUFFER,color);GL.glRenderbufferStorage(GL.GL_RENDERBUFFER,GL.GL_RGBA8,w,h)
+            GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER,GL.GL_COLOR_ATTACHMENT0,GL.GL_RENDERBUFFER,color)
+            GL.glBindRenderbuffer(GL.GL_RENDERBUFFER,depth);GL.glRenderbufferStorage(GL.GL_RENDERBUFFER,GL.GL_DEPTH_COMPONENT24,w,h)
+            GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER,GL.GL_DEPTH_ATTACHMENT,GL.GL_RENDERBUFFER,depth)
+            if GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER)!=GL.GL_FRAMEBUFFER_COMPLETE:raise RuntimeError("Framebuffer de exportação incompleto.")
+            self._export_size=(w,h);self._render(self,None)
+            raw=GL.glReadPixels(0,0,w,h,GL.GL_BGRA,GL.GL_UNSIGNED_BYTE)
+            pixels=np.frombuffer(raw,dtype=np.uint8).reshape(h,w,4)[::-1].copy()
+            image=cairo.ImageSurface.create_for_data(pixels,cairo.FORMAT_ARGB32,w,h,w*4)
+            image.write_to_png(str(path))
+        finally:
+            self._export_size=None;GL.glBindFramebuffer(GL.GL_FRAMEBUFFER,int(old))
+            GL.glDeleteRenderbuffers(1,[color]);GL.glDeleteRenderbuffers(1,[depth]);GL.glDeleteFramebuffers(1,[fbo])
+            self.queue_render()
 
 def clamp_float(x,a,b):return max(a,min(b,x))

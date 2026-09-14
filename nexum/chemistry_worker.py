@@ -43,6 +43,7 @@ def call(operation, *args):
         raise RuntimeError("O motor químico não retornou uma resposta válida.") from exc
     if result.returncode or "error" in response:
         raise RuntimeError(response.get("error", "Falha no motor químico."))
+    if operation == "isotopes":return response["result"]
     response["atoms"] = [Atom(**atom) for atom in response["atoms"]]
     response["bonds"] = [tuple(bond) for bond in response["bonds"]]
     return Molecule(**response)
@@ -57,7 +58,11 @@ def main():
     os.environ.pop("NEXUM_CHEMISTRY_PYTHON", None)
     os.environ.pop("NEXUM_CHEMISTRY_EXECUTABLE", None)
     from nexum.core import structures
+    from nexum.core.molecular_analysis import annotate
+    from nexum.core.data_analysis import isotope_pattern
     operations = {
+        "annotate": annotate,
+        "isotopes": isotope_pattern,
         "mmcif": structures.parse_mmcif,
         "smiles": structures._rdkit_conformer_from_smiles,
         "molblock": structures._rdkit_conformer_from_molblock,
@@ -65,7 +70,8 @@ def main():
     try:
         request = json.load(sys.stdin)
         molecule = operations[request["operation"]](*request["args"])
-        print(json.dumps(asdict(molecule), ensure_ascii=False, allow_nan=False))
+        output={"result":molecule} if request["operation"]=="isotopes" else asdict(molecule)
+        print(json.dumps(output, ensure_ascii=False, allow_nan=False))
         return 0
     except Exception as exc:
         print(json.dumps({"error": str(exc)}, ensure_ascii=False))

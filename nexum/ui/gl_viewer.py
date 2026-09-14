@@ -48,6 +48,7 @@ uniform vec3 u_bg;
 uniform float u_fog_near;
 uniform float u_fog_far;
 uniform bool u_fog;
+uniform float u_alpha;
 out vec4 frag;
 void main(){
     vec2 q = gl_PointCoord*2.0-1.0;
@@ -70,7 +71,7 @@ void main(){
 
     float depth = -eye_z;
     if(u_fog){ float f=smoothstep(u_fog_near,u_fog_far,depth); c=mix(c,u_bg,f); }
-    frag=vec4(c,1.0);
+    frag=vec4(c,u_alpha);
 }
 """
 LINE_VS = r"""
@@ -183,6 +184,7 @@ class GLMoleculeView(Gtk.GLArea):
         self.set_has_depth_buffer(True)
         self.molecule: Molecule|None=None
         self.representation="ribbon";self.show_hydrogens=False;self.show_ligands=True;self.fog=True
+        self.show_influence=False;self.influence_opacity=0.22
         self.visible_chains=None
         self.dark=False;self.bg=(0.965,0.961,0.949)
         self.center=np.zeros(3,dtype=np.float32);self.radius=10.0;self.distance=28.0;self.zoom=1.0
@@ -206,11 +208,16 @@ class GLMoleculeView(Gtk.GLArea):
     def fit(self):
         self.zoom=1.0;self.distance=max(8.0,self.radius*2.55);self.rot_x=-0.24;self.rot_y=0.58;self.queue_render()
 
-    def configure(self,representation=None,show_hydrogens=None,show_ligands=None,fog=None,visible_chains=None):
+    def configure(self,representation=None,show_hydrogens=None,show_ligands=None,fog=None,visible_chains=None,show_influence=None,influence_opacity=None):
         if representation is not None:self.representation=representation
         if show_hydrogens is not None:self.show_hydrogens=show_hydrogens
         if show_ligands is not None:self.show_ligands=show_ligands
         if fog is not None:self.fog=fog
+        if show_influence is not None:self.show_influence=bool(show_influence)
+        if influence_opacity is not None:
+            value=float(influence_opacity)
+            if not math.isfinite(value):raise ValueError('Opacidade deve ser finita.')
+            self.influence_opacity=clamp_float(value,0.05,0.60)
         if visible_chains is not None:self.visible_chains=visible_chains
         self.rebuild_scene();self.queue_render()
 
@@ -254,6 +261,12 @@ class GLMoleculeView(Gtk.GLArea):
             else:r=0.30*vdw_radius(a.element)
             rad.append(r)
         self.scene["point_indices"]=idx;self.scene["point_pos"]=np.asarray(pos,dtype=np.float32);self.scene["point_col"]=np.asarray(col,dtype=np.float32);self.scene["point_rad"]=np.asarray(rad,dtype=np.float32)
+        # The overlay follows visibility filters but is independent of the base
+        # representation, including polymer atoms when ribbons are selected.
+        visible=[a for a in m.atoms if self._atom_visible(a)] if self.show_influence else []
+        self.scene["influence_pos"]=np.asarray([(a.x,a.y,a.z) for a in visible],dtype=np.float32).reshape((-1,3))
+        self.scene["influence_col"]=np.asarray([element_color(a.element) for a in visible],dtype=np.float32).reshape((-1,3))
+        self.scene["influence_rad"]=np.asarray([vdw_radius(a.element) for a in visible],dtype=np.float32)
         # Bonds: real cylinders for normal ball/stick views; GL lines remain the
         # scalable fallback for very large scenes and the explicit Lines mode.
         line_pos=[];line_col=[];bond_v=[];bond_n=[];bond_c=[]
@@ -350,9 +363,31 @@ class GLMoleculeView(Gtk.GLArea):
         pp=self.scene.get("point_pos")
         if pp is not None and len(pp) and self.representation not in ("sticks","lines","backbone"):
             prog=self.programs["points"];GL.glUseProgram(prog);self._uniform_common(prog,model,view,proj)
+            GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),1.0)
             h=max(1,self.get_allocated_height()*self.get_scale_factor());scale=h/(2*math.tan(math.radians(self.fov_deg)/2));GL.glUniform1f(GL.glGetUniformLocation(prog,"u_point_scale"),float(scale))
             vao=GL.glGenVertexArrays(1);GL.glBindVertexArray(vao);temp.append(("vao",vao));
             b1=self._array_buffer(pp,0,3);b2=self._array_buffer(self.scene["point_col"],1,3);b3=self._array_buffer(self.scene["point_rad"],2,1);temp.extend(("buf",b) for b in (b1,b2,b3) if b);GL.glDrawArrays(GL.GL_POINTS,0,len(pp))
+        # Draw transparent spheres after opaque geometry, back-to-front.
+        # Keep depth testing against the base model, but never write overlay depth.
+        influence=self.scene.get("influence_pos")
+        if self.show_influence and influence is not None and len(influence):
+            eye=(view@model)
+            order=np.argsort(influence@eye[2,:3]+eye[2,3],kind="stable")
+            prog=self.programs["points"];GL.glUseProgram(prog);self._uniform_common(prog,model,view,proj)
+            GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),self.influence_opacity)
+            h=max(1,self.get_allocated_height()*self.get_scale_factor())
+            GL.glUniform1f(GL.glGetUniformLocation(prog,"u_point_scale"),float(h/(2*math.tan(math.radians(self.fov_deg)/2))))
+            vao=GL.glGenVertexArrays(1);GL.glBindVertexArray(vao);temp.append(("vao",vao))
+            bufs=[self._array_buffer(np.ascontiguousarray(influence[order]),0,3),
+                  self._array_buffer(np.ascontiguousarray(self.scene["influence_col"][order]),1,3),
+                  self._array_buffer(np.ascontiguousarray(self.scene["influence_rad"][order]),2,1)]
+            temp.extend(("buf",b) for b in bufs if b)
+            GL.glEnable(GL.GL_BLEND);GL.glBlendFunc(GL.GL_SRC_ALPHA,GL.GL_ONE_MINUS_SRC_ALPHA);GL.glDepthMask(False)
+            try:
+                GL.glDrawArrays(GL.GL_POINTS,0,len(influence))
+            finally:
+                GL.glDepthMask(True);GL.glDisable(GL.GL_BLEND)
+                GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),1.0)
         GL.glBindVertexArray(0);GL.glBindBuffer(GL.GL_ARRAY_BUFFER,0)
         for typ,obj in temp:
             try:

@@ -83,6 +83,10 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
         sys.excepthook = lambda *error: errors.append(error)
         try:
             window.struct.viewer.set_molecule(molecule)
+            window.struct.influence.set_active(True)
+            window.struct.influence_opacity.set_value(35)
+            assert window.struct.viewer.show_influence
+            assert len(window.struct.viewer.scene["influence_pos"]) > 0
             window.stack.set_visible_child_name("structures")
             window.present()
             deadline = time.monotonic() + 2
@@ -94,6 +98,11 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
             if window.struct.viewer.get_error():
                 raise RuntimeError(str(window.struct.viewer.get_error()))
             assert len(window.struct.viewer.programs) == 3
+            window.struct.viewer.make_current()
+            assert GL.glGetError() == GL.GL_NO_ERROR
+            window.struct.influence.set_active(False)
+            assert not window.struct.viewer.show_influence
+            assert len(window.struct.viewer.scene["influence_pos"]) == 0
         finally:
             window.destroy()
             sys.excepthook = original_hook

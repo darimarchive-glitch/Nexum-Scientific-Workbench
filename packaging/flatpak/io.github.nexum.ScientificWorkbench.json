@@ -9,7 +9,8 @@
     "--share=network",
     "--socket=wayland",
     "--socket=fallback-x11",
-    "--device=dri"
+    "--device=dri",
+    "--env=PYOPENGL_PLATFORM=egl"
   ],
   "modules": [
     {

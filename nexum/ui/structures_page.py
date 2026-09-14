@@ -26,7 +26,7 @@ class StructurePage(Gtk.Box):
     def __init__(self, window):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.set_hexpand(True);self.set_vexpand(True)
-        self.window=window;self.cache=cache_dir()/"structures";self.selected_suggestion=None;self.search_source="Todos";self.search_timer=0;self._fullscreen=False
+        self.window=window;self.cache=cache_dir()/"structures";self.selected_suggestion=None;self.search_source="Todos";self.search_timer=0;self._fullscreen=False;self.search_generation=0
         self.viewer=GLMoleculeView();self.viewer.selection_callback=self._atom_selected
         style=Adw.StyleManager.get_default();self.viewer.set_dark(style.get_dark());style.connect("notify::dark",lambda *_:self.viewer.set_dark(style.get_dark()))
         self._build_searchbar();self._build_workspace()
@@ -88,17 +88,24 @@ class StructurePage(Gtk.Box):
     def _search_now(self,*_):
         self.search_timer=0;q=self.search.get_text().strip()
         if len(q)<2:return False
+        self.search_generation+=1
+        generation=self.search_generation
         self.window.toast("Buscando estruturas…",timeout=1)
-        threading.Thread(target=self._search_worker,args=(q,self.search_source),daemon=True).start();return False
-    def _search_worker(self,q,source):
-        try:items=suggestions(q,source,4);GLib.idle_add(self._show_results,items)
-        except Exception as exc:GLib.idle_add(self.window.toast,f"Busca indisponível: {exc}")
-    def _show_results(self,items):
+        threading.Thread(target=self._search_worker,args=(q,self.search_source,generation),daemon=True).start();return False
+    def _search_worker(self,q,source,generation):
+        try:items=suggestions(q,source,4);GLib.idle_add(self._show_results,items,generation)
+        except Exception as exc:GLib.idle_add(self._search_error,str(exc),generation)
+    def _search_error(self,message,generation):
+        if generation==self.search_generation:self.window.toast(f"Busca indisponível: {message}")
+        return False
+    def _show_results(self,items,generation=None):
+        if generation is not None and generation!=self.search_generation:return False
         self._clear_results()
         for s in items:
             row=Adw.ActionRow(title=s.title,subtitle=f"{s.source} · {s.subtitle}");row.set_activatable(True);row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"));row.connect("activated",lambda _,ss=s:self._load_suggestion(ss));self.results.append(row)
         self.results_revealer.set_reveal_child(bool(items));return False
     def _load_suggestion(self,s):
+        self.search_generation+=1
         self.selected_suggestion=s;self.results_revealer.set_reveal_child(False);self.window.toast(f"Carregando {s.identifier}…",timeout=2)
         threading.Thread(target=self._load_worker,args=(s,),daemon=True).start()
     def _load_worker(self,s):
@@ -134,3 +141,4 @@ class StructurePage(Gtk.Box):
         self.search_area.set_visible(not self._fullscreen);self.inspector.set_visible(not self._fullscreen)
         if self._fullscreen:self.window.fullscreen();self.full_btn.set_icon_name("view-restore-symbolic")
         else:self.window.unfullscreen();self.full_btn.set_icon_name("view-fullscreen-symbolic")
+

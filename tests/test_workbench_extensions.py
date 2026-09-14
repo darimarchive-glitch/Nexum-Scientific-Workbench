@@ -21,6 +21,23 @@ class ExtensionTests(unittest.TestCase):
                 self.assertEqual(resolve_pubchem_cid(name),'962')
                 self.assertEqual(suggestions(name)[0].title,'Água')
 
+    def test_isomeric_formula_is_not_an_exact_name(self):
+        from nexum.core.molecule_names import exact_compound
+        self.assertIsNone(exact_compound("C2H6O"))
+        self.assertIsNone(exact_compound("C12H22O11"))
+
+    def test_sucrose_identifier(self):
+        self.assertEqual(resolve_pubchem_cid('sacarose'),'5988')
+        self.assertEqual(resolve_pubchem_cid('sucrose'),'5988')
+
+    def test_xdg_paths_inside_flatpak(self):
+        import os
+        from pathlib import Path
+        from nexum import paths
+        with patch.object(paths.sys,'platform','linux'),patch.dict(os.environ,{'XDG_DATA_HOME':'/tmp/flatpak-data','XDG_CACHE_HOME':'/tmp/flatpak-cache'}):
+            self.assertEqual(paths.data_dir(),Path('/tmp/flatpak-data/nexum-lab'))
+            self.assertEqual(paths.cache_dir(),Path('/tmp/flatpak-cache/nexum-lab'))
+
     def test_fuzzy_results_are_suggestions_only(self):
         self.assertEqual(local_candidates('agau'),[])  # Not an edit-distance-one guess.
         self.assertEqual(local_candidates('aguua')[0][0],'962')

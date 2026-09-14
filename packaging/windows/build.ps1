@@ -16,9 +16,13 @@ Copy-Item -Recurse -Force 'dist/NexumChemistry' 'dist/Nexum/chemistry'
 Copy-Item 'LICENSE' 'dist/Nexum/LICENSE.txt'
 # Verify the frozen bundle with the development interpreter variables removed.
 Remove-Item Env:NEXUM_CHEMISTRY_PYTHON,Env:PYTHONPATH,Env:PYTHONHOME -ErrorAction SilentlyContinue
+$env:NEXUM_SELF_TEST_LOG=Join-Path $root 'build/self-test.log'
 $bundle=Join-Path $root 'dist/Nexum/Nexum.exe'
 $check=Start-Process -FilePath $bundle -ArgumentList '--self-test' -Wait -PassThru
-if ($check.ExitCode -ne 0) { throw 'Frozen desktop self-test failed.' }
+if ($check.ExitCode -ne 0) {
+    if (Test-Path $env:NEXUM_SELF_TEST_LOG) { Get-Content $env:NEXUM_SELF_TEST_LOG }
+    throw 'Frozen desktop self-test failed.'
+}
 $iscc=(Get-Command ISCC.exe -ErrorAction SilentlyContinue)
 if ($iscc) { $compiler=$iscc.Source } else { $compiler="${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" }
 Checked $compiler @("/DBundleDir=$root\dist\Nexum",'packaging/windows/nexum.iss')

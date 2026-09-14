@@ -12,7 +12,13 @@ if sys.platform == 'win32':
 
 if '--self-test' in sys.argv:
     from nexum.windows_check import main
-    main()
+    try:
+        main()
+    except Exception:
+        import traceback
+        log=Path(os.environ.get('NEXUM_SELF_TEST_LOG',str(Path.home()/'nexum-self-test.log')))
+        log.write_text(traceback.format_exc(),encoding='utf-8')
+        raise SystemExit(1)
 else:
     from nexum.main import main
     main()

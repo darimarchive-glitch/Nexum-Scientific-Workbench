@@ -20,13 +20,17 @@ COMPOUNDS = [
     ('297', 'Metano', 'CH4', ('methane',)),
     ('6324', 'Etano', 'C2H6', ('ethane',)),
     ('6334', 'Propano', 'C3H8', ('propane',)),
-    ('5460', 'Sacarose', 'C12H22O11', ('sucrose', 'açúcar de mesa')),
+    ('5988', 'Sacarose', 'C12H22O11', ('sucrose', 'açúcar de mesa')),
     ('1118', 'Ácido sulfúrico', 'H2SO4', ('sulfuric acid',)),
     ('944', 'Ácido nítrico', 'HNO3', ('nitric acid',)),
     ('313', 'Ácido clorídrico', 'ClH', ('hydrochloric acid', 'HCl')),
 ]
 BY_CID = {row[0]: row for row in COMPOUNDS}
-ALIASES = {norm(alias): row for row in COMPOUNDS for alias in (row[1], row[2], *row[3])}
+# Most molecular formulas identify several isomers, so only selected simple
+# formulas are direct aliases. Other formulas remain suggestions to select.
+DIRECT_FORMULAS = {'H2O','NaCl','CO2','H3N','H2O2','CH4','C2H6','C3H8','H2SO4','HNO3','ClH'}
+ALIASES = {norm(alias): row for row in COMPOUNDS for alias in (row[1], *row[3])}
+ALIASES.update({norm(row[2]):row for row in COMPOUNDS if row[2] in DIRECT_FORMULAS})
 
 def exact_compound(term):
     raw = str(term).strip()
@@ -40,7 +44,8 @@ def local_candidates(term, limit=4):
     if exact:
         return [exact]
     ranked = {}
-    for alias, row in ALIASES.items():
+    entries=list(ALIASES.items())+[(norm(row[2]),row) for row in COMPOUNDS]
+    for alias, row in entries:
         score = 1 if alias.startswith(q) else 2 if len(q) >= 4 and dist(q, alias) <= 1 else None
         if score is not None:
             ranked[row[0]] = min(score, ranked.get(row[0], 99))

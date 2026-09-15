@@ -1,5 +1,6 @@
 """Fail explicitly if a required Windows runtime feature is unavailable."""
 import tempfile
+import os
 from pathlib import Path
 
 
@@ -87,20 +88,23 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
             print("OpenGL:", GL.glGetString(GL.GL_VERSION), flush=True)
             from nexum.core.molecular_analysis import molecular_surface
             from nexum.ui.session_actions import snapshot,restore
-            output=Path("build/visual-checks");output.mkdir(parents=True,exist_ok=True)
+            output=Path(os.environ.get("NEXUM_RENDER_DIR",folder))/"visual-checks";output.mkdir(parents=True,exist_ok=True)
             viewer=window.struct.viewer
             viewer.set_dark(False);viewer.export_png(output/"vdw-light.png")
             viewer.set_dark(True);viewer.export_png(output/"vdw-dark.png")
             viewer.surface_mesh=molecular_surface(molecule,"vdw",resolution=24)
             viewer.clip_enabled=True;viewer.export_png(output/"surface-cut.png")
             viewer.make_current();assert GL.glGetError()==GL.GL_NO_ERROR
-            panel=window.struct.analysis;panel.mode.set_selected(1);panel.selected(0);panel.selected(1)
+            panel=window.struct.analysis;panel.mode.set_selected(1);panel.selected(1);panel.selected(0)
             assert "Distância" in panel.result.get_text()
+            assert viewer.measurement_indices==[1,0]
+            viewer.export_png(output/"measurement.png")
             window.analysis.mode.set_selected(1);window.analysis.simulate();window.analysis.analyze()
             assert "Concentração" in window.analysis.report.get_text()
             window.analysis.plot.export(output/"calibration.svg")
             state=snapshot(window);restore(window,state)
             assert window.struct.viewer.surface_mesh is not None
+            assert window.struct.viewer.measurement_indices==[1,0]
             assert window.analysis.dataset["origin"]=="Simulado"
             window.analysis.mode.set_selected(3);window.analysis.analyze()
             assert window.analysis.tertiary.data

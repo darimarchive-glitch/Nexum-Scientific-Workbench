@@ -48,6 +48,7 @@ jobs:
           NEXUM_MSYS_ROOT: ${{ steps.msys2.outputs.msys2-location }}
           NEXUM_CPYTHON: ${{ steps.python.outputs.python-path }}
           GTK_A11Y: test
+          NEXUM_RENDER_DIR: build
         run: |
           & .\scripts\windows\nexum.ps1 -Action Install -MsysRoot $env:NEXUM_MSYS_ROOT -PythonExe $env:NEXUM_CPYTHON
           exit $LASTEXITCODE

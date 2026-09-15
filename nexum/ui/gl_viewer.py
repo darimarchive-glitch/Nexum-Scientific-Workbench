@@ -200,7 +200,7 @@ class GLMoleculeView(Gtk.GLArea):
         self.representation="ribbon";self.show_hydrogens=False;self.show_ligands=True;self.fog=True
         self.show_influence=False;self.influence_opacity=0.22
         self.visible_chains=None
-        self.selection=set();self.color_mode="element";self.surface_mesh=None;self.surface_opacity=.35
+        self.selection=set();self.measurement_indices=[];self.color_mode="element";self.surface_mesh=None;self.surface_opacity=.35
         self.clip_enabled=False;self.clip_fraction=.5;self.camera_callback=None;self._export_size=None
         self.dark=False;self.bg=(0.965,0.961,0.949)
         self.center=np.zeros(3,dtype=np.float32);self.radius=10.0;self.distance=28.0;self.zoom=1.0
@@ -219,7 +219,7 @@ class GLMoleculeView(Gtk.GLArea):
         self.fov_deg=clamp_float(float(degrees),26.0,62.0);self.queue_render()
 
     def set_molecule(self,mol:Molecule):
-        self.selection=set();self.surface_mesh=None
+        self.selection=set();self.measurement_indices=[];self.surface_mesh=None
         self.molecule=mol;self.center,self.radius=molecule_center_radius(mol);self.fit();self.rebuild_scene();self.queue_render()
 
     def fit(self):
@@ -274,8 +274,8 @@ class GLMoleculeView(Gtk.GLArea):
         polymer=m.metadata.get("polymer_backbone_atoms",0)>2
         for i,a in enumerate(m.atoms):
             if not self._atom_visible(a):continue
-            if polymer and rep=="ribbon" and not a.hetero:continue
-            if polymer and rep=="backbone" and not a.hetero:continue
+            if polymer and rep=="ribbon" and not a.hetero and i not in self.selection:continue
+            if polymer and rep=="backbone" and not a.hetero and i not in self.selection:continue
             idx.append(i)
         pos=[];col=[];rad=[]
         for i in idx:
@@ -432,8 +432,8 @@ class GLMoleculeView(Gtk.GLArea):
             try:GL.glDrawArrays(GL.GL_TRIANGLES,0,len(mesh["vertices"]))
             finally:
                 GL.glDepthMask(True);GL.glDisable(GL.GL_BLEND);GL.glUniform1f(GL.glGetUniformLocation(prog,"u_alpha"),1.)
-        if len(self.selection)>1:
-            chosen=[i for i in sorted(self.selection) if self._atom_visible(self.molecule.atoms[i])]
+        if len(self.measurement_indices)>1:
+            chosen=[i for i in self.measurement_indices if self._atom_visible(self.molecule.atoms[i])]
             positions=np.array([self.molecule.atoms[i].position for i in chosen],dtype=np.float32)
             if len(positions)>1:
                 prog=self.programs["lines"];GL.glUseProgram(prog);self._uniform_common(prog,model,view,proj)

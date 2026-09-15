@@ -26,7 +26,7 @@ O vocabulário inicial contém 21 compostos, não todo o PubChem. Para registros
 
 `packaging/windows/build.ps1` cria dois bundles PyInstaller: interface GTK e motor químico CPython. O worker empacotado é chamado por JSON, sem interpretador externo instalado. Em seguida executa o autoteste do aplicativo congelado e compila um instalador Inno Setup por usuário, com desinstalador e atalhos. A instalação não exige Python, MSYS2 ou privilégios de administrador no computador final.
 
-O fluxo **Build desktop installers** em GitHub Actions prepara as dependências, verifica o bundle e disponibiliza `Nexum-Setup-6.7.0-x64.exe` como artefato se a compilação passar. O autoteste cobre GTK, OpenGL, RDKit, gemmi e histórico. Ainda é necessário testar instalação, atualização e desinstalação em um Windows limpo, sem ferramentas de desenvolvimento. Os pacotes não possuem assinatura digital configurada.
+O fluxo **Build desktop installers** em GitHub Actions prepara as dependências, verifica o bundle e disponibiliza `Nexum-Setup-6.8.0-x64.exe` como artefato se a compilação passar. O autoteste cobre GTK, OpenGL, RDKit, gemmi e histórico. Ainda é necessário testar instalação, atualização e desinstalação em um Windows limpo, sem ferramentas de desenvolvimento. Os pacotes não possuem assinatura digital configurada.
 
 ## Linux / Flatpak
 
@@ -51,3 +51,4 @@ Instaladores, bytecode e PyInstaller evitam entregar a árvore de desenvolviment
 - https://jrsoftware.org/ishelp/topic_compilercmdline.htm
 - https://docs.flatpak.org/en/latest/first-build.html
 - https://docs.flatpak.org/en/latest/python.html
+

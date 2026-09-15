@@ -12,7 +12,7 @@ from .plot_widget import ScientificPlot
 class MolecularTools(Gtk.Box):
     def __init__(self,page):
         super().__init__(orientation=Gtk.Orientation.VERTICAL,spacing=10)
-        self.page=page;self.window=page.window;self.viewer=page.viewer;self.ids=[];self.generation=0;self.reference=None;self.vibrations=None;self.timer=0;self.original=None;self.positions=[]
+        self.page=page;self.window=page.window;self.viewer=page.viewer;self.ids=[];self.generation=0;self.surface_generation=0;self.reference=None;self.vibrations=None;self.timer=0;self.original=None;self.positions=[]
         self.label('Análise molecular')
         self.mode=Gtk.DropDown.new_from_strings(['Inspecionar','Distância (2 átomos)','Ângulo (3 átomos)','Diedro (4 átomos)']);self.append(self.mode)
         self.mode.connect('notify::selected',lambda *_:self.clear())
@@ -57,11 +57,12 @@ class MolecularTools(Gtk.Box):
     def reset(self):
         self.stop();self.generation+=1;self.ids=[];self.vibrations=None;self.mode_plot.set_plot(None);self.positions=[];self.diagram.queue_draw()
     def clear(self):
-        self.ids=[];self.viewer.selection=set();self.viewer.rebuild_scene();self.viewer.queue_render();self.result.set_text('Seleção vazia.');self.diagram.queue_draw()
+        self.ids=[];self.viewer.measurement_indices=[];self.viewer.selection=set();self.viewer.rebuild_scene();self.viewer.queue_render();self.result.set_text('Seleção vazia.');self.diagram.queue_draw()
     def selected(self,index):
         count=self.mode.get_selected()+1
         if count==1 or len(self.ids)>=count:self.ids=[]
         if index not in self.ids:self.ids.append(index)
+        self.viewer.measurement_indices=list(self.ids) if count>1 else []
         self.highlight()
         if count>1 and len(self.ids)==count:
             try:
@@ -70,6 +71,7 @@ class MolecularTools(Gtk.Box):
     def highlight(self):
         self.viewer.selection=set(self.ids);self.viewer.rebuild_scene();self.viewer.queue_render();self.diagram.queue_draw();self.result.set_text(f'{len(self.ids)} átomos selecionados; filtros continuam ativos.')
     def select_group(self):
+        self.viewer.measurement_indices=[]
         m=self.require();q=self.query.get_text().casefold().strip()
         if q.startswith('grupo:'):
             self.ids=sorted({i for k,groups in m.metadata.get('functional_groups',{}).items() if k.casefold()==q[6:] for g in groups for i in g})
@@ -124,12 +126,13 @@ class MolecularTools(Gtk.Box):
             if distances[i]<16:self.page._atom_selected(i,self.viewer.molecule.atoms[i])
     def options(self,*_):
         self.viewer.surface_opacity=self.opacity.get_value()/100;self.viewer.clip_enabled=self.cut.get_active();self.viewer.clip_fraction=self.cut_at.get_value()/100;self.viewer.queue_render()
-    def remove_surface(self):self.viewer.surface_mesh=None;self.viewer.queue_render()
+    def remove_surface(self):self.surface_generation+=1;self.viewer.surface_mesh=None;self.viewer.queue_render()
     def make_surface(self):
         m=copy.deepcopy(self.require());indices=[i for i,a in enumerate(m.atoms) if self.viewer._atom_visible(a)]
+        self.surface_generation+=1;token=self.surface_generation
         generation=self.generation;kind=['vdw','sas','ses'][self.surface.get_selected()];probe=self.probe.get_value();resolution=self.resolution.get_value_as_int()
         def done(mesh):
-            if generation==self.generation:self.viewer.surface_mesh=mesh;self.note.set_text(mesh['method']);self.viewer.queue_render()
+            if generation==self.generation and token==self.surface_generation:self.viewer.surface_mesh=mesh;self.note.set_text(mesh['method']);self.viewer.queue_render()
         self.note.set_text('Calculando superfície…');background(self.window,lambda:molecular_surface(m,kind,probe,resolution,indices),done)
     def open_cube(self):
         method=self.method.get_text().strip();level=float(self.level.get_text().replace(',','.'));kind=self.kind.get_selected()
@@ -157,7 +160,7 @@ class MolecularTools(Gtk.Box):
         choose(self.window,'Importar campo Cube',opened)
     def snapshot(self):
         self.stop()
-        return {'molecule':asdict(self.require()),'camera':{k:getattr(self.viewer,k) for k in ('rot_x','rot_y','zoom','fov_deg')},'view':{k:getattr(self.viewer,k) for k in ('representation','show_hydrogens','show_ligands','fog','show_influence','influence_opacity','color_mode','surface_opacity','clip_enabled','clip_fraction')},'selection':self.ids,'chains':None if self.viewer.visible_chains is None else sorted(self.viewer.visible_chains),'surface':self.viewer.surface_mesh,'vibrations':self.vibrations}
+        return {'molecule':asdict(self.require()),'camera':{k:getattr(self.viewer,k) for k in ('rot_x','rot_y','zoom','fov_deg')},'view':{k:getattr(self.viewer,k) for k in ('representation','show_hydrogens','show_ligands','fog','show_influence','influence_opacity','color_mode','surface_opacity','clip_enabled','clip_fraction')},'selection':self.ids,'measurement':self.viewer.measurement_indices,'selection_mode':self.mode.get_selected(),'chains':None if self.viewer.visible_chains is None else sorted(self.viewer.visible_chains),'surface':self.viewer.surface_mesh,'vibrations':self.vibrations}
     @staticmethod
     def restore_view(view,data):
         view.set_molecule(molecule_from_dict(data['molecule']))
@@ -165,6 +168,7 @@ class MolecularTools(Gtk.Box):
             if key in data.get('camera',{}):setattr(view,key,float(data['camera'][key]))
         for key in ('representation','show_hydrogens','show_ligands','fog','show_influence','influence_opacity','color_mode','surface_opacity','clip_enabled','clip_fraction'):
             if key in data.get('view',{}):setattr(view,key,data['view'][key])
+        view.measurement_indices=list(data.get('measurement',[]))
         view.selection=set(data.get('selection',[]));view.visible_chains=None if data.get('chains') is None else set(data['chains']);mesh=data.get('surface')
         if mesh:
             mesh=dict(mesh)

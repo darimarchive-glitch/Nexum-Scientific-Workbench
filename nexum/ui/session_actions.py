@@ -41,6 +41,14 @@ def validate_structure(data):
         if key in m.metadata:
             a=np.asarray(m.metadata[key],dtype=float)
             if a.shape!=(len(m.atoms),ncols) or not np.isfinite(a).all():raise ValueError('Anotação salva inválida.')
+    if any(type(i) is not int or not 0<=i<len(m.atoms) for i in data.get('measurement',[])):raise ValueError('Medição salva inválida.')
+    if data.get('view',{}).get('representation','ribbon') not in ('ribbon','ball-stick','spacefill','sticks','backbone','lines'):raise ValueError('Representação inválida.')
+    if data.get('view',{}).get('color_mode','element') not in ('element','chain','residue','charge'):raise ValueError('Cor inválida.')
+    modes=data.get('vibrations')
+    if modes:
+        f=np.asarray(modes['frequencies_cm1'],dtype=float);v=np.asarray(modes['displacements'],dtype=float)
+        intensity=np.asarray(modes.get('intensities',np.ones(len(f))),dtype=float)
+        if f.ndim!=1 or not 1<=len(f)<=3000 or v.shape!=(len(f),len(m.atoms),3) or intensity.shape!=f.shape or not all(np.isfinite(a).all() for a in (f,v,intensity)):raise ValueError('Modos salvos inválidos.')
     charges=m.metadata.get('partial_charges')
     if charges is not None and (len(charges)!=len(m.atoms) or not np.isfinite(charges).all()):raise ValueError('Cargas salvas inválidas.')
 
@@ -68,11 +76,20 @@ def restore(window,data):
         controls.rep.set_selected(next(i for i,r in enumerate(REPRESENTATIONS) if r[1]==view.representation))
         controls.hydrogen.set_active(state['view'].get('show_hydrogens',False));controls.ligands.set_active(state['view'].get('show_ligands',True));controls.fog.set_active(state['view'].get('fog',True));controls.influence.set_active(state['view'].get('show_influence',False));controls.influence_opacity.set_value(state['view'].get('influence_opacity',.22)*100)
         controls.perspective.set_value(state.get('camera',{}).get('fov_deg',38))
+        controls.analysis.mode.set_selected(int(state.get('selection_mode',0)))
         controls.analysis.ids=list(state.get('selection',[]));controls.analysis.vibrations=state.get('vibrations')
         controls.analysis.color.set_selected(['element','chain','residue','charge'].index(state['view'].get('color_mode','element')))
         controls.analysis.opacity.set_value(state['view'].get('surface_opacity',.35)*100);controls.analysis.cut.set_active(state['view'].get('clip_enabled',False));controls.analysis.cut_at.set_value(state['view'].get('clip_fraction',.5)*100)
         for chain,button in controls.chain_buttons:button.set_active(state.get('chains') is None or chain in state['chains'])
         MolecularTools.restore_view(view,state);controls.analysis.diagram.queue_draw()
+        modes=controls.analysis.vibrations
+        if modes:
+            controls.analysis.mode_index.set_range(1,len(modes['frequencies_cm1']))
+            controls.analysis.mode_plot.set_plot({'title':'Modos calculados','xlabel':'cm⁻¹','ylabel':'Intensidade relativa','series':[{'name':modes.get('method','Calculado'),'points':list(zip(modes['frequencies_cm1'],modes.get('intensities',[1]*len(modes['frequencies_cm1'])))),'scatter':True}]})
+    else:
+        window.struct.analysis.reset();view=window.struct.viewer
+        view.molecule=None;view.surface_mesh=None;view.scene={};view.selection=set();view.measurement_indices=[];view.queue_render()
+        window.struct.empty.set_visible(True);window.struct.title.set_text('Nenhuma estrutura carregada');window.struct.meta.set_text('');window.struct.provenance_text.set_text('')
     window.struct.analysis.reference=data.get('reference')
     calc=data['calculator'];window.calc.select_tool(next(t for t in TOOLS if t[0]==calc['id']));restore_rows({k:r for k,(r,_) in window.calc.inputs.items()},calc.get('fields',{}));window.calc.value.set_text(calc.get('value','—'));window.calc.details.set_text(calc.get('details',''))
     for chart,plot in zip(window.calc.plots,calc.get('plots',[])):chart.set_plot(plot)

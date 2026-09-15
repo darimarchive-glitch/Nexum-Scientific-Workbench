@@ -128,7 +128,9 @@ def isotope_pattern(formula,charge=1):
     from rdkit import Chem
     from .chemistry import parse_formula
     counts=parse_formula(formula)
-    charge=int(charge)
+    raw_charge=float(charge)
+    if not math.isfinite(raw_charge) or not raw_charge.is_integer():raise ValueError('Carga deve ser inteira e finita.')
+    charge=int(raw_charge)
     if charge==0 or abs(charge)>10:raise ValueError("Carga entre −10 e +10, diferente de zero.")
     if sum(counts.values())>150:raise ValueError("Padrão limitado a 150 átomos.")
     pt=Chem.GetPeriodicTable();distribution={0.:1.}
@@ -166,3 +168,4 @@ def read_session(path):
     if obj.get("format")!="nexum-session" or obj.get("version")!=1 or not isinstance(obj.get("payload"),dict):
         raise ValueError("Formato/versão da sessão não suportado.")
     return obj["payload"]
+

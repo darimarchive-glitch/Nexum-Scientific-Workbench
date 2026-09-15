@@ -33,7 +33,7 @@ class ScientificPlot(Gtk.DrawingArea):
         d=self.data
         if not d:return
         legend_rows=(len(d.get("series",[]))+2)//3
-        left,right,top,bottom=62,22,30,48+legend_rows*20
+        left,right,top,bottom=90,22,36,48+legend_rows*20
         pw=max(10,w-left-right);ph=max(10,h-top-bottom)
         pts=[]
         for s in d.get('series',[]):
@@ -55,7 +55,7 @@ class ScientificPlot(Gtk.DrawingArea):
             f=i/5; x=left+f*pw; y=top+f*ph
             cr.set_source_rgba(.5,.5,.5,.10);cr.move_to(x,top);cr.line_to(x,top+ph);cr.stroke();cr.move_to(left,y);cr.line_to(left+pw,y);cr.stroke()
             self._text(cr,x-12,top+ph+20,f'{xmin+f*(xmax-xmin):.4g}',10)
-            self._text(cr,4,top+ph-f*ph+4,f'{ymin+f*(ymax-ymin):.4g}',10)
+            self._text(cr,30,top+ph-f*ph+4,f'{ymin+f*(ymax-ymin):.4g}',10)
         palette=[(.20,.50,.90,.95),(.90,.42,.18,.95),(.20,.68,.48,.95),(.62,.38,.84,.95)]
         for si,s in enumerate(d.get('series',[])):
             color=palette[si%len(palette)];valid=[(float(x),float(y)) for x,y in s.get('points',[]) if math.isfinite(float(x)) and math.isfinite(float(y))]
@@ -80,7 +80,7 @@ class ScientificPlot(Gtk.DrawingArea):
             x=float(m.get('x',0))
             if xmin<=x<=xmax:
                 px,_=xy(x,ymin);cr.set_source_rgba(.72,.28,.22,.72);cr.set_line_width(1.2);cr.move_to(px,top);cr.line_to(px,top+ph);cr.stroke();self._text(cr,min(px+4,w-130),top+15,m.get('label',''),10)
-        self._text(cr,left,18,d.get('title',''),13,True);self._text(cr,left+pw/2-30,h-9,d.get('xlabel',''),11);self._text(cr,5,16,d.get('ylabel',''),10)
+        self._text(cr,left,18,d.get('title',''),13,True);self._text(cr,left+pw/2-30,h-9,d.get('xlabel',''),11);cr.save();cr.translate(15,top+ph/2);cr.rotate(-math.pi/2);self._text(cr,-40,0,d.get('ylabel',''),10);cr.restore()
 
 
     def _clicked(self,gesture,n,x,y):

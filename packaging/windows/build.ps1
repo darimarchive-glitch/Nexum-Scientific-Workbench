@@ -22,7 +22,7 @@ $env:NEXUM_SELF_TEST_LOG=Join-Path $root 'build/self-test.log'
 $bundle=Join-Path $root 'dist/Nexum/Nexum.exe'
 $check=Start-Process -FilePath $bundle -ArgumentList '--self-test' -Wait -PassThru
 if ($check.ExitCode -ne 0) {
-    if (Test-Path $env:NEXUM_SELF_TEST_LOG) { Get-Content $env:NEXUM_SELF_TEST_LOG }
+    if (Test-Path $env:NEXUM_SELF_TEST_LOG) { Get-Content -Encoding UTF8 $env:NEXUM_SELF_TEST_LOG }
     throw 'Frozen desktop self-test failed.'
 }
 $iscc=(Get-Command ISCC.exe -ErrorAction SilentlyContinue)
@@ -41,7 +41,7 @@ try {
     $env:PATH="$env:SystemRoot\System32;$env:SystemRoot"
     $env:NEXUM_SELF_TEST_LOG=Join-Path $root 'build/installed-self-test.log'
     $installed=Start-Process -FilePath (Join-Path $installDir 'Nexum.exe') -WorkingDirectory $installDir -ArgumentList '--self-test' -Wait -PassThru
-    if (Test-Path $env:NEXUM_SELF_TEST_LOG) { Get-Content $env:NEXUM_SELF_TEST_LOG }
+    if (Test-Path $env:NEXUM_SELF_TEST_LOG) { Get-Content -Encoding UTF8 $env:NEXUM_SELF_TEST_LOG }
     if ($installed.ExitCode -ne 0) { throw "Installed application self-test failed: $($installed.ExitCode)" }
 } finally {
     $env:PATH=$buildSearchPath

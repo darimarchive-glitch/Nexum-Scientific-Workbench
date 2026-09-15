@@ -15,3 +15,6 @@ flatpak run --filesystem="$PWD/build/flatpak-input" --share=network --command=sh
 (cd build/flatpak-input/wheels && sha256sum ./*.whl) > build/flatpak-input/WHEELS.sha256
 flatpak-builder --user --force-clean --repo=build/flatpak-repo build/flatpak-app packaging/flatpak/io.github.nexum.ScientificWorkbench.json
 flatpak build-bundle build/flatpak-repo dist/Nexum-x86_64.flatpak "$app_id" --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo
+
+
+cp packaging/flatpak/repair-shortcut.sh dist/Reparar-atalho-Nexum.sh

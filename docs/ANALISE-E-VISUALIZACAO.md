@@ -28,7 +28,7 @@ Calibração: mínimos quadrados ordinários e incerteza padrão (k=1) da previs
 
 Titulação poliprótica: até três prótons, ácido inicialmente não neutralizado, base forte, equilíbrio ideal a 25 °C. Balanço de carga inclui água; etapas próximas podem não apresentar picos separados. Padrões isotópicos: abundâncias naturais do RDKit, até 150 átomos, 2048 combinações mais prováveis por passo, limiar de intensidade relativo; não simula fragmentação nem enriquecimento. Informe a fórmula completa da espécie iônica, incluindo aduto; o algoritmo corrige massa de elétrons, não adiciona prótons automaticamente.
 
-As bancadas de calibração, comparação cinética e titulação poliprótica são acessíveis também pela aba Experimentos. Curvas podem ser reproduzidas ponto a ponto e guardadas para comparação; somente curvas do mesmo tipo e com as mesmas unidades são sobrepostas. Até oito referências por sessão.
+Calibração, comparação cinética e titulação poliprótica ficam na aba Análise. A aba Experimentos reúne apenas as bancadas experimentais. Curvas podem ser reproduzidas ponto a ponto e guardadas para comparação; somente curvas do mesmo tipo e com as mesmas unidades são sobrepostas. Até oito referências por sessão.
 
 ## Sessões
 

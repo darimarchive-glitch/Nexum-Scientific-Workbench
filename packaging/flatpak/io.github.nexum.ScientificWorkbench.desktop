@@ -1,9 +1,13 @@
 [Desktop Entry]
 Type=Application
 Name=Nexum Scientific Workbench
+GenericName=Bancada científica
+Keywords=Nexum;Química;Chemistry;Moléculas;Calculadoras;Análise;
+StartupWMClass=io.github.nexum.ScientificWorkbench
 Comment=Calculadoras, estruturas moleculares e experimentos de química
 Exec=nexum
 Icon=io.github.nexum.ScientificWorkbench
 Terminal=false
 Categories=Education;Science;Chemistry;
 StartupNotify=true
+

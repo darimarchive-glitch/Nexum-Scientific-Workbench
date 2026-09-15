@@ -42,7 +42,7 @@ class MainWindow(Adw.ApplicationWindow):
         self.stack.add_titled_with_icon(self.struct,"structures","Estruturas 3D","applications-science-symbolic")
         self.stack.add_titled_with_icon(self.exp,"experiments","Experimentos","media-playback-start-symbolic")
         self.analysis=AnalysisPage(self)
-        self.stack.add_titled_with_icon(self.analysis,"analysis","Análise","view-statistics-symbolic")
+        self.stack.add_titled_with_icon(self.analysis,"analysis","Análise","nexum-analysis-symbolic")
         self.stack.add_titled_with_icon(self.hist,"history","Histórico","document-open-recent-symbolic")
         from .session_actions import add_actions
         add_actions(self,header)
@@ -53,4 +53,3 @@ class MainWindow(Adw.ApplicationWindow):
     def _key(self,controller,keyval,keycode,state):
         if keyval==Gdk.KEY_Escape and getattr(self.struct,"_fullscreen",False):self.struct._toggle_fullscreen();return True
         return False
-

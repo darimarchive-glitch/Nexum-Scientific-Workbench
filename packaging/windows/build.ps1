@@ -36,6 +36,16 @@ if ($setupFiles.Count -ne 1) { throw 'Expected exactly one generated installer.'
 $installDir=Join-Path $root 'build/installed Nexum'
 $install=Start-Process -FilePath $setupFiles[0].FullName -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',('/DIR="{0}"' -f $installDir)) -Wait -PassThru
 if ($install.ExitCode -ne 0) { throw "Installer failed: $($install.ExitCode)" }
+$shortcutShell=New-Object -ComObject WScript.Shell
+foreach ($shortcutPath in @(
+    (Join-Path ([Environment]::GetFolderPath('Programs')) 'Nexum\Nexum.lnk'),
+    (Join-Path ([Environment]::GetFolderPath('DesktopDirectory')) 'Nexum.lnk')
+)) {
+    if (-not (Test-Path -LiteralPath $shortcutPath)) { throw "Shortcut missing: $shortcutPath" }
+    $shortcut=$shortcutShell.CreateShortcut($shortcutPath)
+    if ($shortcut.TargetPath -ne (Join-Path $installDir 'Nexum.exe')) { throw "Wrong shortcut target: $shortcutPath" }
+}
+Write-Host 'Start menu and desktop shortcuts: OK'
 $buildSearchPath=$env:PATH
 try {
     $env:PATH="$env:SystemRoot\System32;$env:SystemRoot"

@@ -10,6 +10,10 @@ def icon_directory():
     folder.mkdir(parents=True,exist_ok=True)
     target=folder/(APP_ID+'.svg')
     if not target.exists() or target.read_bytes()!=logo:target.write_bytes(logo)
+    analysis=files('nexum').joinpath('assets/nexum-analysis-symbolic.svg').read_bytes()
+    analysis_target=folder/'nexum-analysis-symbolic.svg'
+    if not analysis_target.exists() or analysis_target.read_bytes()!=analysis:
+        analysis_target.write_bytes(analysis)
     (folder.parents[1]/'index.theme').write_text('[Icon Theme]\nName=Nexum\nComment=Official Nexum icon\nDirectories=scalable/apps\n\n[scalable/apps]\nSize=128\nType=Scalable\nMinSize=16\nMaxSize=512\nContext=Applications\n',encoding='utf-8')
     return folder.parents[2]
 

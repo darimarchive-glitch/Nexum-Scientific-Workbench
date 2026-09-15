@@ -64,10 +64,6 @@ class ExperimentsPage(Gtk.Box):
         head.append(t)
         head.append(d)
         self.control_box.append(head)
-        for label,index in (("Calibração e incerteza",1),("Comparar ordens cinéticas",2),("Titulação poliprótica",3)):
-            button=Gtk.Button(label=label)
-            button.connect("clicked",lambda _,i=index:self._open_analysis(i))
-            self.control_box.append(button)
 
         self.exp_list = Gtk.ListBox()
         self.exp_list.add_css_class("boxed-list")
@@ -503,9 +499,3 @@ class ExperimentsPage(Gtk.Box):
 
     def _draw_chart(self, _area, cr, width, height):
         LaboratoryDrawing(cr, Adw.StyleManager.get_default().get_dark()).chart(width, height, self.session)
-
-
-    def _open_analysis(self,index):
-        self._pause()
-        self.window.analysis.mode.set_selected(index)
-        self.window.stack.set_visible_child_name("analysis")

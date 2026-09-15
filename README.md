@@ -55,6 +55,8 @@ Os modos vibracionais são importados de cálculos e animados em velocidade did�
 
 O workflow **Build desktop installers** produz um instalador Windows `.exe` e um pacote Linux `.flatpak`. Os artefatos da PR exigem acesso ao repositório e possuem prazo de retenção. No Linux: `flatpak install --user Nexum-x86_64.flatpak`; depois, `flatpak run io.github.nexum.ScientificWorkbench`.
 
+**Atalho no Linux:** após instalar o Flatpak, procure **Nexum** no menu de aplicativos e fixe-o nos favoritos, se desejar. Se ele abrir pela loja, mas não aparecer no menu, o ZIP do pacote inclui `Reparar-atalho-Nexum.sh`: execute `bash Reparar-atalho-Nexum.sh` na pasta extraída. Ele restaura o atalho e o logo no menu do usuário, preservando uma cópia de um atalho anterior diferente. Caso o menu ainda não atualize, saia da sessão e entre novamente. Isso não exige reinstalar dependências de desenvolvimento.
+
 As instruções abaixo são para execução a partir do código e desenvolvimento.
 
 ## Começar no Windows

@@ -110,6 +110,7 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
             assert window.analysis.tertiary.data
             from nexum.branding import APP_ID
             assert Gtk.IconTheme.get_for_display(Gdk.Display.get_default()).has_icon(APP_ID)
+            assert Gtk.IconTheme.get_for_display(Gdk.Display.get_default()).has_icon("nexum-analysis-symbolic")
             if errors:raise RuntimeError("Falha no fluxo integrado") from errors[0][1]
             print("Medições/superfícies/PNG/SVG/calibração/titulação/sessão/logo: OK",flush=True)
 

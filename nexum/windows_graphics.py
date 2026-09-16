@@ -28,7 +28,12 @@ def configure(mode, bundle):
         import ctypes
         _dll_handles.append(os.add_dll_directory(str(folder)))
         # Load by absolute path before GTK/epoxy/PyOpenGL can load system GL.
-        _dll_handles.append(ctypes.WinDLL(str(driver), winmode=0x8))
+        # Windows DLL search flags require a native absolute path. In MSYS2,
+        # pathlib emits forward slashes; ALTERED_SEARCH_PATH then fails to
+        # resolve Mesa's adjacent libgallium_wgl.dll. Use the modern loader
+        # search with DLL_LOAD_DIR plus DEFAULT_DIRS instead.
+        native_path = str(driver.resolve()).replace('/', '\\')
+        _dll_handles.append(ctypes.WinDLL(native_path, winmode=0x1100))
         os.environ['GALLIUM_DRIVER'] = 'llvmpipe'
         os.environ['GSK_RENDERER'] = 'cairo'
 

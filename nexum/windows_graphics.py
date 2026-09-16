@@ -33,7 +33,16 @@ def configure(mode, bundle):
         # resolve Mesa's adjacent libgallium_wgl.dll. Use the modern loader
         # search with DLL_LOAD_DIR plus DEFAULT_DIRS instead.
         native_path = str(driver.resolve()).replace('/', '\\')
-        _dll_handles.append(ctypes.WinDLL(native_path, winmode=0x1100))
+        mesa = ctypes.WinDLL(native_path, winmode=0x1100)
+        _dll_handles.append(mesa)
+        # PyOpenGL's find_library('opengl32') returns the SYSTEM DLL even
+        # when Mesa is loaded. Bind its WGL functions to the same DLL as GTK
+        # before importing any GL wrappers; mixing them has no current context.
+        from OpenGL import platform
+        from OpenGL.platform.win32 import Win32Platform
+        binding = Win32Platform()
+        binding.GL = mesa
+        binding.install(vars(platform))
         os.environ['GALLIUM_DRIVER'] = 'llvmpipe'
         os.environ['GSK_RENDERER'] = 'cairo'
 
@@ -51,14 +60,9 @@ def probe():
     context.make_current()
     try:
         from OpenGL import GL
-        # GDK's capability probes can leave a GL error on the fresh context.
-        # Drain only at this ownership boundary; retain PyOpenGL checking for
-        # all subsequent queries and the application's real rendering tests.
-        for _ in range(16):
-            if GL.glGetError() == GL.GL_NO_ERROR:
-                break
-        else:
-            raise RuntimeError('O driver manteve erros após criar o contexto OpenGL.')
+        from OpenGL import platform
+        if not platform.GetCurrentContext():
+            raise RuntimeError('GTK e PyOpenGL não compartilham o contexto gráfico.')
         version = GL.glGetString(GL.GL_VERSION)
         renderer = GL.glGetString(GL.GL_RENDERER)
         if not version or not renderer:

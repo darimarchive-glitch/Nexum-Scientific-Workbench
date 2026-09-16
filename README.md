@@ -42,6 +42,10 @@ Os cálculos são locais. A instalação e a busca de estruturas em **PubChem/RC
 
 > **Nexum 6.8 · Windows e Linux:** aplicação desktop nativa com o mesmo motor científico, calculadoras, bancadas e visualizador molecular. A versão Windows funciona sem WSL.
 
+## Correção de compatibilidade Windows — 6.8.1
+
+O instalador inclui um renderizador de compatibilidade para computadores em que o OpenGL nativo não inicia. A seleção é automática; o modo por software pode ser mais lento em estruturas grandes. [Diagnóstico e funcionamento](docs/WINDOWS_GRAPHICS.md).
+
 ## Novidades da versão 6.8
 
 - **Logo oficial:** `docs/logo-nexum.svg`, usado no aplicativo, no instalador e nos atalhos.
@@ -264,4 +268,5 @@ Distribuído sob a [licença MIT](LICENSE), conforme definida pelo mantenedor ne
 
 © 2026 [Davi P. Souza](https://github.com/darimarchive-glitch) – Nexum Scientific Workbench
 </div>
+
 

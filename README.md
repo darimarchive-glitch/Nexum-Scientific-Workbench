@@ -20,7 +20,7 @@ Química computacional, estruturas 3D e experimentos em uma bancada nativa para 
 **43 calculadoras · 12 áreas científicas · 10 bancadas · 5 ferramentas de análise de dados**
 <!-- nexum-catalog:end -->
 
-**Instalar o Nexum 6.8.0:** [Windows — instalador EXE](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases/download/v6.8.0/Nexum-Setup-6.8.0-x64.exe) · [Linux — Flatpak](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases/download/v6.8.0/Nexum-x86_64.flatpak) · [Instruções e arquivos da versão](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases/tag/v6.8.0)
+**Instalar o Nexum 6.8.1:** [Windows — instalador EXE](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases/download/v6.8.1/Nexum-Setup-6.8.1-x64.exe) · [Linux — Flatpak](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases/download/v6.8.1/Nexum-x86_64.flatpak) · [Instruções e arquivos da versão](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases/tag/v6.8.1)
 
 [Instalar no Windows](#começar-no-windows) · [Instalar no Fedora](#começar-no-fedora) · [Experimentos](#uma-bancada-que-responde-aos-seus-dados) · [Motor científico](#o-cérebro-científico) · [Documentação](#documentação)
 

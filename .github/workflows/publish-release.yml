@@ -46,9 +46,14 @@ jobs:
           release_id=$(gh api repos/$GH_REPO/releases --jq '.[] | select(.tag_name == "v6.8.1") | .id')
           if [ -z "$release_id" ]; then
             gh release create v6.8.1 --target c0f7cacb6df6bae48170092f5d7bcbe9ab317ae6 --draft --title 'Nexum 6.8.1' --notes-file docs/RELEASE-6.8.1.md
-            release_id=$(gh api repos/$GH_REPO/releases --jq '.[] | select(.tag_name == "v6.8.1") | .id')
+            for attempt in 1 2 3 4 5; do
+              release_id=$(gh api repos/$GH_REPO/releases --jq '.[] | select(.tag_name == "v6.8.1") | .id')
+              [ -n "$release_id" ] && break
+              sleep 2
+            done
           fi
           test -n "$release_id"
+          echo "Validating release ID: $release_id"
           test "$(gh api repos/$GH_REPO/releases/$release_id --jq .target_commitish)" = c0f7cacb6df6bae48170092f5d7bcbe9ab317ae6
           if [ "$(gh api repos/$GH_REPO/releases/$release_id --jq .draft)" = false ]; then
             echo 'This release is already published; its files will not be replaced.'

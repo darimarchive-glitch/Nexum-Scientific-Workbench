@@ -1,0 +1,47 @@
+name: Publish Nexum 6.8 installers
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-release.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: publish-nexum-6-8
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify tested revision and download installers
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/$GH_REPO/actions/runs/35033588559 --jq .conclusion)" = success
+          test "$(gh api repos/$GH_REPO/actions/runs/35033588559 --jq .head_sha)" = 4141cbad2d18cbc26214bf6e81e6a32bcc949645
+          test "$(git rev-parse ece08726171cc15ad24ff880bda45b893f7ff62b^{tree})" = "$(git rev-parse 4141cbad2d18cbc26214bf6e81e6a32bcc949645^{tree})"
+          mkdir assets
+          gh run download 35033588559 --name Nexum-Windows-installer --dir assets
+          gh run download 35033588559 --name Nexum-Linux-flatpak --dir assets
+          test -s assets/Nexum-Setup-6.8.0-x64.exe
+          test -s assets/Nexum-x86_64.flatpak
+          test -s assets/Reparar-atalho-Nexum.sh
+          cd assets
+          sha256sum Nexum-Setup-6.8.0-x64.exe Nexum-x86_64.flatpak Reparar-atalho-Nexum.sh > SHA256SUMS.txt
+      - name: Upload all files before publishing the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh release create v6.8.0 --target ece08726171cc15ad24ff880bda45b893f7ff62b --draft --title 'Nexum 6.8.0' --notes-file docs/RELEASE-6.8.0.md
+          gh release upload v6.8.0 assets/Nexum-Setup-6.8.0-x64.exe assets/Nexum-x86_64.flatpak assets/Reparar-atalho-Nexum.sh assets/SHA256SUMS.txt
+          test "$(gh api repos/$GH_REPO/releases/tags/v6.8.0 --jq '.assets | length')" = 4
+          gh release edit v6.8.0 --draft=false --latest

@@ -1,0 +1,35 @@
+{
+  "app-id": "io.github.nexum.ScientificWorkbench",
+  "runtime": "org.gnome.Platform",
+  "runtime-version": "49",
+  "sdk": "org.gnome.Sdk",
+  "command": "nexum",
+  "finish-args": [
+    "--share=ipc",
+    "--share=network",
+    "--socket=wayland",
+    "--socket=fallback-x11",
+    "--device=dri",
+    "--env=PYOPENGL_PLATFORM=egl"
+  ],
+  "modules": [
+    {
+      "name": "nexum",
+      "buildsystem": "simple",
+      "build-commands": [
+        "python3 -m pip install --no-index --find-links=wheels --no-build-isolation --prefix=/app -r requirements.txt",
+        "python3 packaging/flatpak/install.py",
+        "install -Dm755 packaging/flatpak/nexum /app/bin/nexum",
+        "install -Dm644 packaging/flatpak/io.github.nexum.ScientificWorkbench.desktop /app/share/applications/io.github.nexum.ScientificWorkbench.desktop",
+        "install -Dm644 nexum/assets/logo.svg /app/share/icons/hicolor/scalable/apps/io.github.nexum.ScientificWorkbench.svg"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "../../build/flatpak-input"
+        }
+      ]
+    }
+  ]
+}
+

@@ -26,7 +26,7 @@ class StructurePage(Gtk.Box):
     def __init__(self, window):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.set_hexpand(True);self.set_vexpand(True)
-        self.window=window;self.cache=cache_dir()/"structures";self.selected_suggestion=None;self.search_source="Todos";self.search_timer=0;self._fullscreen=False
+        self.window=window;self.cache=cache_dir()/"structures";self.selected_suggestion=None;self.search_source="Todos";self.search_timer=0;self._fullscreen=False;self.search_generation=0
         self.viewer=GLMoleculeView();self.viewer.selection_callback=self._atom_selected
         style=Adw.StyleManager.get_default();self.viewer.set_dark(style.get_dark());style.connect("notify::dark",lambda *_:self.viewer.set_dark(style.get_dark()))
         self._build_searchbar();self._build_workspace()
@@ -36,7 +36,7 @@ class StructurePage(Gtk.Box):
         row=Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=8);row.set_margin_top(8);row.set_margin_bottom(8);row.set_margin_start(12);row.set_margin_end(12)
         self.search=Gtk.SearchEntry();self.search.set_hexpand(True);self.search.set_placeholder_text("Molécula, proteína, DNA ou código PDB…")
         self.search.connect("search-changed",self._search_changed);self.search.connect("activate",lambda *_:self._search_now())
-        self.source=Gtk.DropDown.new_from_strings(["Todas as fontes","PubChem","RCSB PDB"]);self.source.set_selected(0);self.source.connect("notify::selected",self._source_changed)
+        self.source=Gtk.DropDown.new_from_strings(["Todas as estruturas","Moléculas","Macromoléculas"]);self.source.set_selected(0);self.source.connect("notify::selected",self._source_changed)
         btn_import=Gtk.Button(icon_name="document-open-symbolic");btn_import.set_tooltip_text("Importar SDF/MOL/PDB/mmCIF");btn_import.connect("clicked",self._import_file)
         btn_full=Gtk.Button(icon_name="view-fullscreen-symbolic");btn_full.set_tooltip_text("Visualizador em tela cheia");btn_full.connect("clicked",self._toggle_fullscreen);self.full_btn=btn_full
         row.append(self.search);row.append(self.source);row.append(btn_import);row.append(btn_full);outer.append(row)
@@ -51,7 +51,7 @@ class StructurePage(Gtk.Box):
         fit=Gtk.Button(icon_name="zoom-fit-best-symbolic");fit.set_tooltip_text("Reenquadrar");fit.connect("clicked",lambda *_:self.viewer.fit())
         reset=Gtk.Button(icon_name="view-refresh-symbolic");reset.set_tooltip_text("Restaurar câmera");reset.connect("clicked",lambda *_:self.viewer.fit())
         controls.append(fit);controls.append(reset);viewer_overlay.add_overlay(controls)
-        self.empty=Adw.StatusPage(title="Estruturas 3D",description="Pesquise e selecione uma estrutura. Moléculas pequenas usam PubChem; macromoléculas usam RCSB/mmCIF.",icon_name="applications-science-symbolic");viewer_overlay.add_overlay(self.empty)
+        self.empty=Adw.StatusPage(title="Estruturas 3D",description="Pesquise uma molécula ou macromolécula para explorar sua estrutura em 3D.",icon_name="applications-science-symbolic");viewer_overlay.add_overlay(self.empty)
         paned.set_start_child(viewer_overlay)
         self.inspector=self._build_inspector();paned.set_end_child(self.inspector);paned.set_position(980)
         self.paned=paned;self.viewer_overlay=viewer_overlay;self.append(paned)
@@ -61,11 +61,23 @@ class StructurePage(Gtk.Box):
         box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=18);box.set_margin_top(16);box.set_margin_bottom(20);box.set_margin_start(16);box.set_margin_end(16)
         self.title=Gtk.Label(label="Nenhuma estrutura carregada",xalign=0);self.title.add_css_class("title-3");self.title.set_wrap(True);box.append(self.title)
         self.meta=Gtk.Label(label="",xalign=0);self.meta.add_css_class("dim-label");self.meta.set_wrap(True);box.append(self.meta)
+        self.provenance=Gtk.Expander(label="Origem e identificação dos dados")
+        self.provenance_text=Gtk.Label(xalign=0);self.provenance_text.set_wrap(True);self.provenance_text.set_selectable(True)
+        self.provenance.set_child(self.provenance_text);box.append(self.provenance)
         rep_group=Adw.PreferencesGroup(title="Representação")
         self.rep=Adw.ComboRow(title="Modo");self.rep.set_model(Gtk.StringList.new([x[0] for x in REPRESENTATIONS]));self.rep.set_selected(0);self.rep.connect("notify::selected",self._viewer_options_changed);rep_group.add(self.rep)
         self.hydrogen=Adw.SwitchRow(title="Hidrogênios");self.hydrogen.set_active(False);self.hydrogen.connect("notify::active",self._viewer_options_changed);rep_group.add(self.hydrogen)
         self.ligands=Adw.SwitchRow(title="Ligantes e cofatores");self.ligands.set_active(True);self.ligands.connect("notify::active",self._viewer_options_changed);rep_group.add(self.ligands)
         self.fog=Adw.SwitchRow(title="Névoa de profundidade",subtitle="Integra estruturas distantes ao fundo e reforça perspectiva");self.fog.set_active(True);self.fog.connect("notify::active",self._viewer_options_changed);rep_group.add(self.fog);box.append(rep_group)
+        layers=Adw.PreferencesGroup(title="Camadas")
+        self.influence=Adw.SwitchRow(title="Volume atômico",subtitle="Raios de van der Waals sobre a estrutura")
+        self.influence.set_tooltip_text("Envoltórias aproximadas em angstroms. Não representam densidade eletrônica, orbitais ou potencial eletrostático.")
+        self.influence.connect("notify::active",self._influence_changed);layers.add(self.influence)
+        opacity=Adw.ActionRow(title="Opacidade da camada")
+        self.influence_opacity=Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL,5,60,1)
+        self.influence_opacity.set_value(22);self.influence_opacity.set_size_request(130,-1)
+        self.influence_opacity.set_sensitive(False);self.influence_opacity.connect("value-changed",self._influence_changed)
+        opacity.add_suffix(self.influence_opacity);layers.add(opacity);box.append(layers)
         camera_group=Adw.PreferencesGroup(title="Câmera")
         depth_row=Adw.ActionRow(title="Perspectiva",subtitle="Campo de visão maior reforça a diferença entre frente e fundo")
         self.perspective=Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL,28,58,1);self.perspective.set_value(38);self.perspective.set_draw_value(False);self.perspective.set_size_request(120,-1);self.perspective.set_tooltip_text("Intensidade da perspectiva")
@@ -73,12 +85,16 @@ class StructurePage(Gtk.Box):
         chain_group=Adw.PreferencesGroup(title="Cadeias");self.chain_box=Gtk.FlowBox();self.chain_box.set_selection_mode(Gtk.SelectionMode.NONE);self.chain_box.set_column_spacing(6);self.chain_box.set_row_spacing(6);chain_group.add(self.chain_box);box.append(chain_group)
         sel_group=Adw.PreferencesGroup(title="Seleção");self.atom_info=Adw.ActionRow(title="Clique em um átomo",subtitle="Elemento, resíduo e cadeia aparecerão aqui.");sel_group.add(self.atom_info);box.append(sel_group)
         info=Adw.PreferencesGroup(title="Método");method=Adw.ActionRow(title="Macromoléculas",subtitle="mmCIF → backbone CA/P → fita 3D nativa; ligantes renderizados separadamente.");method.set_subtitle_lines(3);info.add(method);box.append(info)
+        from .molecular_tools import MolecularTools
+        self.analysis=MolecularTools(self);box.append(self.analysis)
         sw.set_child(box);return sw
 
     def _source_changed(self,*_):
         self.search_source=["Todos","PubChem","RCSB PDB"][self.source.get_selected()];self._schedule_search()
     def _search_changed(self,*_):self._schedule_search()
     def _schedule_search(self):
+        self.search_generation+=1
+        self._clear_results()
         if self.search_timer:GLib.source_remove(self.search_timer)
         if len(self.search.get_text().strip())<2:self._clear_results();return
         self.search_timer=GLib.timeout_add(350,self._search_now)
@@ -88,17 +104,25 @@ class StructurePage(Gtk.Box):
     def _search_now(self,*_):
         self.search_timer=0;q=self.search.get_text().strip()
         if len(q)<2:return False
+        self.search_generation+=1
+        generation=self.search_generation
         self.window.toast("Buscando estruturas…",timeout=1)
-        threading.Thread(target=self._search_worker,args=(q,self.search_source),daemon=True).start();return False
-    def _search_worker(self,q,source):
-        try:items=suggestions(q,source,4);GLib.idle_add(self._show_results,items)
-        except Exception as exc:GLib.idle_add(self.window.toast,f"Busca indisponível: {exc}")
-    def _show_results(self,items):
+        threading.Thread(target=self._search_worker,args=(q,self.search_source,generation),daemon=True).start();return False
+    def _search_worker(self,q,source,generation):
+        try:items=suggestions(q,source,4);GLib.idle_add(self._show_results,items,generation)
+        except Exception as exc:GLib.idle_add(self._search_error,str(exc),generation)
+    def _search_error(self,message,generation):
+        if generation==self.search_generation:self.window.toast(f"Busca indisponível: {message}")
+        return False
+    def _show_results(self,items,generation=None):
+        if generation is not None and generation!=self.search_generation:return False
         self._clear_results()
         for s in items:
-            row=Adw.ActionRow(title=s.title,subtitle=f"{s.source} · {s.subtitle}");row.set_activatable(True);row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"));row.connect("activated",lambda _,ss=s:self._load_suggestion(ss));self.results.append(row)
+            row=Adw.ActionRow(title=s.title,subtitle="Macromolécula / complexo" if s.source=="RCSB PDB" else "Molécula")
+            row.set_tooltip_text(s.subtitle);row.set_activatable(True);row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"));row.connect("activated",lambda _,ss=s:self._load_suggestion(ss));self.results.append(row)
         self.results_revealer.set_reveal_child(bool(items));return False
     def _load_suggestion(self,s):
+        self.search_generation+=1
         self.selected_suggestion=s;self.results_revealer.set_reveal_child(False);self.window.toast(f"Carregando {s.identifier}…",timeout=2)
         threading.Thread(target=self._load_worker,args=(s,),daemon=True).start()
     def _load_worker(self,s):
@@ -107,7 +131,10 @@ class StructurePage(Gtk.Box):
             GLib.idle_add(self._apply_molecule,mol)
         except Exception as exc:GLib.idle_add(self.window.toast,f"Não foi possível carregar a estrutura: {exc}")
     def _apply_molecule(self,mol):
-        self.empty.set_visible(False);self.title.set_text(mol.name);md=mol.metadata;self.meta.set_text(f"{mol.source} · {mol.identifier}\n{len(mol.atoms):,} átomos · {md.get('residue_count',0)} resíduos · {md.get('chain_count',0)} cadeias\n{mol.description}".replace(",","."))
+        self.analysis.reset()
+        self.empty.set_visible(False);self.title.set_text(mol.name);md=mol.metadata;kind="Macromolécula / complexo" if md.get("polymer_backbone_atoms",0)>2 else "Molécula"
+        self.meta.set_text(f"{kind}\n{len(mol.atoms):,} átomos · {md.get('residue_count',0)} resíduos · {md.get('chain_count',0)} cadeias".replace(",","."))
+        self.provenance_text.set_text(f"Fonte: {mol.source}\nIdentificador: {mol.identifier}\n{mol.description}")
         is_poly=md.get("polymer_backbone_atoms",0)>2;self.rep.set_selected(0 if is_poly else 1);self.viewer.visible_chains=None;self.viewer.set_molecule(mol);self._rebuild_chain_buttons(md.get("chains",[]));self._viewer_options_changed();self.window.toast("Estrutura carregada");return False
     def _rebuild_chain_buttons(self,chains):
         while (c:=self.chain_box.get_first_child()) is not None:self.chain_box.remove(c)
@@ -116,9 +143,15 @@ class StructurePage(Gtk.Box):
             b=Gtk.ToggleButton(label=chain);b.set_active(True);b.connect("toggled",self._chains_changed);self.chain_box.append(b);self.chain_buttons.append((chain,b))
     def _chains_changed(self,*_):
         active={c for c,b in getattr(self,"chain_buttons",[]) if b.get_active()};self.viewer.configure(visible_chains=active or set())
+    def _influence_changed(self,*_):
+        active=self.influence.get_active()
+        self.influence_opacity.set_sensitive(active)
+        self.viewer.configure(show_influence=active,influence_opacity=self.influence_opacity.get_value()/100)
+
     def _viewer_options_changed(self,*_):
         rep=REPRESENTATIONS[self.rep.get_selected()][1];self.viewer.configure(representation=rep,show_hydrogens=self.hydrogen.get_active(),show_ligands=self.ligands.get_active(),fog=self.fog.get_active())
     def _atom_selected(self,idx,a):
+        self.analysis.selected(idx)
         title=f"{a.element} · {a.name or 'átomo'}";sub=f"{a.residue} {a.residue_id} · cadeia {a.chain}" if a.residue else f"índice {idx+1}";self.atom_info.set_title(title);self.atom_info.set_subtitle(sub)
 
     def _import_file(self,*_):
@@ -134,3 +167,5 @@ class StructurePage(Gtk.Box):
         self.search_area.set_visible(not self._fullscreen);self.inspector.set_visible(not self._fullscreen)
         if self._fullscreen:self.window.fullscreen();self.full_btn.set_icon_name("view-restore-symbolic")
         else:self.window.unfullscreen();self.full_btn.set_icon_name("view-fullscreen-symbolic")
+
+

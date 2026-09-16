@@ -24,7 +24,7 @@ def _positive_real_root(coeffs):
 
 class ValidationMatrixV6(unittest.TestCase):
     def test_every_tool_has_declared_scope(self):
-        self.assertEqual(len(TOOLS),35)
+        self.assertEqual(len(TOOLS),len({t[0] for t in TOOLS}))
         self.assertEqual(set(t[0] for t in TOOLS),set(TOOL_SCOPE))
 
     def test_molar_mass_simple_reference_set(self):
@@ -175,3 +175,4 @@ class ValidationMatrixV6(unittest.TestCase):
 
 if __name__=='__main__':
     unittest.main()
+

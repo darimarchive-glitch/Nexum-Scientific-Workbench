@@ -83,6 +83,7 @@ try {
         $shortcut.TargetPath = Join-Path $projectRoot 'run-windows.cmd'
         $shortcut.WorkingDirectory = $projectRoot
         $shortcut.Description = 'Nexum Scientific Workbench'
+        $shortcut.IconLocation = (Join-Path $projectRoot 'nexum\assets\nexum.ico')
         $shortcut.Save()
         Write-Host 'Nexum desktop shortcut created.'
     }
@@ -91,3 +92,4 @@ try {
     Write-Host "Nexum: $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }
+

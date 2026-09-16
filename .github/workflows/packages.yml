@@ -1,0 +1,72 @@
+name: Build desktop installers
+on:
+  pull_request:
+    paths: ['packaging/**', '.github/workflows/packages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        id: python
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pyinstaller==6.22.3
+      - uses: msys2/setup-msys2@v2
+        id: msys2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-gtk4
+            mingw-w64-ucrt-x86_64-libadwaita
+            mingw-w64-ucrt-x86_64-python-gobject
+            mingw-w64-ucrt-x86_64-python-cairo
+            mingw-w64-ucrt-x86_64-python-numpy
+            mingw-w64-ucrt-x86_64-python-scipy
+            mingw-w64-ucrt-x86_64-python-pyopengl
+            mingw-w64-ucrt-x86_64-adwaita-icon-theme
+            mingw-w64-ucrt-x86_64-pyinstaller
+      - uses: ssciwr/setup-mesa-dist-win@v3
+      - name: Compile bundle, verify, create installer
+        shell: powershell
+        env:
+          NEXUM_BUILD_MSYS: ${{ steps.msys2.outputs.msys2-location }}
+          NEXUM_BUILD_PYTHON: ${{ steps.python.outputs.python-path }}
+          GTK_A11Y: test
+        run: |
+          & ./packaging/windows/build.ps1 -MsysRoot $env:NEXUM_BUILD_MSYS -SciencePython $env:NEXUM_BUILD_PYTHON
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Nexum-Windows-installer
+          path: dist/installer/*.exe
+          if-no-files-found: error
+  flatpak:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y flatpak flatpak-builder xvfb dbus-x11 desktop-file-utils python3-gi
+      - run: bash packaging/flatpak/build.sh
+      - name: Install and test the actual Flatpak bundle
+        run: |
+          flatpak install --user --noninteractive dist/Nexum-x86_64.flatpak
+          export XDG_DATA_DIRS="$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+          python3 packaging/flatpak/check-launcher.py
+          bash packaging/flatpak/repair-shortcut.sh
+          python3 packaging/flatpak/check-launcher.py
+          dbus-run-session -- xvfb-run -a flatpak run --command=python3 io.github.nexum.ScientificWorkbench -u -X faulthandler -c "import sys; sys.path.insert(0, '/app/share/nexum/nexum.zip'); from nexum.windows_check import main; main()"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Nexum-Linux-flatpak
+          path: |
+            dist/*.flatpak
+            dist/Reparar-atalho-Nexum.sh
+          if-no-files-found: error
+

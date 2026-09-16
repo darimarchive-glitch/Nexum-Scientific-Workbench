@@ -10,6 +10,7 @@ from .calculators_page import CalculatorPage
 from .structures_page import StructurePage
 from .experiments_page import ExperimentsPage
 from .history_page import HistoryPage
+from .analysis_page import AnalysisPage
 
 CSS=b"""
 .numeric-result { font-size: 2rem; font-weight: 700; font-feature-settings: 'tnum' 1; padding: 10px 4px; }
@@ -29,16 +30,22 @@ class MainWindow(Adw.ApplicationWindow):
     def __init__(self,application):
         super().__init__(application=application);self.set_title("Nexum");self.set_default_size(1440,900);self.set_size_request(860,600)
         provider=Gtk.CssProvider();provider.load_from_data(CSS);Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(),provider,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        from nexum.branding import install_icons
+        install_icons()
         self.history=HistoryStore(data_dir()/"history.sqlite3")
         self.overlay=Adw.ToastOverlay();toolbar=Adw.ToolbarView();self.overlay.set_child(toolbar);self.set_content(self.overlay)
-        header=Adw.HeaderBar();brand=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=0);b=Gtk.Label(label="NEXUM",xalign=0);b.add_css_class("heading");sub=Gtk.Label(label="Scientific Workbench",xalign=0);sub.add_css_class("caption");brand.append(b);brand.append(sub);header.pack_start(brand)
+        header=Adw.HeaderBar();brand=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=0);b=Gtk.Label(label="NEXUM",xalign=0);b.add_css_class("heading");sub=Gtk.Label(label="Scientific Workbench",xalign=0);sub.add_css_class("caption");brand.append(b);brand.append(sub);header.pack_start(Gtk.Image.new_from_icon_name("io.github.nexum.ScientificWorkbench"));header.pack_start(brand)
         self.stack=Adw.ViewStack();self.stack.set_hexpand(True);self.stack.set_vexpand(True);switcher=Adw.ViewSwitcher();switcher.set_stack(self.stack);switcher.set_policy(Adw.ViewSwitcherPolicy.WIDE);header.set_title_widget(switcher);toolbar.add_top_bar(header)
         self.home=HomePage(self);self.calc=CalculatorPage(self,self.history);self.struct=StructurePage(self);self.exp=ExperimentsPage(self);self.hist=HistoryPage(self.history)
         self.stack.add_titled_with_icon(self.home,"home","Início","go-home-symbolic")
         self.stack.add_titled_with_icon(self.calc,"calculators","Calculadoras","accessories-calculator-symbolic")
         self.stack.add_titled_with_icon(self.struct,"structures","Estruturas 3D","applications-science-symbolic")
         self.stack.add_titled_with_icon(self.exp,"experiments","Experimentos","media-playback-start-symbolic")
+        self.analysis=AnalysisPage(self)
+        self.stack.add_titled_with_icon(self.analysis,"analysis","Análise","nexum-analysis-symbolic")
         self.stack.add_titled_with_icon(self.hist,"history","Histórico","document-open-recent-symbolic")
+        from .session_actions import add_actions
+        add_actions(self,header)
         toolbar.set_content(self.stack)
         keys=Gtk.EventControllerKey();keys.connect("key-pressed",self._key);self.add_controller(keys)
     def toast(self,text,timeout=4):

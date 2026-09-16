@@ -1,9 +1,12 @@
 """Fail explicitly if a required Windows runtime feature is unavailable."""
 import tempfile
+import os
 from pathlib import Path
 
 
 def main():
+    import faulthandler
+    faulthandler.enable()
     import gi
     gi.require_version("Gtk", "4.0")
     gi.require_version("Adw", "1")
@@ -47,25 +50,7 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
         history = HistoryStore(Path(folder) / "histórico" / "history.sqlite3")
         history.add("windows-check", {"concentração": 1}, {"resultado": 2})
         assert len(history.latest()) == 1
-    surface = Gdk.Surface.new_toplevel(Gdk.Display.get_default())
-    context = surface.create_gl_context()
-    context.set_required_version(3, 3)
-    context.set_use_es(False)
-    context.realize()
-    context.make_current()
-    try:
-        from OpenGL.GL import shaders
-        from nexum.ui import gl_viewer
-        for name in ("POINT", "LINE", "RIBBON"):
-            program = shaders.compileProgram(
-                shaders.compileShader(getattr(gl_viewer, name + "_VS"), GL.GL_VERTEX_SHADER),
-                shaders.compileShader(getattr(gl_viewer, name + "_FS"), GL.GL_FRAGMENT_SHADER),
-            )
-            GL.glDeleteProgram(program)
-        print("OpenGL:", GL.glGetString(GL.GL_VERSION))
-    finally:
-        Gdk.GLContext.clear_current()
-        surface.destroy()
+    print("Chemistry and storage: OK; opening application", flush=True)
     # Instantiate every page and exercise the actual GLArea render callback.
     import sys
     import time
@@ -82,7 +67,11 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
         original_hook = sys.excepthook
         sys.excepthook = lambda *error: errors.append(error)
         try:
-            window.struct.viewer.set_molecule(molecule)
+            window.struct._apply_molecule(molecule)
+            window.struct.influence.set_active(True)
+            window.struct.influence_opacity.set_value(35)
+            assert window.struct.viewer.show_influence
+            assert len(window.struct.viewer.scene["influence_pos"]) > 0
             window.stack.set_visible_child_name("structures")
             window.present()
             deadline = time.monotonic() + 2
@@ -94,6 +83,40 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
             if window.struct.viewer.get_error():
                 raise RuntimeError(str(window.struct.viewer.get_error()))
             assert len(window.struct.viewer.programs) == 3
+            window.struct.viewer.make_current()
+            assert GL.glGetError() == GL.GL_NO_ERROR
+            print("OpenGL:", GL.glGetString(GL.GL_VERSION), flush=True)
+            from nexum.core.molecular_analysis import molecular_surface
+            from nexum.ui.session_actions import snapshot,restore
+            output=Path(os.environ.get("NEXUM_RENDER_DIR",folder))/"visual-checks";output.mkdir(parents=True,exist_ok=True)
+            viewer=window.struct.viewer
+            viewer.set_dark(False);viewer.export_png(output/"vdw-light.png")
+            viewer.set_dark(True);viewer.export_png(output/"vdw-dark.png")
+            viewer.surface_mesh=molecular_surface(molecule,"vdw",resolution=24)
+            viewer.clip_enabled=True;viewer.export_png(output/"surface-cut.png")
+            viewer.make_current();assert GL.glGetError()==GL.GL_NO_ERROR
+            panel=window.struct.analysis;panel.mode.set_selected(1);panel.selected(1);panel.selected(0)
+            assert "Distância" in panel.result.get_text()
+            assert viewer.measurement_indices==[1,0]
+            viewer.export_png(output/"measurement.png")
+            window.analysis.mode.set_selected(1);window.analysis.simulate();window.analysis.analyze()
+            assert "Concentração" in window.analysis.report.get_text()
+            window.analysis.plot.export(output/"calibration.svg")
+            state=snapshot(window);restore(window,state)
+            assert window.struct.viewer.surface_mesh is not None
+            assert window.struct.viewer.measurement_indices==[1,0]
+            assert window.analysis.dataset["origin"]=="Simulado"
+            window.analysis.mode.set_selected(3);window.analysis.analyze()
+            assert window.analysis.tertiary.data
+            from nexum.branding import APP_ID
+            assert Gtk.IconTheme.get_for_display(Gdk.Display.get_default()).has_icon(APP_ID)
+            assert Gtk.IconTheme.get_for_display(Gdk.Display.get_default()).has_icon("nexum-analysis-symbolic")
+            if errors:raise RuntimeError("Falha no fluxo integrado") from errors[0][1]
+            print("Medições/superfícies/PNG/SVG/calibração/titulação/sessão/logo: OK",flush=True)
+
+            window.struct.influence.set_active(False)
+            assert not window.struct.viewer.show_influence
+            assert len(window.struct.viewer.scene["influence_pos"]) == 0
         finally:
             window.destroy()
             sys.excepthook = original_hook
@@ -102,3 +125,4 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
 
 if __name__ == "__main__":
     main()
+

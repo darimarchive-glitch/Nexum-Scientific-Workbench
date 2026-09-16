@@ -8,7 +8,7 @@ from nexum.core.structures import parse_sdf,parse_pdb,parse_mmcif,resolve_pubche
 from nexum.core.search import match
 class ScientificSuite(unittest.TestCase):
     def test_all_default_cases_execute(self):
-        self.assertEqual(len(TOOLS),35)
+        self.assertEqual(len(TOOLS),len({t[0] for t in TOOLS}))
         for t in TOOLS:
             with self.subTest(tool=t[0]):
                 d={f['key']:f['default'] for f in t[4]}; r=CALCS[t[0]](d); self.assertTrue(r.value); self.assertTrue(r.details)
@@ -99,3 +99,4 @@ ATOM 3 C CA B ALA A 1 1 ? 0.1 0 0 0.5 10 ? 1 ALA A CA 1
         self.assertEqual(m.metadata.get('polymer_backbone_atoms'),1)
 
 if __name__=='__main__': unittest.main()
+

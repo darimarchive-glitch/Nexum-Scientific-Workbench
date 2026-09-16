@@ -227,7 +227,12 @@ def calc_titration(d):
     vmax=max(Vb,st['equivalence_ml']*2,Va*2)
     curve=titration_curve(mode=mode,acid_c=Ca,acid_v_ml=Va,base_c=Cb,max_volume_ml=vmax,ka=ka,points=241)
     pdata=plot('Curva de titulação','V base / mL','pH',[{'name':'pH','points':curve}],markers=[{'x':st['equivalence_ml'],'label':'equivalência'}])
-    data={**st,'plot':pdata}
+    from .titration_analysis import analyze_curve
+    from .additional_calculators import derivative_plots
+    analysis=analyze_curve(curve)
+    graphs=derivative_plots(curve,analysis)
+    graphs[0]=pdata
+    data={**st,**analysis,'plot':pdata,'plots':graphs}
     return R('pH',st['ph'],'','Balanço de matéria + eletroneutralidade + Ka/Kw',
              f'nácido={st["acid_moles"]:.8g} mol; nbase={st["base_moles"]:.8g} mol; Vtotal={st["total_volume_l"]:.8g} L\nVeq={st["equivalence_ml"]:.8g} mL; [H⁺]={st["h_m"]:.10g} mol/L',
              ['25 °C, Kw=10⁻¹⁴; soluções ideais; ácido monoprótico e titulante base forte.', 'A curva usa o mesmo solucionador de balanço em todos os pontos, inclusive perto da equivalência.'],data)
@@ -374,3 +379,10 @@ CALCS={
 'beer':calc_beer,'regression':calc_regression,'lattice':calc_lattice,'bragg':calc_bragg,'decay':calc_decay,'nuclear':calc_nuclear,
 'ethanol':calc_ethanol,'brix':calc_brix,'kinetics':calc_kinetics,
 }
+
+
+from .additional_calculators import ADDITIONAL_CALCS
+CALCS.update(ADDITIONAL_CALCS)
+
+from .process_calculators import PROCESS_CALCS
+CALCS.update(PROCESS_CALCS)

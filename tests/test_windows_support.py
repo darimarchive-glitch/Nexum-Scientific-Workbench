@@ -97,9 +97,10 @@ M  END
     def test_timeout_and_missing_executable_are_actionable(self):
         for error in (FileNotFoundError(), subprocess.TimeoutExpired("worker", 180)):
             with patch.object(chemistry_worker.subprocess, "run", side_effect=error):
-                with self.assertRaisesRegex(RuntimeError, "install-windows.cmd"):
+                with self.assertRaisesRegex(RuntimeError, "Reinstale o Nexum"):
                     chemistry_worker.call("smiles", "O", "Água", "962")
 
     def test_unknown_operation_is_rejected(self):
         with self.assertRaises(RuntimeError):
             chemistry_worker.call("arbitrary-code")
+

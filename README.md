@@ -2,19 +2,23 @@
 
 <img src="docs/images/banner-nexum.png" alt="Nexum Scientific Workbench — banner com identidade visual molecular em azul e turquesa" width="100%">
 
+<img src="docs/logo-nexum.svg" alt="Logo oficial do Nexum" width="128">
+
 # Nexum · Scientific Workbench
 
 ### Da equação à descoberta.
 
 Química computacional, estruturas 3D e experimentos em uma bancada nativa para Windows e Linux.
 
-![Versão 6.6](https://img.shields.io/badge/vers%C3%A3o-6.6-3584e4?style=for-the-badge)
+![Versão 6.8](https://img.shields.io/badge/vers%C3%A3o-6.8-3584e4?style=for-the-badge)
 ![GTK4 e libadwaita](https://img.shields.io/badge/desktop-GTK4%20%2B%20libadwaita-9141ac?style=for-the-badge)
 ![Windows 10/11 x64](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078d4?style=for-the-badge)
 ![Fedora](https://img.shields.io/badge/Linux-Fedora-51a2da?style=for-the-badge)
 ![Python](https://img.shields.io/badge/motor-Python-26a269?style=for-the-badge)
 
-**35 calculadoras · 12 áreas da química · 8 bancadas · 14 modelos no registro avançado**
+<!-- nexum-catalog:start -->
+**43 calculadoras · 12 áreas científicas · 10 bancadas · 5 ferramentas de análise de dados**
+<!-- nexum-catalog:end -->
 
 [Instalar no Windows](#começar-no-windows) · [Instalar no Fedora](#começar-no-fedora) · [Experimentos](#uma-bancada-que-responde-aos-seus-dados) · [Motor científico](#o-cérebro-científico) · [Documentação](#documentação)
 
@@ -24,7 +28,7 @@ Química computacional, estruturas 3D e experimentos em uma bancada nativa para 
 
 ## Química em uma bancada integrada
 
-O **Nexum Scientific Workbench** reúne cálculos químicos, visualização molecular 3D e experimentos computados em uma aplicação nativa com **GTK4, libadwaita e OpenGL**. A interface organiza o trabalho em Início, Calculadoras, Estruturas 3D, Experimentos e Histórico.
+O **Nexum Scientific Workbench** reúne cálculos químicos, visualização molecular 3D e experimentos computados em uma aplicação nativa com **GTK4, libadwaita e OpenGL**. A interface organiza o trabalho em Início, Calculadoras, Estruturas 3D, Experimentos, Análise e Histórico.
 
 A ideia central é simples: **você fornece as condições; o motor resolve o modelo; a bancada mostra o estado calculado.** Presets preenchem entradas. As equações determinam os resultados.
 
@@ -34,7 +38,26 @@ A ideia central é simples: **você fornece as condições; o motor resolve o mo
 
 Os cálculos são locais. A instalação e a busca de estruturas em **PubChem/RCSB** precisam de conexão. Os módulos científicos avançados também podem ser usados diretamente em Python; nem todos possuem formulário próprio na interface.
 
-> **Nexum 6.6 · Windows e Fedora:** aplicação desktop nativa com o mesmo motor científico, calculadoras, bancadas e visualizador molecular. A versão Windows funciona sem WSL.
+> **Nexum 6.8 · Windows e Linux:** aplicação desktop nativa com o mesmo motor científico, calculadoras, bancadas e visualizador molecular. A versão Windows funciona sem WSL.
+
+## Novidades da versão 6.8
+
+- **Logo oficial:** `docs/logo-nexum.svg`, usado no aplicativo, no instalador e nos atalhos.
+- **Visualização:** contornos adaptados ao fundo na camada de van der Waals; medições de distância, ângulo e diedro; seleção por grupos, cadeias e resíduos; 2D vinculado ao 3D; cargas empíricas Gasteiger quando a conectividade permitir.
+- **Superfícies:** van der Waals, acessível ao solvente e SES aproximada por grade; corte e transparência; importação de densidade/orbitais Cube e mapeamento de potencial fornecido pelo usuário.
+- **Análise:** espectros CSV, integração, correção de base sem alterar o original, calibração com incerteza, comparação cinética com resíduos/AIC, titulação poliprótica e padrões isotópicos.
+- **Processos:** combustão, CSTR/PFR, perda de carga em tubos, troca térmica e resolução cromatográfica.
+- **Sessões e figuras:** salvar/restaurar estruturas, câmera, camadas, entradas, resultados, experimentos e anotações; comparação de estruturas; PNG de alta resolução e gráficos SVG/PDF.
+
+Os modos vibracionais são importados de cálculos e animados em velocidade didática. O programa não calcula orbitais ab initio nem deduz identidade química de um espectro. Consulte [o guia de análise](docs/ANALISE-E-VISUALIZACAO.md) para formatos, limites e exemplos.
+
+### Instalação empacotada
+
+O workflow **Build desktop installers** produz um instalador Windows `.exe` e um pacote Linux `.flatpak`. Os artefatos da PR exigem acesso ao repositório e possuem prazo de retenção. No Linux: `flatpak install --user Nexum-x86_64.flatpak`; depois, `flatpak run io.github.nexum.ScientificWorkbench`.
+
+**Atalho no Linux:** após instalar o Flatpak, procure **Nexum** no menu de aplicativos e fixe-o nos favoritos, se desejar. Se ele abrir pela loja, mas não aparecer no menu, o ZIP do pacote inclui `Reparar-atalho-Nexum.sh`: execute `bash Reparar-atalho-Nexum.sh` na pasta extraída. Ele restaura o atalho e o logo no menu do usuário, preservando uma cópia de um atalho anterior diferente. Caso o menu ainda não atualize, saia da sessão e entre novamente. Isso não exige reinstalar dependências de desenvolvimento.
+
+As instruções abaixo são para execução a partir do código e desenvolvimento.
 
 ## Começar no Windows
 
@@ -233,9 +256,10 @@ Distribuído sob a [licença MIT](LICENSE), conforme definida pelo mantenedor ne
 
 <img src="docs/images/logo-nexum.png" alt="Logotipo do Nexum em formato de N com ligações moleculares" width="120">
 
-**Nexum Scientific Workbench · Windows e Fedora · 6.6**
+**Nexum Scientific Workbench · Windows e Linux · 6.8**
 
 *Entradas explícitas. Modelos declarados. Resultados calculados.*
 
 © 2026 [Davi P. Souza](https://github.com/darimarchive-glitch) – Nexum Scientific Workbench
 </div>
+

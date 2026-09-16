@@ -51,6 +51,14 @@ def probe():
     context.make_current()
     try:
         from OpenGL import GL
+        # GDK's capability probes can leave a GL error on the fresh context.
+        # Drain only at this ownership boundary; retain PyOpenGL checking for
+        # all subsequent queries and the application's real rendering tests.
+        for _ in range(16):
+            if GL.glGetError() == GL.GL_NO_ERROR:
+                break
+        else:
+            raise RuntimeError('O driver manteve erros após criar o contexto OpenGL.')
         version = GL.glGetString(GL.GL_VERSION)
         renderer = GL.glGetString(GL.GL_RENDERER)
         if not version or not renderer:

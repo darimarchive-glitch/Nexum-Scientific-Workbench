@@ -2,7 +2,7 @@
   #define BundleDir "..\..\dist\Nexum"
 #endif
 #ifndef AppVersion
-  #define AppVersion "6.8.0"
+  #define AppVersion "6.8.1"
 #endif
 [Setup]
 AppId={{863F9039-AC62-4E2D-A848-E14474B9C09E}
@@ -31,4 +31,5 @@ Name: "{autodesktop}\Nexum"; Filename: "{app}\Nexum.exe"; Tasks: desktopicon
 Name: "desktopicon"; Description: "Criar atalho na área de trabalho"
 [Run]
 Filename: "{app}\Nexum.exe"; Description: "Abrir Nexum"; Flags: nowait postinstall skipifsilent
+
 

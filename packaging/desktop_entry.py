@@ -4,11 +4,34 @@ from pathlib import Path
 import sys
 
 if sys.platform == 'win32':
-    os.environ['GDK_BACKEND']='win32'
-    os.environ['GDK_DISABLE']='egl,gles-api'
-    os.environ['PYOPENGL_PLATFORM']='win32'
-    if getattr(sys,'frozen',False):
-        os.environ['NEXUM_CHEMISTRY_EXECUTABLE']=str(Path(sys.executable).parent/'chemistry'/'NexumChemistry.exe')
+    import contextlib
+    import traceback
+    from nexum.windows_graphics import configure, probe, select_mode
+    bundle = Path(sys.executable).parent
+    if '--graphics-probe' in sys.argv:
+        log = Path(os.environ['NEXUM_GRAPHICS_PROBE_LOG'])
+        with log.open('w', encoding='utf-8') as stream:
+            with contextlib.redirect_stdout(stream), contextlib.redirect_stderr(stream):
+                try:
+                    configure(sys.argv[-1], bundle)
+                    probe()
+                except Exception:
+                    traceback.print_exc()
+                    raise SystemExit(1)
+        raise SystemExit(0)
+    try:
+        logs = Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / 'Nexum' / 'graphics'
+        mode = select_mode(sys.executable, os.environ.get('NEXUM_GRAPHICS', 'auto'), logs)
+        configure(mode, bundle)
+    except Exception as error:
+        import ctypes
+        if '--self-test' in sys.argv:
+            Path(os.environ.get('NEXUM_SELF_TEST_LOG', str(Path.home() / 'nexum-self-test.log'))).write_text(str(error), encoding='utf-8')
+        else:
+            ctypes.windll.user32.MessageBoxW(None, str(error), 'Nexum — diagnóstico gráfico', 0x10)
+        raise SystemExit(1)
+    if getattr(sys, 'frozen', False):
+        os.environ['NEXUM_CHEMISTRY_EXECUTABLE'] = str(bundle / 'chemistry' / 'NexumChemistry.exe')
 
 if '--self-test' in sys.argv:
     import contextlib
@@ -30,3 +53,4 @@ if '--self-test' in sys.argv:
 else:
     from nexum.main import main
     main()
+

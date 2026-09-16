@@ -16,8 +16,10 @@ Checked $SciencePython @('-m','PyInstaller','--noconfirm','--clean','--onedir','
 Checked $gtkPython @('-m','PyInstaller','--noconfirm','--clean','packaging/windows/desktop.spec')
 Copy-Item -Recurse -Force 'dist/NexumChemistry' 'dist/Nexum/chemistry'
 Copy-Item 'LICENSE' 'dist/Nexum/LICENSE.txt'
+. ./packaging/windows/mesa.ps1
 # Verify the frozen bundle with the development interpreter variables removed.
 Remove-Item Env:NEXUM_CHEMISTRY_PYTHON,Env:PYTHONPATH,Env:PYTHONHOME -ErrorAction SilentlyContinue
+$env:NEXUM_GRAPHICS='auto'
 $env:NEXUM_SELF_TEST_LOG=Join-Path $root 'build/self-test.log'
 $bundle=Join-Path $root 'dist/Nexum/Nexum.exe'
 $check=Start-Process -FilePath $bundle -ArgumentList '--self-test' -Wait -PassThru
@@ -49,11 +51,14 @@ Write-Host 'Start menu and desktop shortcuts: OK'
 $buildSearchPath=$env:PATH
 try {
     $env:PATH="$env:SystemRoot\System32;$env:SystemRoot"
+    $env:NEXUM_GRAPHICS='software'
     $env:NEXUM_SELF_TEST_LOG=Join-Path $root 'build/installed-self-test.log'
     $installed=Start-Process -FilePath (Join-Path $installDir 'Nexum.exe') -WorkingDirectory $installDir -ArgumentList '--self-test' -Wait -PassThru
     if (Test-Path $env:NEXUM_SELF_TEST_LOG) { Get-Content -Encoding UTF8 $env:NEXUM_SELF_TEST_LOG }
     if ($installed.ExitCode -ne 0) { throw "Installed application self-test failed: $($installed.ExitCode)" }
 } finally {
+    Remove-Item Env:NEXUM_GRAPHICS -ErrorAction SilentlyContinue
     $env:PATH=$buildSearchPath
 }
+
 

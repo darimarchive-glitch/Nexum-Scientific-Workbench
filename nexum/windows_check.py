@@ -85,7 +85,10 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
             assert len(window.struct.viewer.programs) == 3
             window.struct.viewer.make_current()
             assert GL.glGetError() == GL.GL_NO_ERROR
-            print("OpenGL:", GL.glGetString(GL.GL_VERSION), flush=True)
+            renderer = GL.glGetString(GL.GL_RENDERER)
+            print("OpenGL:", GL.glGetString(GL.GL_VERSION), "Renderer:", renderer, flush=True)
+            if os.environ.get('NEXUM_GRAPHICS_ACTIVE') == 'software':
+                assert b'llvmpipe' in renderer.lower(), 'Packaged software renderer was not used' 
             from nexum.core.molecular_analysis import molecular_surface
             from nexum.ui.session_actions import snapshot,restore
             output=Path(os.environ.get("NEXUM_RENDER_DIR",folder))/"visual-checks";output.mkdir(parents=True,exist_ok=True)
@@ -125,4 +128,5 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
 
 if __name__ == "__main__":
     main()
+
 

@@ -41,7 +41,17 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          gh release create v6.8.0 --target ece08726171cc15ad24ff880bda45b893f7ff62b --draft --title 'Nexum 6.8.0' --notes-file docs/RELEASE-6.8.0.md
-          gh release upload v6.8.0 assets/Nexum-Setup-6.8.0-x64.exe assets/Nexum-x86_64.flatpak assets/Reparar-atalho-Nexum.sh assets/SHA256SUMS.txt
-          test "$(gh api repos/$GH_REPO/releases/tags/v6.8.0 --jq '.assets | length')" = 4
+          release_id=$(gh api repos/$GH_REPO/releases --jq '.[] | select(.tag_name == "v6.8.0") | .id')
+          if [ -z "$release_id" ]; then
+            gh release create v6.8.0 --target ece08726171cc15ad24ff880bda45b893f7ff62b --draft --title 'Nexum 6.8.0' --notes-file docs/RELEASE-6.8.0.md
+            release_id=$(gh api repos/$GH_REPO/releases --jq '.[] | select(.tag_name == "v6.8.0") | .id')
+          fi
+          test -n "$release_id"
+          test "$(gh api repos/$GH_REPO/releases/$release_id --jq .target_commitish)" = ece08726171cc15ad24ff880bda45b893f7ff62b
+          if [ "$(gh api repos/$GH_REPO/releases/$release_id --jq .draft)" = false ]; then
+            echo 'This release is already published; its files will not be replaced.'
+            exit 0
+          fi
+          gh release upload v6.8.0 assets/Nexum-Setup-6.8.0-x64.exe assets/Nexum-x86_64.flatpak assets/Reparar-atalho-Nexum.sh assets/SHA256SUMS.txt --clobber
+          test "$(gh api repos/$GH_REPO/releases/$release_id --jq '.assets | length')" = 4
           gh release edit v6.8.0 --draft=false --latest

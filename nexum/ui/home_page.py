@@ -14,9 +14,12 @@ class HomePage(Gtk.ScrolledWindow):
         for name,label,icon in [('calculators','Abrir calculadoras','accessories-calculator-symbolic'),('structures','Estruturas 3D','applications-science-symbolic'),('experiments','Experimentos','media-playback-start-symbolic')]:
             b=Gtk.Button(label=label,icon_name=icon);b.add_css_class('pill');b.connect('clicked',lambda _,n=name:self.window.stack.set_visible_child_name(n));actions.append(b)
         root.append(actions)
+        lab=Gtk.Button(label='Abrir Laboratório · projetos e novas ferramentas');lab.add_css_class('suggested-action');lab.connect('clicked',lambda *_:self.window.open_laboratory());root.append(lab)
         grid=Gtk.Grid(column_spacing=14,row_spacing=14);grid.set_column_homogeneous(True)
         c=counts()
         cards=[
+            (f"{c['laboratory']} recursos de laboratório",'Da molécula ao relatório','Editor 2D/3D, atribuições espectrais, fluxos, planejamento experimental, controle de qualidade e projetos portáteis.'),
+            ('6 projetos de exemplo','Trabalhe mesmo sem internet','Dados didáticos simulados, cenários investigativos e resultados com origem e parâmetros registrados.'),
             (f"{c['calculators']} calculadoras",f"{c['areas']} áreas científicas",'Entradas livres, desenvolvimento, unidades e gráficos quando a variável depende de uma série.'),
             ('Verificação automatizada','Escopo científico declarado','Benchmarks independentes, identidades de conservação e regressões numéricas; cada ferramenta mostra se é quantitativa, modelo ou formal.'),
             ('3D molecular','Moléculas e macromoléculas','Moléculas pequenas, macromoléculas, fitas, ligantes, profundidade e geração local de conformador quando necessário.'),

@@ -90,4 +90,4 @@ uma sessão manual no Windows: abrir todas as páginas, calcular e reabrir o
 histórico, controlar as oito bancadas, buscar no PubChem/RCSB, girar moléculas,
 selecionar átomos, alternar tela cheia e testar escalas 100%, 150% e 200%.
 Testes ignorados (`skipped`) não contam como aprovados. O resultado desta
-preparação está em [VALIDACAO-WINDOWS.md](VALIDACAO-WINDOWS.md).
+preparação está em [validação atual](../development/validation.md).

@@ -2,7 +2,7 @@
 from importlib.resources import files
 from pathlib import Path
 from .paths import cache_dir
-APP_ID='io.github.nexum.ScientificWorkbench'
+from .identity import APP_ID
 
 def icon_directory():
     logo=files('nexum').joinpath('assets/logo.svg').read_bytes()

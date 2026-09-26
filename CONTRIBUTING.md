@@ -1,21 +1,18 @@
-# Contribuir com o Nexum GNOME
+# Contribuir com o Nexum
 
-Esta edição usa a branch `main`. Crie sua branch de trabalho a partir dela e direcione os pull requests para essa mesma base.
+Uma contribuição científica deve explicar pergunta, modelo, unidades, hipóteses, entradas válidas e limitações. Inclua referências e teste contra um caso analítico, conservação ou fonte independente; reproduzir a própria implementação em outro teste não basta.
 
-## Preparar o ambiente
+Mantenha o cálculo independente da interface. Operações longas devem liberar a thread GTK. Dados originais não podem ser substituídos silenciosamente por dados processados. Não use `eval`, pickle ou execução automática de código ao abrir projetos.
 
-No Fedora, execute `./install-fedora.sh`. O instalador prepara o ambiente e roda a suíte. Use `./run.sh` para abrir o aplicativo e `./test.sh` para verificar alterações.
+Antes de propor uma mudança:
 
-## Melhorar um modelo científico
+```bash
+python -m unittest discover -s tests -v
+python -m compileall -q nexum
+python scripts/update_catalog.py --check
+python scripts/check_project.py
+```
 
-Descreva equações, unidades, estados padrão, hipóteses e domínio de validade. Referencie a fonte dos parâmetros. Implemente o cálculo no núcleo, mantendo a interface responsável pela apresentação e pelos controles.
+Informe casos ignorados, plataforma, dependências, limites conhecidos e comportamento esperado. Novas funcionalidades gráficas exigem verificação em uma sessão GTK real. Alterações de embalagem exigem teste do artefato instalado no sistema correspondente.
 
-Inclua uma verificação independente adequada à mudança: solução analítica, benchmark rastreável, conservação de massa/carga/energia ou transformação de entradas cuja consequência seja conhecida. Registre tolerâncias e diagnósticos quando relevantes. Atualize a documentação científica afetada.
-
-## Relatar um problema
-
-Informe versão do Nexum, Fedora e Python, bancada ou calculadora, entradas completas, passos de reprodução, resultado observado e resultado esperado com sua referência. Para problemas visuais, inclua captura e resolução da janela. Para carregamento molecular, informe identificador e fonte, como CID/PubChem ou código PDB/RCSB.
-
-## Abrir um pull request
-
-Explique o problema, o comportamento resultante e como foi verificado. Diferencie testes aprovados de testes ignorados por dependências ou display ausentes. Para mudanças visuais, verifique a aplicação em uma sessão gráfica e anexe capturas reais.
+Consulte [arquitetura](docs/development/architecture.md), [métodos científicos](docs/science/laboratory-methods.md) e [distribuição](docs/distribution/README.md). Não versione ambientes virtuais, tokens, dados particulares, caches ou binários temporários. A publicação é uma decisão separada do mantenedor.

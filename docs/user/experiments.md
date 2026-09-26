@@ -1,6 +1,6 @@
-# Bancadas didáticas — v6.6
+# Bancadas didáticas
 
-Esta revisão mantém a estrutura desktop GNOME e concentra as mudanças na aba Experimentos. O motor numérico usa equações locais e recebe as entradas preenchidas pelo usuário.
+As bancadas usam a interface desktop compartilhada. O motor numérico usa equações locais e recebe as entradas preenchidas pelo usuário.
 
 ## Comportamento das bancadas
 
@@ -43,29 +43,11 @@ Na cinética, A azul e B incolor são uma convenção do exemplo. A concentraç�
 
 ## Referências conceituais
 
-As relações entre curva de titulação, equivalência e indicadores podem ser consultadas no [OpenStax, Chemistry 2e, seção 14.7](https://openstax.org/books/chemistry-2e/pages/14-7-acid-base-titrations). A convenção de absorbância e as hipóteses de atenuação estão no [IUPAC Gold Book, lei de Lambert](https://goldbook.iupac.org/terms/view/L03445/pdf). Os coeficientes termodinâmicos e demais equações já presentes no projeto continuam documentados em `SCIENTIFIC-AUDIT.md` e `VALIDATION-MATRIX.md`.
+As relações entre curva de titulação, equivalência e indicadores podem ser consultadas no [OpenStax, Chemistry 2e, seção 14.7](https://openstax.org/books/chemistry-2e/pages/14-7-acid-base-titrations). A convenção de absorbância e as hipóteses de atenuação estão no [IUPAC Gold Book, lei de Lambert](https://goldbook.iupac.org/terms/view/L03445/pdf). Os coeficientes termodinâmicos e demais equações já presentes no projeto continuam documentados em [auditoria](../science/model-audit.md) e [matriz de validação](../science/validation-matrix.md).
 
-## Validação desta entrega
+## Validação
 
-- 134 testes existentes de ciência, backend e regressões: aprovados.
-- 24 novos testes de sessão: aprovados, incluindo conservação, estados limite, titulação, indicadores, curva e navegação temporal.
-- 6 novos testes de renderização Cairo: aprovados. Executam os desenhos reais em ambos os temas e verificam alterações visuais e ausência de movimento fictício com corrente/taxa zero.
-- 6 novos testes de integração GTK incluídos: não executados nesta entrega por indisponibilidade de um display gráfico permitido no ambiente de validação.
-- Compilação dos módulos Python verificada. As bancadas e gráficos foram renderizados e inspecionados em temas claro e escuro.
-
-Portanto, 164 testes foram executados com sucesso. Os 6 testes GTK permanecem para execução em uma sessão gráfica com as dependências instaladas; não se declara uma execução interativa validada no Fedora.
-
-Para repetir a suíte no sistema de destino:
-
-```bash
-./test.sh
-```
-
-Para executar somente a integração gráfica em uma sessão GNOME:
-
-```bash
-.venv/bin/python -m unittest discover -s tests -p test_gtk_experiments.py -v
-```
+Consulte [os resultados atuais](../development/validation.md). As contagens históricas de testes não descrevem esta versão.
 
 ## Organização do código
 

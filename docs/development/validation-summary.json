@@ -1,0 +1,100 @@
+{
+  "version": "7.0.0-preview.1",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "dependencies": {
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "rdkit": "2026.3.6",
+    "gemmi": "0.7.5",
+    "Pillow": "12.3.0",
+    "PyOpenGL": "3.1.10"
+  },
+  "tests": 274,
+  "passed": 254,
+  "skipped": [
+    {
+      "test": "test_each_dynamic_bench_has_a_visible_physical_change (test_experiment_rendering.ExperimentRenderingTests.test_each_dynamic_bench_has_a_visible_physical_change)",
+      "reason": "PyCairo não está disponível neste Python"
+    },
+    {
+      "test": "test_every_bench_and_chart_draws_start_middle_end_in_both_themes (test_experiment_rendering.ExperimentRenderingTests.test_every_bench_and_chart_draws_start_middle_end_in_both_themes)",
+      "reason": "PyCairo não está disponível neste Python"
+    },
+    {
+      "test": "test_invalid_and_boundary_states_draw_without_errors (test_experiment_rendering.ExperimentRenderingTests.test_invalid_and_boundary_states_draw_without_errors)",
+      "reason": "PyCairo não está disponível neste Python"
+    },
+    {
+      "test": "test_source_off_removes_the_optical_beams (test_experiment_rendering.ExperimentRenderingTests.test_source_off_removes_the_optical_beams)",
+      "reason": "PyCairo não está disponível neste Python"
+    },
+    {
+      "test": "test_static_parameter_changes_have_visible_effects (test_experiment_rendering.ExperimentRenderingTests.test_static_parameter_changes_have_visible_effects)",
+      "reason": "PyCairo não está disponível neste Python"
+    },
+    {
+      "test": "test_zero_current_and_zero_rate_have_no_fictitious_motion (test_experiment_rendering.ExperimentRenderingTests.test_zero_current_and_zero_rate_have_no_fictitious_motion)",
+      "reason": "PyCairo não está disponível neste Python"
+    },
+    {
+      "test": "test_equivalence_and_time_scrubbing_update_the_same_state (test_gtk_experiments.GtkExperimentTests.test_equivalence_and_time_scrubbing_update_the_same_state)",
+      "reason": "GTK4/libadwaita e display não estão disponíveis"
+    },
+    {
+      "test": "test_invalid_edit_does_not_show_stale_measurements_or_allow_play (test_gtk_experiments.GtkExperimentTests.test_invalid_edit_does_not_show_stale_measurements_or_allow_play)",
+      "reason": "GTK4/libadwaita e display não estão disponíveis"
+    },
+    {
+      "test": "test_play_pause_manual_drop_and_new_parameters (test_gtk_experiments.GtkExperimentTests.test_play_pause_manual_drop_and_new_parameters)",
+      "reason": "GTK4/libadwaita e display não estão disponíveis"
+    },
+    {
+      "test": "test_reaching_end_reenables_inputs_and_repeat_restarts (test_gtk_experiments.GtkExperimentTests.test_reaching_end_reenables_inputs_and_repeat_restarts)",
+      "reason": "GTK4/libadwaita e display não estão disponíveis"
+    },
+    {
+      "test": "test_static_benches_hide_playback_controls_and_update_on_edit (test_gtk_experiments.GtkExperimentTests.test_static_benches_hide_playback_controls_and_update_on_edit)",
+      "reason": "GTK4/libadwaita e display não estão disponíveis"
+    },
+    {
+      "test": "test_switching_and_unmapping_stop_the_clock (test_gtk_experiments.GtkExperimentTests.test_switching_and_unmapping_stop_the_clock)",
+      "reason": "GTK4/libadwaita e display não estão disponíveis"
+    },
+    {
+      "test": "test_all_examples_refresh_and_transfer_analysis (test_laboratory_gtk.LaboratoryGtkTests.test_all_examples_refresh_and_transfer_analysis)",
+      "reason": "GTK4/libadwaita com sessão gráfica indisponível"
+    },
+    {
+      "test": "test_autorecovery_validated_roundtrip (test_laboratory_gtk.LaboratoryGtkTests.test_autorecovery_validated_roundtrip)",
+      "reason": "GTK4/libadwaita com sessão gráfica indisponível"
+    },
+    {
+      "test": "test_flow_and_doe_and_process (test_laboratory_gtk.LaboratoryGtkTests.test_flow_and_doe_and_process)",
+      "reason": "GTK4/libadwaita com sessão gráfica indisponível"
+    },
+    {
+      "test": "test_molecular_builder_and_assignment (test_laboratory_gtk.LaboratoryGtkTests.test_molecular_builder_and_assignment)",
+      "reason": "GTK4/libadwaita com sessão gráfica indisponível"
+    },
+    {
+      "test": "test_pending_notes_survive_other_actions_and_undo (test_laboratory_gtk.LaboratoryGtkTests.test_pending_notes_survive_other_actions_and_undo)",
+      "reason": "GTK4/libadwaita com sessão gráfica indisponível"
+    },
+    {
+      "test": "test_layer_preserves_base_geometry_and_uses_vdw_radii (test_viewer_layers.ViewerLayers.test_layer_preserves_base_geometry_and_uses_vdw_radii)",
+      "reason": "GTK4/libadwaita e display não disponíveis"
+    },
+    {
+      "test": "test_layer_respects_chains_and_rejects_nan_opacity (test_viewer_layers.ViewerLayers.test_layer_respects_chains_and_rejects_nan_opacity)",
+      "reason": "GTK4/libadwaita e display não disponíveis"
+    },
+    {
+      "test": "test_stale_search_does_not_replace_new_results (test_viewer_layers.ViewerLayers.test_stale_search_does_not_replace_new_results)",
+      "reason": "GTK4/libadwaita e display não disponíveis"
+    }
+  ],
+  "failures": 0,
+  "errors": 0,
+  "seconds": 8.55
+}

@@ -1,12 +1,30 @@
 name: Build desktop installers
 on:
+  push:
+    branches: [main]
+    paths: ["nexum/**", "packaging/**", "requirements.txt", ".github/workflows/packages.yml"]
   pull_request:
     paths: ['packaging/**', '.github/workflows/packages.yml']
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: desktop-packages-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
+  scientific:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - run: python scripts/validate.py
+      - run: python scripts/check_project.py
+      - run: python scripts/update_catalog.py --check
   windows:
+    needs: scientific
     runs-on: windows-latest
     timeout-minutes: 45
     steps:
@@ -29,6 +47,7 @@ jobs:
             mingw-w64-ucrt-x86_64-python-cairo
             mingw-w64-ucrt-x86_64-python-numpy
             mingw-w64-ucrt-x86_64-python-scipy
+            mingw-w64-ucrt-x86_64-python-pillow
             mingw-w64-ucrt-x86_64-python-pyopengl
             mingw-w64-ucrt-x86_64-adwaita-icon-theme
             mingw-w64-ucrt-x86_64-pyinstaller
@@ -47,6 +66,7 @@ jobs:
           path: dist/installer/*.exe
           if-no-files-found: error
   flatpak:
+    needs: scientific
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -55,7 +75,7 @@ jobs:
       - run: bash packaging/flatpak/build.sh
       - name: Install and test the actual Flatpak bundle
         run: |
-          flatpak install --user --noninteractive dist/Nexum-x86_64.flatpak
+          flatpak install --user --noninteractive dist/Nexum-*-linux-x86_64.flatpak
           export XDG_DATA_DIRS="$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
           python3 packaging/flatpak/check-launcher.py
           bash packaging/flatpak/repair-shortcut.sh
@@ -66,7 +86,65 @@ jobs:
           name: Nexum-Linux-flatpak
           path: |
             dist/*.flatpak
-            dist/Reparar-atalho-Nexum.sh
+            dist/nexum-repair-shortcut.sh
           if-no-files-found: error
 
 
+  macos:
+    needs: scientific
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x86_64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          environment-file: packaging/macos/environment.yml
+          activate-environment: nexum-build
+          auto-activate-base: false
+      - name: Build and verify native application
+        shell: bash -el {0}
+        run: bash packaging/macos/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Nexum-macOS-${{ matrix.arch }}
+          path: dist/*.dmg
+          if-no-files-found: error
+  release:
+    needs: [scientific, windows, flatpak, macos]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: Nexum-*
+          path: release-assets
+          merge-multiple: true
+      - name: Assemble source and checksums
+        run: |
+          version=$(python3 -m nexum.identity version)
+          git archive --format=zip --prefix="Nexum-$version/" HEAD > "release-assets/Nexum-$version-source.zip"
+          cd release-assets
+          sha256sum *.exe *.flatpak *.dmg *.zip > SHA256SUMS.txt
+      - name: Publish verified preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(python3 -m nexum.identity version)
+          tag="v$version"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release already exists; refusing to replace published binaries." >&2
+            exit 1
+          fi
+          gh release create "$tag" --target "$GITHUB_SHA" --title "Nexum $version" --prerelease --notes-file docs/releases/7.0.0-preview.1.md release-assets/*

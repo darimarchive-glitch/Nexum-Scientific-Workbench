@@ -1,4 +1,4 @@
-# Arquitetura do motor científico — v6.5
+# Arquitetura do motor científico
 
 ## 1. Fluxo obrigatório
 
@@ -75,7 +75,7 @@ Exemplos:
 - Butler–Volmer não ganha transporte de massa fictício; Cottrell/transportes precisam ser acoplados explicitamente.
 
 
-## 7. Sessão e desenho da bancada — v6.6
+## 7. Sessão e desenho da bancada
 
 `core/experiment_session.py` valida a configuração, amostra as funções de `core/experiments.py`, calcula uma curva de referência e mantém o tempo/estado atual. O histórico visível é a parte dessa curva até o instante escolhido, mais o estado exato do cursor. Alterar parâmetros constrói outra sessão e elimina a trajetória anterior.
 
@@ -84,3 +84,13 @@ Exemplos:
 `ui/experiment_drawing.py` desenha vidrarias, aparelhos, populações e gráficos usando exclusivamente os valores da sessão. Pode ser renderizado sem GTK com Cairo, como nos testes de regressão visual. Cores e movimentos esquemáticos são identificados como tais na interface; não alteram os cálculos.
 
 Equilíbrio é uma comparação de estados; Beer–Lambert é uma relação estática entre parâmetros e leitura teórica. Nenhum deles utiliza uma cronologia de reação fictícia.
+
+## Laboratório integrado
+
+`nexum/lab/` não depende de GTK. Projetos usam JSON finito dentro de um ZIP de duas entradas, validação estrutural, hash e substituição atômica. Processamento produz novas séries e registra origem/etapas; os bytes do arquivo importado são preservados.
+
+`nexum/ui/laboratory.py` coordena os painéis. Cálculos químicos e processamento são executados em thread de trabalho; a resposta é aplicada na thread GTK, com verificação da identidade/revisão do projeto. Capturas OpenGL são feitas na thread da interface. A recuperação automática cobre o documento de laboratório.
+
+No Windows, construção e conformeros atravessam o protocolo JSON do motor químico separado. Não se importa RDKit no processo GTK para executar essas operações. As novas operações pertencem a uma lista explícita, sem avaliação de código do documento.
+
+A identidade e os nomes de artefatos estão em `nexum/identity.py`. A contagem de calculadoras, bancadas, análises e recursos do laboratório é calculada pelos registros, não por números copiados na interface. Os builds de cada plataforma têm suas próprias dependências nativas e validação do executável empacotado.

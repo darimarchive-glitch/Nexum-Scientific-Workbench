@@ -48,7 +48,7 @@ try {
         # A core update can terminate this shell. Rerun the installer to finish.
         Invoke-Checked $bash @('--login', '-c', 'pacman -Syu --noconfirm')
         Invoke-Checked $bash @('--login', '-c', 'pacman -Syu --noconfirm')
-        Invoke-Checked $bash @('--login', '-c', 'pacman -S --needed --noconfirm mingw-w64-ucrt-x86_64-python mingw-w64-ucrt-x86_64-gtk4 mingw-w64-ucrt-x86_64-libadwaita mingw-w64-ucrt-x86_64-python-gobject mingw-w64-ucrt-x86_64-python-cairo mingw-w64-ucrt-x86_64-python-numpy mingw-w64-ucrt-x86_64-python-scipy mingw-w64-ucrt-x86_64-python-pyopengl mingw-w64-ucrt-x86_64-adwaita-icon-theme')
+        Invoke-Checked $bash @('--login', '-c', 'pacman -S --needed --noconfirm mingw-w64-ucrt-x86_64-python mingw-w64-ucrt-x86_64-gtk4 mingw-w64-ucrt-x86_64-libadwaita mingw-w64-ucrt-x86_64-python-gobject mingw-w64-ucrt-x86_64-python-cairo mingw-w64-ucrt-x86_64-python-numpy mingw-w64-ucrt-x86_64-python-scipy mingw-w64-ucrt-x86_64-python-pyopengl mingw-w64-ucrt-x86_64-python-pillow mingw-w64-ucrt-x86_64-adwaita-icon-theme')
         @{ msysRoot = $MsysRoot } | ConvertTo-Json | Set-Content -LiteralPath $configPath -Encoding UTF8
     }
     if (-not (Test-Path -LiteralPath $gtkPython) -or -not (Test-Path -LiteralPath $sciencePython)) {

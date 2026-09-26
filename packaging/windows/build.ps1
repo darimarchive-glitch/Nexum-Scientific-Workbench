@@ -30,11 +30,13 @@ if ($check.ExitCode -ne 0) {
 }
 $iscc=(Get-Command ISCC.exe -ErrorAction SilentlyContinue)
 if ($iscc) { $compiler=$iscc.Source } else { $compiler="${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" }
-Checked $compiler @("/DBundleDir=$root\dist\Nexum",'packaging/windows/nexum.iss')
+$version=(& $SciencePython -m nexum.identity version).Trim()
+if ($LASTEXITCODE -ne 0) { throw 'Cannot determine application version.' }
+Checked $compiler @("/DAppVersion=$version","/DBundleDir=$root\dist\Nexum",'packaging/windows/nexum.iss')
 
 # Install the produced setup and exercise the installed copy without MSYS2
 # or Python on PATH, matching an end user's launch environment.
-$setupFiles=@(Get-ChildItem -LiteralPath 'dist/installer' -Filter 'Nexum-Setup-*-x64.exe')
+$setupFiles=@(Get-ChildItem -LiteralPath 'dist/installer' -Filter "Nexum-$version-windows-x86_64-setup.exe")
 if ($setupFiles.Count -ne 1) { throw 'Expected exactly one generated installer.' }
 $installDir=Join-Path $root 'build/installed Nexum'
 $install=Start-Process -FilePath $setupFiles[0].FullName -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',('/DIR="{0}"' -f $installDir)) -Wait -PassThru

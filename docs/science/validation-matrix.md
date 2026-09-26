@@ -1,4 +1,4 @@
-# Matriz de validação — Nexum v6.0
+# Matriz de validação do motor científico
 
 Esta matriz descreve **o que cada ferramenta resolve** e **o que ela não deve afirmar**. “Passou nos testes” significa que a implementação reproduziu benchmarks/identidades do modelo; não significa validade universal fora das hipóteses.
 
@@ -50,7 +50,7 @@ Esta matriz descreve **o que cada ferramenta resolve** e **o que ela não deve a
 | Calorimetria elétrica | MODELO | solução analítica de C dT/dt=P-k(T-Tamb) | C e k constantes; mistura homogênea |
 | Haber | MODELO | propriedades Shomate, Kp(T), extensão Qp=Kp | gás ideal; sem fugacidade industrial |
 | Beer–Lambert | MODELO | A e transmitância | região linear e meio homogêneo |
-| Cinética 1ª ordem | MODELO | [A](t), fração e meia-vida | k constante e lei de 1ª ordem |
+| Cinética 1ª ordem | MODELO | concentração de A ao longo do tempo, fração e meia-vida | k constante e lei de 1ª ordem |
 | Decaimento nuclear | MODELO | população esperada N(t) | modelo macroscópico; não prevê evento individual |
 
 ## Próximo nível científico
@@ -66,7 +66,7 @@ Antes de chamar o Nexum de ferramenta de pós-graduação em áreas específicas
 - eletroquímica não reversível (Butler–Volmer, iR, difusão) quando explicitamente modelada;
 - análise espectroscópica com ponderação, LOD/LOQ e diagnóstico de resíduos;
 - termodinâmica com Cp(T), fugacidade/atividade e bancos de dados rastreáveis.
-## Backend avançado v6.5
+## Motor avançado
 
 | Núcleo | Modelo | Diagnóstico obrigatório | Limite declarado |
 |---|---|---|---|

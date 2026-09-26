@@ -1,8 +1,8 @@
-# Auditoria científica — Nexum GNOME / Fedora v6.5
+# Auditoria dos modelos do motor científico
 
 ## Objetivo
 
-A v6.5 abandona a ideia de que um cálculo é “validado” só porque reproduz um exemplo. O backend deve satisfazer três camadas simultâneas:
+Um cálculo não é considerado validado apenas por reproduzir um exemplo. O backend deve satisfazer três camadas simultâneas:
 
 1. **equação/modelo correto**;
 2. **solver numérico convergente e diagnosticável**;
@@ -55,7 +55,7 @@ Beer–Lambert multicomponente é resolvido por LS/NNLS. O número de condição
 
 ## Experimentos calculados
 
-Os protocolos da v6.5 obedecem:
+Os protocolos obedecem:
 
 `controle experimental → estado físico/químico → diagnóstico → quadro visual`
 
@@ -70,7 +70,7 @@ Exemplos:
 
 ## Validação automatizada
 
-A entrega executa **134 testes**, incluindo a suíte completa da v6.0 mais 34 testes específicos da v6.5.
+O resultado e a contagem atuais estão no [registro de validação](../development/validation.md).
 
 Os novos testes incluem referências analíticas, round-trips, resíduos, fechamento material, igualdade de fugacidades, invariantes de ODE e testes metamórficos contra resultados pré-moldados.
 

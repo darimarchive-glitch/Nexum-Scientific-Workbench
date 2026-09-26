@@ -1,4 +1,18 @@
-# Nexum Scientific Workbench v6.6 — Bancadas didáticas
+# Histórico de alterações
+
+## 7.0.0-preview.1 — desenvolvimento
+
+- Laboratório integrado com projetos, caderno, recuperação, dados originais e desfazer/refazer.
+- Editor 2D/3D, conformeros, alinhamento RMSD e atribuições espectrais manuais.
+- Importação tabular/JCAMP explícito, fluxos reutilizáveis, planejamento fatorial e qualidade.
+- Processos estacionários simples, investigações, cenas, GIF, apresentações e relatórios.
+- Modelos de incerteza correlacionada, Monte Carlo, sensibilidade e distribuição ácido–base.
+- Nomes de pacotes centralizados, documentação reorganizada e publicador obsoleto removido.
+- Caminhos macOS e receita nativa .app/.dmg; sem binário macOS homologado nesta entrega.
+- Identidade legada preservada; distribuição Flatpak independente diferenciada de submissão ao Flathub.
+
+O estado dos testes está em [Validação](docs/development/validation.md). Esta versão é uma prévia; não foi publicada remotamente.
+
 
 - Bancadas de titulação, Daniell, calorimetria, equilíbrio, Beer–Lambert, cinética e decaimento refeitas em Cairo, com os valores ligados aos elementos do desenho.
 - Erlenmeyer com enchimento calculado pela geometria cônica, indicadores e ponto da titulação no gráfico.

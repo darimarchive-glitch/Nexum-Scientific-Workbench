@@ -1,6 +1,6 @@
 """JSON boundary between MSYS2 GTK and CPython's gemmi/RDKit wheels.
 
-Only three named operations are supported. No shell, pickle or network service.
+Only explicitly named operations are supported. No shell, pickle or network service.
 Linux and regular CPython continue to call the existing implementations directly.
 """
 from dataclasses import asdict
@@ -43,7 +43,7 @@ def call(operation, *args):
         raise RuntimeError("O motor químico não retornou uma resposta válida.") from exc
     if result.returncode or "error" in response:
         raise RuntimeError(response.get("error", "Falha no motor químico."))
-    if operation == "isotopes":return response["result"]
+    if operation in ("isotopes", "builder", "conformers", "smiles_graph"):return response["result"]
     response["atoms"] = [Atom(**atom) for atom in response["atoms"]]
     response["bonds"] = [tuple(bond) for bond in response["bonds"]]
     return Molecule(**response)
@@ -60,7 +60,9 @@ def main():
     from nexum.core import structures
     from nexum.core.molecular_analysis import annotate
     from nexum.core.data_analysis import isotope_pattern
+    from nexum.lab.molecules import build, conformers, smiles_graph
     operations = {
+        "builder": build, "conformers": conformers, "smiles_graph": smiles_graph,
         "annotate": annotate,
         "isotopes": isotope_pattern,
         "mmcif": structures.parse_mmcif,
@@ -70,7 +72,7 @@ def main():
     try:
         request = json.load(sys.stdin)
         molecule = operations[request["operation"]](*request["args"])
-        output={"result":molecule} if request["operation"]=="isotopes" else asdict(molecule)
+        output={"result":molecule} if request["operation"] in ("isotopes", "builder", "conformers", "smiles_graph") else asdict(molecule)
         print(json.dumps(output, ensure_ascii=False, allow_nan=False))
         return 0
     except Exception as exc:

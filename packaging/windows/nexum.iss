@@ -2,11 +2,11 @@
   #define BundleDir "..\..\dist\Nexum"
 #endif
 #ifndef AppVersion
-  #define AppVersion "6.8.1"
+  #define AppVersion "7.0.0-preview.1"
 #endif
 [Setup]
 AppId={{863F9039-AC62-4E2D-A848-E14474B9C09E}
-AppName=Nexum Scientific Workbench
+AppName=Nexum
 AppVersion={#AppVersion}
 DefaultDirName={localappdata}\Programs\Nexum
 DefaultGroupName=Nexum
@@ -14,7 +14,7 @@ PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=..\..\dist\installer
-OutputBaseFilename=Nexum-Setup-{#AppVersion}-x64
+OutputBaseFilename=Nexum-{#AppVersion}-windows-x86_64-setup
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern

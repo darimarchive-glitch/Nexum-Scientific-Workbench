@@ -152,6 +152,12 @@ class StructurePage(Gtk.Box):
         rep=REPRESENTATIONS[self.rep.get_selected()][1];self.viewer.configure(representation=rep,show_hydrogens=self.hydrogen.get_active(),show_ligands=self.ligands.get_active(),fog=self.fog.get_active())
     def _atom_selected(self,idx,a):
         self.analysis.selected(idx)
+        lab=getattr(self.window,'lab',None)
+        if lab and lab.project.data.get('molecule'):
+            from dataclasses import asdict
+            from nexum.lab.project import fingerprint
+            if fingerprint(lab.project.data['molecule'])==fingerprint(asdict(self.viewer.molecule)):
+                lab.canvas.selected=idx if idx<len(lab.project.data['graph']['atoms']) else None;lab.canvas.queue_draw();lab.select_editor_atom(idx)
         title=f"{a.element} · {a.name or 'átomo'}";sub=f"{a.residue} {a.residue_id} · cadeia {a.chain}" if a.residue else f"índice {idx+1}";self.atom_info.set_title(title);self.atom_info.set_subtitle(sub)
 
     def _import_file(self,*_):

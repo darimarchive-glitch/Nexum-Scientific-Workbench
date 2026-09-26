@@ -11,7 +11,7 @@ def measurement(molecule, indices):
         raise ValueError("Selecione 2, 3 ou 4 átomos distintos.")
     if any(type(i) is not int or not 0<=i<len(molecule.atoms) for i in ids):
         raise ValueError("Índice de átomo inválido.")
-    p=np.array([molecule.atoms[i].position for i in ids],dtype=float)
+    p=np.array([[molecule.atoms[i].x,molecule.atoms[i].y,molecule.atoms[i].z] for i in ids],dtype=float)
     if len(ids)==2:
         return "Distância",float(np.linalg.norm(p[1]-p[0])),"Å"
     if len(ids)==3:

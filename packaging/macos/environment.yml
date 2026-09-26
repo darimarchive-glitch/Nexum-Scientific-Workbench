@@ -1,0 +1,20 @@
+# Native build environment. Create separately on Apple Silicon and Intel Macs.
+name: nexum-build
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12
+  - gtk4>=4.18,<5
+  - libadwaita>=1.6,<2
+  - pygobject>=3.48,<4
+  - pycairo>=1.25
+  - numpy>=1.26,<3
+  - scipy>=1.13,<2
+  - pyopengl>=3.1.7,<4
+  - gemmi>=0.7,<1
+  - rdkit>=2026.3,<2027
+  - pillow>=10,<13
+  - cairosvg>=2.7,<3
+  - pyinstaller>=6.16,<7
+  - adwaita-icon-theme

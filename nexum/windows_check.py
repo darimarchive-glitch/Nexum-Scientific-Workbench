@@ -117,10 +117,29 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
             if errors:raise RuntimeError("Falha no fluxo integrado") from errors[0][1]
             print("Medições/superfícies/PNG/SVG/calibração/titulação/sessão/logo: OK",flush=True)
 
+            # The private delivery's laboratory must work in the frozen bundle too.
+            with patch('nexum.ui.laboratory.data_dir', return_value=Path(folder)):
+                window.open_laboratory()
+            lab=window.lab
+            from nexum.lab import molecules as lab_molecules, examples
+            from nexum.lab.project import Project,write_project,read_project
+            built=lab_molecules.chemistry('builder',lab_molecules.chemistry('smiles_graph','CCO'))
+            lab.accept_molecule(built['molecule'],built['graph'])
+            lab.project=Project(examples.example(0));lab.refresh();lab.use_current()
+            lab.to_analysis();assert window.analysis.dataset['x']==lab.project.data['datasets'][0]['x']
+            lab.capture_scene();lab.autosave(force=True)
+            project_file=output/'laboratorio.nexum7';write_project(project_file,lab.project.data)
+            assert len(read_project(project_file)['scenes'])==1
+            lab.project=Project(examples.example(3));lab.refresh();lab.fit_design()
+            lab.project=Project(examples.example(4));lab.refresh();lab.run_process()
+            assert lab.project.data['results'][-1]['payload']['terminal_streams']
+            window.close_laboratory()
+            print('Laboratório/editor/motor separado/projeto/cena/DOE/processos: OK',flush=True)
             window.struct.influence.set_active(False)
             assert not window.struct.viewer.show_influence
             assert len(window.struct.viewer.scene["influence_pos"]) == 0
         finally:
+            window.close_laboratory()
             window.destroy()
             sys.excepthook = original_hook
     print("GTK4/libadwaita/Cairo/NumPy/SciPy/OpenGL/RDKit/gemmi/SQLite: OK")

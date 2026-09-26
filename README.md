@@ -1,272 +1,130 @@
 <div align="center">
+<img src="docs/logo-nexum.svg" width="112" alt="Logo oficial do Nexum">
 
-<img src="docs/images/banner-nexum.png" alt="Nexum Scientific Workbench — banner com identidade visual molecular em azul e turquesa" width="100%">
+# Nexum
 
-<img src="docs/logo-nexum.svg" alt="Logo oficial do Nexum" width="128">
+**Scientific Workbench — explore a química, compreenda o modelo, examine o resultado.**
 
-# Nexum · Scientific Workbench
-
-### Da equação à descoberta.
-
-Química computacional, estruturas 3D e experimentos em uma bancada nativa para Windows e Linux.
-
-![Versão 6.8](https://img.shields.io/badge/vers%C3%A3o-6.8-3584e4?style=for-the-badge)
-![GTK4 e libadwaita](https://img.shields.io/badge/desktop-GTK4%20%2B%20libadwaita-9141ac?style=for-the-badge)
-![Windows 10/11 x64](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078d4?style=for-the-badge)
-![Fedora](https://img.shields.io/badge/Linux-Fedora-51a2da?style=for-the-badge)
-![Python](https://img.shields.io/badge/motor-Python-26a269?style=for-the-badge)
+Versão **7.0.0-preview.1** · aplicação desktop · interface em português brasileiro
+</div>
 
 <!-- nexum-catalog:start -->
-**43 calculadoras · 12 áreas científicas · 10 bancadas · 5 ferramentas de análise de dados**
+**43 calculadoras · 12 áreas científicas · 10 bancadas · 5 ferramentas de análise de dados · 16 recursos de laboratório**
 <!-- nexum-catalog:end -->
 
-**Instalar o Nexum 6.8.1:** [Windows — instalador EXE](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases/download/v6.8.1/Nexum-Setup-6.8.1-x64.exe) · [Linux — Flatpak](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases/download/v6.8.1/Nexum-x86_64.flatpak) · [Instruções e arquivos da versão](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases/tag/v6.8.1)
+Este pacote contém o projeto atualizado e os procedimentos de compilação. É uma **prévia de desenvolvimento**: os testes automatizados e as limitações efetivamente verificadas estão em [Validação](docs/development/validation.md). Não inclui instaladores certificados para os três sistemas. Os instaladores aprovados pela compilação e pelos testes nativos serão disponibilizados em [Releases](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases). A publicação no Flathub é uma etapa separada.
 
-[Instalar no Windows](#começar-no-windows) · [Instalar no Fedora](#começar-no-fedora) · [Experimentos](#uma-bancada-que-responde-aos-seus-dados) · [Motor científico](#o-cérebro-científico) · [Documentação](#documentação)
+## O que você pode fazer
 
-</div>
+- Calcular estequiometria, termodinâmica, equilíbrio, cinética, processos e propriedades espectrais.
+- Buscar moléculas com nomes brasileiros, importar estruturas e examinar geometrias, medidas, superfícies, cortes e campos externos.
+- Desenhar moléculas 2D, validar conectividade, gerar estruturas 3D e comparar conformeros por energia e RMSD.
+- Importar dados experimentais, manter o arquivo original, aplicar fluxos de processamento e registrar atribuições espectrais manuais.
+- Planejar experimentos fatoriais, estudar resíduos, avaliar controle de qualidade e fechar balanços de processos simples.
+- Explorar incerteza, correlações e sensibilidade em modelos químicos explícitos.
+- Salvar projetos com caderno, análises e cenas; exportar CSV, figuras, relatórios e apresentações.
 
----
+Na tela inicial, clique em **Abrir Laboratório**. O laboratório também tem um botão na barra superior. Comece pelos seis projetos de exemplo em **Projeto e caderno**; os dados desses exemplos são identificados como simulados.
 
-## Química em uma bancada integrada
+## Novidades desta prévia
 
-O **Nexum Scientific Workbench** reúne cálculos químicos, visualização molecular 3D e experimentos computados em uma aplicação nativa com **GTK4, libadwaita e OpenGL**. A interface organiza o trabalho em Início, Calculadoras, Estruturas 3D, Experimentos, Análise e Histórico.
+| Recurso | Uso concreto |
+| --- | --- |
+| Editor molecular | Átomos, cargas formais, ligações, SMILES, minimização MMFF94/UFF e conformeros. |
+| Espectro e molécula | Uma região espectral pode ser vinculada manualmente a átomos da versão exata da estrutura. |
+| Projetos portáteis | Arquivo `.nexum7`, recuperação automática, desfazer/refazer e dados originais com SHA-256. |
+| Fluxos de análise | Linha de base, Savitzky–Golay, normalização, derivada, integração e calibração, em série ou lote. |
+| Planejamento experimental | Fatorial completo 2^k, réplicas, pontos centrais, aleatorização e interações de dois fatores. |
+| Qualidade | Viés, desvio padrão, RSD, recuperação e distinção entre controle e especificação. |
+| Processos | Alimentação, mistura, divisão, aquecimento e conversão mássica 1:1; balanços explícitos. |
+| Modelos e incerteza | Propagação correlacionada, Monte Carlo, sensibilidade e distribuição ácido–base ideal. |
+| Comunicação científica | Cenas, PNG, GIF de rotação da câmera, apresentação HTML e relatório com rastreabilidade. |
+| Extensões | Função Python local, revisada e autorizada pelo usuário; nenhum projeto executa código automaticamente. |
 
-A ideia central é simples: **você fornece as condições; o motor resolve o modelo; a bancada mostra o estado calculado.** Presets preenchem entradas. As equações determinam os resultados.
+As contagens vêm dos registros do código e podem ser atualizadas por `python scripts/update_catalog.py`. Os 16 recursos do laboratório não são somados artificialmente ao número de calculadoras.
 
-| Calcule | Explore | Experimente |
-| :--- | :--- | :--- |
-| Estequiometria, equilíbrio, termodinâmica, cinética e outras áreas, com gráficos nas ferramentas que os implementam. | Moléculas e macromoléculas, fitas com espessura, profundidade, ligantes e diferentes representações. | Titulação, eletroquímica, calorimetria e outras bancadas com medições e curvas ligadas ao mesmo estado. |
+## Sistemas e distribuição
 
-Os cálculos são locais. A instalação e a busca de estruturas em **PubChem/RCSB** precisam de conexão. Os módulos científicos avançados também podem ser usados diretamente em Python; nem todos possuem formulário próprio na interface.
+| Sistema | Formato previsto | Situação desta entrega |
+| --- | --- | --- |
+| Linux | `.flatpak`, x86_64 ou aarch64 conforme o ambiente de compilação | Fluxo de pacote independente preservado e atualizado; compilação e teste do binário ainda necessários. |
+| Windows | Instalador `.exe`, x86_64 | Pipeline com GTK, motor químico separado, atalhos e fallback gráfico preservado; recompilação nativa necessária. |
+| macOS | `.app` dentro de `.dmg`, Apple Silicon e Intel em builds separados | Suporte de caminhos e receita de compilação acrescentados; execução nativa, assinatura e notarização ainda não verificadas. |
 
-> **Nexum 6.8 · Windows e Linux:** aplicação desktop nativa com o mesmo motor científico, calculadoras, bancadas e visualizador molecular. A versão Windows funciona sem WSL.
+O Flatpak não depende de uma distribuição específica, mas exige Flatpak funcional, runtime compatível, arquitetura correspondente e suporte gráfico. **Pacote Flatpak independente e publicação no Flathub são etapas distintas.** Consulte [Distribuição](docs/distribution/README.md) e as [condições para o Flathub](docs/distribution/flathub.md).
 
-## Correção de compatibilidade Windows — 6.8.1
+Os nomes seguem um padrão, por exemplo:
 
-O instalador inclui um renderizador de compatibilidade para computadores em que o OpenGL nativo não inicia. A seleção é automática; o modo por software pode ser mais lento em estruturas grandes. [Diagnóstico e funcionamento](docs/WINDOWS_GRAPHICS.md).
+- `Nexum-7.0.0-preview.1-source.zip`
+- `Nexum-7.0.0-preview.1-windows-x86_64-setup.exe`
+- `Nexum-7.0.0-preview.1-linux-x86_64.flatpak`
+- `Nexum-7.0.0-preview.1-macos-arm64.dmg`
 
-## Novidades da versão 6.8
+Esses nomes descrevem os artefatos produzidos pelos scripts; não significam que todos os binários acompanham o ZIP de código.
 
-- **Logo oficial:** `docs/logo-nexum.svg`, usado no aplicativo, no instalador e nos atalhos.
-- **Visualização:** contornos adaptados ao fundo na camada de van der Waals; medições de distância, ângulo e diedro; seleção por grupos, cadeias e resíduos; 2D vinculado ao 3D; cargas empíricas Gasteiger quando a conectividade permitir.
-- **Superfícies:** van der Waals, acessível ao solvente e SES aproximada por grade; corte e transparência; importação de densidade/orbitais Cube e mapeamento de potencial fornecido pelo usuário.
-- **Análise:** espectros CSV, integração, correção de base sem alterar o original, calibração com incerteza, comparação cinética com resíduos/AIC, titulação poliprótica e padrões isotópicos.
-- **Processos:** combustão, CSTR/PFR, perda de carga em tubos, troca térmica e resolução cromatográfica.
-- **Sessões e figuras:** salvar/restaurar estruturas, câmera, camadas, entradas, resultados, experimentos e anotações; comparação de estruturas; PNG de alta resolução e gráficos SVG/PDF.
+## Executar a partir do código
 
-Os modos vibracionais são importados de cálculos e animados em velocidade didática. O programa não calcula orbitais ab initio nem deduz identidade química de um espectro. Consulte [o guia de análise](docs/ANALISE-E-VISUALIZACAO.md) para formatos, limites e exemplos.
+Para o usuário final, a distribuição pretendida é por instaladores. Os comandos abaixo são para desenvolvimento.
 
-### Instalação empacotada
-
-O workflow **Build desktop installers** produz um instalador Windows `.exe` e um pacote Linux `.flatpak`. Os artefatos da PR exigem acesso ao repositório e possuem prazo de retenção. No Linux: `flatpak install --user Nexum-x86_64.flatpak`; depois, `flatpak run io.github.nexum.ScientificWorkbench`.
-
-**Atalho no Linux:** após instalar o Flatpak, procure **Nexum** no menu de aplicativos e fixe-o nos favoritos, se desejar. Se ele abrir pela loja, mas não aparecer no menu, o ZIP do pacote inclui `Reparar-atalho-Nexum.sh`: execute `bash Reparar-atalho-Nexum.sh` na pasta extraída. Ele restaura o atalho e o logo no menu do usuário, preservando uma cópia de um atalho anterior diferente. Caso o menu ainda não atualize, saia da sessão e entre novamente. Isso não exige reinstalar dependências de desenvolvimento.
-
-As instruções abaixo são para execução a partir do código e desenvolvimento.
-
-## Começar no Windows
-
-**Requisitos:** Windows 10/11 de 64 bits, driver com suporte a **OpenGL 3.3** e conexão para instalar as dependências.
-
-1. Instale [MSYS2](https://www.msys2.org/) na pasta padrão `C:\msys64` e [Python 3.12 x64](https://www.python.org/downloads/windows/), incluindo o launcher `py`. Se tiver WinGet, pode usar o Terminal:
-
-   ```powershell
-   winget install --exact --id MSYS2.MSYS2
-   winget install --exact --id Python.Python.3.12
-   ```
-
-2. [Baixe o projeto em ZIP](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/archive/refs/heads/main.zip), clique com o botão direito e escolha **Extrair tudo**. Use uma pasta gravável, como `Documentos\Nexum`.
-3. Após instalar os pré-requisitos, abra **`install-windows.cmd`** na pasta extraída. Aguarde a instalação, o diagnóstico e os testes.
-4. Abra **`run-windows.cmd`** ou o atalho **Nexum** criado na Área de Trabalho.
-
-O instalador prepara GTK4/libadwaita, as bibliotecas científicas e o suporte 3D. Ele verifica a leitura mmCIF, a geração de conformadores, o histórico SQLite e a renderização antes de concluir. A distribuição usa o código-fonte com dependências instaladas; **não é um `.exe` independente**.
-
-| Arquivo | O que faz |
-| :--- | :--- |
-| `install-windows.cmd` | Instala dependências, executa diagnóstico e testes e cria o atalho. |
-| `run-windows.cmd` | Abre o aplicativo. |
-| `test-windows.cmd` | Executa o diagnóstico completo e a suíte de testes. |
-| `diagnose-windows.cmd` | Verifica dependências, química, SQLite e OpenGL. |
-| `install-windows-shortcut.cmd` | Recria o atalho na Área de Trabalho. |
-
-**Dados locais:** histórico em `%LOCALAPPDATA%\Nexum\history.sqlite3` e cache de estruturas em `%LOCALAPPDATA%\Nexum\Cache\structures`. Atualizar o código não apaga o histórico.
-
-Se a atualização do próprio MSYS2 encerrar a instalação, execute `install-windows.cmd` novamente. Se ocorrer outro erro, a janela permanece aberta para mostrar a mensagem. Caminhos personalizados, reinstalação e diagnóstico estão no [guia completo para Windows](docs/WINDOWS.md).
-
-## Começar no Fedora
-
-Em uma sessão gráfica do Fedora, com Git instalado:
+**Linux:** instale Python 3.12 ou superior, GTK4/libadwaita, PyGObject e Cairo pelos pacotes da sua distribuição. Crie um ambiente que tenha acesso aos módulos gráficos do sistema:
 
 ```bash
-git clone https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench.git nexum-gnome
-cd nexum-gnome
-chmod +x *.sh
-./install-fedora.sh
-./run.sh
+python3 -m venv --system-site-packages .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m nexum.main
 ```
 
-O instalador usa `dnf` ou `dnf5`, solicita `sudo` para instalar as dependências nativas, cria um ambiente `.venv` com acesso aos pacotes GTK do sistema, instala as bibliotecas Python e executa a suíte de testes.
+No Fedora, o atalho de preparação existente continua disponível: `bash install-fedora.sh` e `bash run.sh`. Flatpak é o caminho para distribuição ao usuário final em outras distribuições.
 
-| Comando | O que faz |
-| :--- | :--- |
-| `./install-fedora.sh` | Prepara dependências e ambiente Python; executa os testes. |
-| `./run.sh` | Abre a aplicação nativa. |
-| `./test.sh` | Executa os testes e verifica a compilação dos módulos Python. |
-| `./install-desktop-shortcut.sh` | Adiciona o Nexum ao menu de aplicativos. |
+**Windows:** siga [Desenvolvimento e diagnóstico Windows](docs/distribution/windows.md). `install-windows.cmd` prepara os ambientes de desenvolvimento; `run-windows.cmd` inicia o código. A receita do instalador está em `packaging/windows/build.ps1`.
 
-**Dependências:** Python 3, PyGObject, GTK4, libadwaita, Mesa/OpenGL, NumPy, SciPy, PyOpenGL, gemmi e RDKit. As faixas de versões das bibliotecas Python estão em [requirements.txt](requirements.txt); os pacotes do sistema estão no [instalador](install-fedora.sh). A validação automatizada desta publicação usou Python 3.12.
-
-## Uma bancada que responde aos seus dados
-
-Na v6.6, configuração, desenho e gráfico compartilham uma sessão experimental. Você pode pausar, avançar um passo, explorar um instante ou editar os parâmetros para construir outro cenário.
-
-| Bancada | O que você explora | Base do cálculo |
-| :--- | :--- | :--- |
-| **Titulação** | Adição de titulante, indicador, curva de pH e equivalência. | Ácido forte ou monoprótico fraco com base forte; balanços de matéria e carga, equilíbrio ácido e autoionização da água. |
-| **Célula de Daniell** | Consumo de espécies, massas depositadas e potencial reversível. | Carga elétrica, lei de Faraday e Nernst. |
-| **Calorimetria elétrica** | Aquecimento e perdas térmicas para o ambiente. | Balanço de energia com potência e troca térmica. |
-| **Equilíbrio de Haber** | Composição inicial e composição de equilíbrio. | Constante dependente da temperatura e extensão de reação no modelo ideal. |
-| **Beer–Lambert** | Absorbância, caminho óptico e transmissão. | `A = εbc` e `T = 10⁻ᴬ`. |
-| **Cinética** | Conversão de A em B e marcações de meia-vida. | Lei temporal de primeira ordem. |
-| **Decaimento nuclear** | População esperada, atividade e meias-vidas. | Decaimento exponencial. |
-| **Gás ideal** | Compressão e expansão isotérmicas. | `pV = nRT`. |
-
-**Para começar:** escolha Titulação, altere as concentrações e use **Ir à equivalência**. Depois explore a curva com o controle de tempo. O indicador muda a representação da cor, mantendo o pH calculado pelo modelo.
-
-A velocidade de reprodução controla o relógio visual. **Haber e Beer–Lambert são bancadas estáticas**, atualizadas ao editar os parâmetros. Cores e movimentos esquemáticos ajudam a interpretar o estado. Consulte as hipóteses em [Experimentos v6.6](EXPERIMENTOS-v6.6.md).
-
-## Estruturas com profundidade
-
-O visualizador combina `Gtk.GLArea`, depth buffer, perspectiva e geometria OpenGL. As fitas de macromoléculas são geradas como malhas com espessura.
-
-- **Fontes:** busca em PubChem e RCSB; leitura de SDF, PDB e PDBx/mmCIF no núcleo.
-- **Representações:** fitas, bolas e ligações, preenchimento, varetas, backbone e linhas.
-- **Inspeção:** cadeias, ligantes, hidrogênios, névoa e perspectiva.
-- **Conformadores:** quando não há 3D disponível no PubChem, o fluxo tenta gerar coordenadas com RDKit, ETKDG e otimização MMFF/UFF.
-
-Experimente pesquisar **`4HHB`**, selecionar **RCSB** e usar **Fitas** para explorar a hemoglobina. A disponibilidade depende do serviço remoto; um conformador gerado computacionalmente é uma aproximação do método utilizado.
-
-## O cérebro científico
-
-O registro público `ScientificEngine` reúne modelos reutilizáveis com entradas, equações, hipóteses e domínio declarado. Uma chamada a `solve()` executa o solver e devolve um `CalculationTrace` com resultado, tempo de execução e diagnósticos disponíveis para aquele modelo.
-
-| Área | Implementações no backend | Diagnósticos e escopo |
-| :--- | :--- | :--- |
-| **Soluções** | Força iônica, Debye–Hückel, Davies e especiação poliprótica. | Balanço de carga e domínio dos modelos de atividade. |
-| **Equilíbrio** | Constantes de formação e equilíbrio multirreacional ideal. | Resíduos de balanço e afinidade química. |
-| **Gases e fases** | Peng–Robinson puro/misturas, `kij`, fugacidades, Rachford–Rice e flash TP. | Fechamento material e igualdade de fugacidades. |
-| **Cinética** | Redes de ação das massas e integração ODE, incluindo BDF. | Avaliações do solver e invariantes estequiométricos. |
-| **Eletroquímica** | Butler–Volmer, inversão, polarização com queda `iR` e Cottrell. | Convenções de sinal e hipóteses de cinética/difusão. |
-| **Metrologia** | GUM, Monte Carlo e regressão ponderada. | Sensibilidades, covariância, resíduos e `χ²`. |
-| **Espectroscopia** | Beer–Lambert multicomponente por LS/NNLS. | Espectro reconstruído, RMSE, posto e condicionamento. |
-
-### Use o motor diretamente em Python
-
-Na raiz do projeto, com as dependências científicas instaladas:
-
-```python
-from nexum.core.engine import default_engine
-
-engine = default_engine()
-
-# Três comprimentos de onda, duas espécies e caminho óptico de 1 cm.
-# ε em L mol⁻¹ cm⁻¹; absorbâncias adimensionais.
-trace = engine.solve(
-    "multicomponent-beer",
-    absorbance=[0.12, 0.21, 0.15],
-    epsilon_matrix=[[100, 10], [10, 100], [50, 50]],
-    path_cm=1.0,
-)
-
-print(trace.result["concentrations_m"])  # ≈ [0.001, 0.002] mol/L
-print(trace.diagnostics)                # RMSE e número de condição
-print(engine.keys())                   # Modelos registrados
-```
-
-O [exemplo completo](examples/beer_multicomponente.py) pode ser executado após a instalação, a partir da raiz do projeto.
-
-No Windows, pelo PowerShell:
-
-```powershell
-.\.venv-science\Scripts\python.exe -m examples.beer_multicomponente
-```
-
-No Fedora:
+**macOS:** em um Mac com Miniforge/conda-forge e ferramentas de desenvolvimento da Apple:
 
 ```bash
-.venv/bin/python -m examples.beer_multicomponente
+conda env create -f packaging/macos/environment.yml
+conda activate nexum-build
+python -m nexum.main
+bash packaging/macos/build.sh
 ```
 
-Esse exemplo foi executado nesta publicação e recuperou as concentrações com erro residual próximo da precisão de ponto flutuante. O trace registra equações declaradas e diagnósticos retornados; ele não representa uma derivação simbólica automática nem um histórico completo das iterações internas.
+A disponibilidade conjunta das dependências e a renderização ainda precisam ser verificadas em cada arquitetura. Não se produz um `.app` macOS confiável convertendo o executável Linux ou Windows. Veja [macOS](docs/distribution/macos.md).
 
-## Validação e limites científicos
+## Verificar o projeto
 
-**A suíte contém 179 testes.** Na [validação automatizada da adaptação Windows](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/34487381888), o commit `ade6fa1` obteve:
+```bash
+python -m unittest discover -s tests -v
+python -m compileall -q nexum
+python scripts/update_catalog.py --check
+python scripts/check_project.py
+```
 
-| Ambiente | Resultado |
-| :--- | :--- |
-| Windows com GTK/Cairo e Mesa | **179 aprovados, nenhum ignorado.** |
-| Backend CPython 3.12 no Windows | 167 aprovados; 12 ignorados por ausência de GTK/Cairo. |
-| Backend CPython 3.12 no Ubuntu | 167 aprovados; 12 ignorados por ausência de GTK/Cairo. |
+Execute em uma sessão gráfica para incluir os testes GTK. Casos ignorados por falta de GTK/Cairo não contam como aprovados. O teste do aplicativo empacotado está disponível por `Nexum --self-test`; ele exige sessão gráfica e valida o motor químico, a janela e o contexto OpenGL.
 
-A etapa desktop também instalou as dependências em uma pasta com espaços, compilou os shaders, abriu a janela completa, renderizou uma molécula, criou o atalho e repetiu o diagnóstico pelo lançador CMD. O contexto gráfico foi **OpenGL 4.6 Core Profile com Mesa 26.0.3 por software**.
+## Estrutura
 
-Os testes cobrem cálculos, conservação, benchmarks, mudanças de entradas, sessões experimentais, renderização Cairo, integração GTK, comunicação com RDKit/gemmi e persistência do histórico. Testes `skipped` não contam como aprovados. O diagnóstico registrou avisos GObject no encerramento, sem falha da execução. A verificação manual com GPU física, buscas remotas e escalas de tela 100%, 150% e 200% continua pendente.
+| Diretório | Responsabilidade |
+| --- | --- |
+| `nexum/core/` | Modelos químicos, dados, importadores e motores científicos existentes. |
+| `nexum/lab/` | Projetos, processamento, construção molecular, DOE, qualidade, incerteza e relatórios. |
+| `nexum/ui/` | Interface GTK4/libadwaita, gráficos e visualizador OpenGL. |
+| `nexum/assets/` | Logo e ícones efetivamente utilizados. |
+| `packaging/` | Receitas de distribuição Windows, Linux e macOS. |
+| `examples/` | Projetos didáticos, dados e exemplo de extensão Python. |
+| `tests/` | Referências numéricas, regressões, persistência e integração gráfica. |
+| `docs/` | Guias de uso, ciência, desenvolvimento e distribuição. |
 
-Consulte o [escopo de validação Windows](docs/VALIDACAO-WINDOWS.md) e o [registro da publicação original no Fedora](docs/VALIDACAO-PUBLICACAO.md), que documenta a suíte anterior de 170 testes.
+## Ciência e interpretação
 
-Precisão numérica e adequação física precisam ser avaliadas juntas. O projeto declara limites relevantes:
+A arquitetura separa entrada, modelo, cálculo, diagnóstico e apresentação. O Nexum não identifica automaticamente uma molécula a partir de um espectro, não transforma MMFF/UFF em cálculo quântico e não apresenta uma aproximação geométrica como densidade eletrônica. Os modelos precisam ser usados dentro de suas hipóteses.
 
-- **Flash Peng–Robinson:** ainda sem teste global completo de estabilidade por plano tangente.
-- **Atividades:** Davies e Debye–Hückel têm domínio restrito; convergência não garante validade em soluções concentradas.
-- **Cinética:** mecanismos e parâmetros devem ser fornecidos; a rede não é inferida automaticamente.
-- **Metrologia:** Monte Carlo usa entradas normais multivariadas; regressão ponderada não trata incerteza em `x`.
-- **Pesquisa:** Pitzer/SIT parametrizado, DFT e transporte eletroquímico acoplado não fazem parte desta entrega.
+- [Guia do laboratório](docs/user/laboratory.md)
+- [Análise e visualização](docs/user/analysis-and-visualization.md)
+- [Experimentos](docs/user/experiments.md)
+- [Modelos, incerteza e referências](docs/science/laboratory-methods.md)
+- [Matriz do motor científico](docs/science/validation-matrix.md)
+- [Arquitetura](docs/development/architecture.md)
+- [Resultados de validação](docs/development/validation.md)
+- [Organização e migração](docs/development/organization.md)
+- [Contribuição](CONTRIBUTING.md)
 
-## Organização do projeto
-
-| Caminho | Responsabilidade |
-| :--- | :--- |
-| [`nexum/core/`](nexum/core/) | Calculadoras, química, estruturas, experimentos e sessões. |
-| [`nexum/core/advanced/`](nexum/core/advanced/) | Solvers científicos e registro auditável, independentes de GTK. |
-| [`nexum/ui/`](nexum/ui/) | Interface GTK, renderização OpenGL e desenhos/gráficos Cairo. |
-| [`nexum/history.py`](nexum/history.py) | Histórico local em SQLite. |
-| [`nexum/paths.py`](nexum/paths.py) | Pastas de dados e cache por sistema operacional. |
-| [`nexum/chemistry_worker.py`](nexum/chemistry_worker.py) | Integração local com RDKit/gemmi no ambiente Windows. |
-| [`scripts/windows/`](scripts/windows/) | Instalação, execução, diagnóstico e atalho no Windows. |
-| [`tests/`](tests/) | Testes científicos, numéricos e de interface. |
-| [`examples/`](examples/) | Exemplos de uso programático. |
-
-## Licença
-
-Distribuído sob a [licença MIT](LICENSE), conforme definida pelo mantenedor neste repositório.
-
-## Documentação
-
-| Documento | Para que serve |
-| :--- | :--- |
-| [Windows](docs/WINDOWS.md) | Instalação, execução, dados locais e solução de problemas. |
-| [Validação Windows](docs/VALIDACAO-WINDOWS.md) | Escopo dos testes e verificações manuais pendentes. |
-| [Experimentos v6.6](EXPERIMENTOS-v6.6.md) | Controles, leitura das bancadas e limites de cada modelo. |
-| [Arquitetura do backend](BACKEND-ARCHITECTURE.md) | Contratos, solvers, traces e separação da interface. |
-| [Auditoria científica](SCIENTIFIC-AUDIT.md) | Hipóteses, equações e decisões de modelagem. |
-| [Matriz de validação](VALIDATION-MATRIX.md) | Escopo e verificações científicas documentadas. |
-| [Design da interface](UI-DESIGN.md) | Organização e linguagem visual. |
-| [Changelog](CHANGELOG.md) | Evolução do projeto. |
-| [Contribuição](CONTRIBUTING.md) | Como propor melhorias e relatar problemas reproduzíveis. |
-
----
-
-<div align="center">
-
-<img src="docs/images/logo-nexum.png" alt="Logotipo do Nexum em formato de N com ligações moleculares" width="120">
-
-**Nexum Scientific Workbench · Windows e Linux · 6.8**
-
-*Entradas explícitas. Modelos declarados. Resultados calculados.*
-
-© 2026 [Davi P. Souza](https://github.com/darimarchive-glitch) – Nexum Scientific Workbench
-</div>
-
-
+O nome curto exibido é **Nexum**. O logo oficial continua sendo `docs/logo-nexum.svg`. A identidade técnica antiga foi mantida para preservar instalações existentes; a identidade definitiva da loja deve corresponder à conta ou domínio controlado pelo mantenedor.

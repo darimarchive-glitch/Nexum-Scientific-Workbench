@@ -1,7 +1,7 @@
 {
   "app-id": "io.github.nexum.ScientificWorkbench",
   "runtime": "org.gnome.Platform",
-  "runtime-version": "49",
+  "runtime-version": "50",
   "sdk": "org.gnome.Sdk",
   "command": "nexum",
   "finish-args": [
@@ -21,7 +21,9 @@
         "python3 packaging/flatpak/install.py",
         "install -Dm755 packaging/flatpak/nexum /app/bin/nexum",
         "install -Dm644 packaging/flatpak/io.github.nexum.ScientificWorkbench.desktop /app/share/applications/io.github.nexum.ScientificWorkbench.desktop",
-        "install -Dm644 nexum/assets/logo.svg /app/share/icons/hicolor/scalable/apps/io.github.nexum.ScientificWorkbench.svg"
+        "install -Dm644 nexum/assets/logo.svg /app/share/icons/hicolor/scalable/apps/io.github.nexum.ScientificWorkbench.svg",
+        "install -Dm644 packaging/flatpak/io.github.nexum.ScientificWorkbench.metainfo.xml /app/share/metainfo/io.github.nexum.ScientificWorkbench.metainfo.xml",
+        "install -Dm644 LICENSE /app/share/licenses/io.github.nexum.ScientificWorkbench/LICENSE"
       ],
       "sources": [
         {
@@ -32,4 +34,3 @@
     }
   ]
 }
-

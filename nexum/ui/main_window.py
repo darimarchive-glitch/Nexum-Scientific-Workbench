@@ -46,10 +46,26 @@ class MainWindow(Adw.ApplicationWindow):
         self.stack.add_titled_with_icon(self.hist,"history","Histórico","document-open-recent-symbolic")
         from .session_actions import add_actions
         add_actions(self,header)
+        self.lab=None
+        laboratory=Gtk.Button(icon_name='applications-science-symbolic',tooltip_text='Abrir laboratório de projetos');laboratory.connect('clicked',lambda *_:self.open_laboratory());header.pack_start(laboratory)
+        self.connect('close-request',self.close_laboratory)
         toolbar.set_content(self.stack)
         keys=Gtk.EventControllerKey();keys.connect("key-pressed",self._key);self.add_controller(keys)
     def toast(self,text,timeout=4):
         t=Adw.Toast.new(str(text));t.set_timeout(timeout);self.overlay.add_toast(t);return False
     def _key(self,controller,keyval,keycode,state):
         if keyval==Gdk.KEY_Escape and getattr(self.struct,"_fullscreen",False):self.struct._toggle_fullscreen();return True
+        return False
+
+    def open_laboratory(self):
+        if self.lab is None:
+            from .laboratory import Laboratory
+            self.lab=Laboratory(self)
+        self.lab.present()
+
+    def close_laboratory(self,*_):
+        if self.lab:
+            if self.lab.busy:self.toast('Aguarde a operação do laboratório antes de fechar.');return True
+            from gi.repository import GLib
+            self.lab.autosave(force=True);GLib.source_remove(self.lab.timer);self.lab.destroy();self.lab=None
         return False

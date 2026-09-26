@@ -1,4 +1,4 @@
-# UI/UX — GNOME industrial v6.0
+# Interface e interação
 
 ## Princípio
 

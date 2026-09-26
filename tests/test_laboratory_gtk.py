@@ -51,10 +51,20 @@ class LaboratoryGtkTests(unittest.TestCase):
         self.assertFalse(self.errors, [str(e[1]) for e in self.errors])
 
     def drain(self):
+        # Run the real event loop: polling one event then sleeping can starve
+        # idle callbacks behind the macOS native window event source.
+        loop = GLib.MainLoop()
         deadline = time.monotonic() + 30
-        while self.lab.busy and time.monotonic() < deadline:
-            GLib.MainContext.default().iteration(False)
-            time.sleep(0.01)
+        def check():
+            if not self.lab.busy or time.monotonic() >= deadline:
+                loop.quit()
+                return False
+            return True
+        GLib.timeout_add(10, check)
+        loop.run()
+        if self.lab.busy:
+            import faulthandler
+            faulthandler.dump_traceback()
         self.assertFalse(self.lab.busy)
 
     def test_all_examples_refresh_and_transfer_analysis(self):

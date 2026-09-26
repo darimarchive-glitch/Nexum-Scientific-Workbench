@@ -22,11 +22,12 @@ def choose(window,title,callback,save=False,name=None):
 def background(window,work,done):
     def run():
         try:result=work()
-        except Exception as exc:GLib.idle_add(window.toast,str(exc),8)
+        except Exception as exc:GLib.idle_add(window.toast,str(exc),8,priority=GLib.PRIORITY_DEFAULT)
         else:
             def apply():
                 try:done(result)
                 except Exception as exc:window.toast(str(exc),timeout=8)
                 return False
-            GLib.idle_add(apply)
+            # Deliver completed work even while native window events keep flowing.
+            GLib.idle_add(apply,priority=GLib.PRIORITY_DEFAULT)
     threading.Thread(target=run,daemon=True).start()

@@ -1,6 +1,6 @@
 # macOS: compilação e verificação
 
-**Estado:** portabilidade e receita de build implementadas; nenhum `.app` ou `.dmg` desta versão foi compilado ou executado em macOS nesta entrega. O ambiente disponível é Linux. Essa diferença é relevante: dependências nativas, PyGObject, OpenGL, assinatura e integração com o Finder só podem ser homologados no destino.
+**Estado:** compilação nativa em CI para Apple Silicon e Intel configurada. As primeiras execuções detectaram dependências de introspecção GTK ausentes; o ambiente foi corrigido. A release só disponibiliza DMGs após a verificação do aplicativo empacotado. Assinatura Developer ID e notarização exigem credenciais do responsável pelo projeto.
 
 ## Implementação
 

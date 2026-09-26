@@ -1,8 +1,8 @@
 # Validação — Nexum 7.0.0-preview.1
 
-Executada em 26 de setembro de 2026, em Linux x86_64, Python 3.12.14. Nenhum build remoto foi executado e nenhuma alteração foi publicada no GitHub.
+Validação local executada em 26 de setembro de 2026, em Linux x86_64, Python 3.12.14. A atualização foi publicada no GitHub; as verificações nativas de CI estão registradas abaixo.
 
-## Resultado da suíte
+## Resultado da suíte local
 
 - **274 testes descobertos**.
 - **254 aprovados**.
@@ -45,11 +45,17 @@ Compilação sintática Python, sintaxe dos scripts shell, catálogo automático
 | Pillow | 12.3.0 |
 | PyOpenGL | 3.1.10 |
 
+## Verificações nativas no GitHub
+
+- [Windows: regressões e interface GTK](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/36236515520): aprovado após corrigir o isolamento dos testes GTK e a expectativa de exceção do motor em subprocesso.
+- [Instaladores Windows e Flatpak](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/36236234219): ambos os jobs aprovados. O Windows instalou o EXE, verificou os atalhos e executou a cópia instalada com PATH restrito. O Linux instalou o Flatpak, verificou os atalhos e executou a interface e o laboratório em sessão gráfica de CI.
+- macOS: a primeira compilação identificou dependências de introspecção ausentes. As correções fazem parte do ambiente de build; a homologação do aplicativo ainda depende de uma execução aprovada.
+
 ## Limites concretos
 
-Não foi possível abrir uma sessão GTK/OpenGL utilizável neste ambiente. Portanto, a disposição visual do novo laboratório, cliques, arraste, diálogos, capturas PNG/GIF, cenas e integração com o gerenciador de janelas ainda precisam de verificação nativa. Há testes de integração incluídos para esse fim, mas eles foram ignorados nesta execução.
+Os testes gráficos nativos de CI complementam os testes locais ignorados. Eles não substituem a avaliação manual da disposição visual, dos diálogos, de acessibilidade e da experiência de uso em computadores reais. Não se afirma assinatura comercial, notarização Apple, aprovação no Flathub ou compatibilidade universal de GPU.
 
-Não foram compilados instaladores desta versão para Windows, Flatpak ou macOS. Não há EXE, Flatpak ou DMG homologado neste ZIP. As receitas foram revisadas e verificadas onde possível; isso não substitui instalação e execução dos binários de destino. Não se afirma assinatura, notarização, aprovação no Flathub ou compatibilidade universal de GPU.
+A release exige que todos os jobs de empacotamento passem. Consulte [as execuções](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/workflows/packages.yml) e [os downloads publicados](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases) para o estado atual dos binários.
 
 ## Como repetir
 

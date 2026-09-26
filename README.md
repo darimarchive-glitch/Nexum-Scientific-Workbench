@@ -48,7 +48,7 @@ As contagens vêm dos registros do código e podem ser atualizadas por `python s
 | Sistema | Formato previsto | Situação desta entrega |
 | --- | --- | --- |
 | Linux | `.flatpak`, x86_64 ou aarch64 conforme o ambiente de compilação | Fluxo de pacote independente preservado e atualizado; compilação e teste do binário ainda necessários. |
-| Windows | Instalador `.exe`, x86_64 | Pipeline com GTK, motor químico separado, atalhos e fallback gráfico preservado; recompilação nativa necessária. |
+| Windows | Instalador `.exe`, x86_64 | Pipeline com GTK, motor químico separado, atalhos e fallback gráfico preservado; compilação e teste da cópia instalada aprovados no CI. |
 | macOS | `.app` dentro de `.dmg`, Apple Silicon e Intel em builds separados | Suporte de caminhos e receita de compilação acrescentados; execução nativa, assinatura e notarização ainda não verificadas. |
 
 O Flatpak não depende de uma distribuição específica, mas exige Flatpak funcional, runtime compatível, arquitetura correspondente e suporte gráfico. **Pacote Flatpak independente e publicação no Flathub são etapas distintas.** Consulte [Distribuição](docs/distribution/README.md) e as [condições para o Flathub](docs/distribution/flathub.md).

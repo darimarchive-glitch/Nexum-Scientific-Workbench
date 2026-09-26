@@ -8,7 +8,7 @@ O nome para o público é **Nexum**, com a descrição **Scientific Workbench**.
 | Windows | `Nexum-VERSAO-windows-x86_64-setup.exe` |
 | Linux | `Nexum-VERSAO-linux-ARQUITETURA.flatpak` |
 | macOS | `Nexum-VERSAO-macos-ARQUITETURA.dmg` |
-| Integridade | mesmo nome do binário + `.sha256` |
+| Integridade | `SHA256SUMS.txt` na release; `.sha256` no build local macOS |
 
 A extensão de projeto é `.nexum7`. Os fluxos reutilizáveis usam `.nexumflow`.
 
@@ -26,6 +26,6 @@ A ID existente `io.github.nexum.ScientificWorkbench` foi preservada para não fr
 
 A mudança deve ser coordenada em `nexum/identity.py`, arquivos `.desktop`, `.metainfo.xml`, nome e conteúdo do manifesto Flatpak, verificações de atalhos e scripts de instalação. O identificador de upgrade do Inno Setup foi preservado para instalações Windows existentes. IDs internos não precisam ser tão curtos quanto o nome exibido.
 
-Não há publicação automática configurada para esta versão. O antigo publicador com hashes, versões e IDs de jobs fixos foi removido. Os workflows de compilação existentes não foram executados nesta entrega.
+O workflow `packages.yml` compila e verifica os pacotes nativos e publica a prévia somente após o sucesso de todos os jobs. O antigo publicador com hashes, versões e IDs de jobs fixos foi removido. Uma release já publicada não tem seus binários substituídos automaticamente.
 
-O runtime do pacote independente foi atualizado de GNOME 49 para 50. A migração está preparada, mas ainda exige compilação no SDK e teste do bundle. Referência: [GNOME, recomendação de migração para o runtime 50](https://thisweek.gnome.org/posts/2026/03/twig-242/).
+O runtime do pacote independente foi atualizado de GNOME 49 para 50. O bundle foi compilado, instalado e testado no CI. Referência: [GNOME, recomendação de migração para o runtime 50](https://thisweek.gnome.org/posts/2026/03/twig-242/).

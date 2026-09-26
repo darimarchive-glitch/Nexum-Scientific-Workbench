@@ -241,9 +241,11 @@ class GLMoleculeView(Gtk.GLArea):
     def _realize(self,*_):
         self.make_current()
         if self.get_error():return
-        self.programs["points"]=shaders.compileProgram(shaders.compileShader(POINT_VS,GL.GL_VERTEX_SHADER),shaders.compileShader(POINT_FS,GL.GL_FRAGMENT_SHADER))
-        self.programs["lines"]=shaders.compileProgram(shaders.compileShader(LINE_VS,GL.GL_VERTEX_SHADER),shaders.compileShader(LINE_FS,GL.GL_FRAGMENT_SHADER))
-        self.programs["ribbon"]=shaders.compileProgram(shaders.compileShader(RIBBON_VS,GL.GL_VERTEX_SHADER),shaders.compileShader(RIBBON_FS,GL.GL_FRAGMENT_SHADER))
+        # Linking is checked here; state validation needs GTK's render framebuffer.
+        self._programs_validated=False
+        self.programs["points"]=shaders.compileProgram(shaders.compileShader(POINT_VS,GL.GL_VERTEX_SHADER),shaders.compileShader(POINT_FS,GL.GL_FRAGMENT_SHADER),validate=False)
+        self.programs["lines"]=shaders.compileProgram(shaders.compileShader(LINE_VS,GL.GL_VERTEX_SHADER),shaders.compileShader(LINE_FS,GL.GL_FRAGMENT_SHADER),validate=False)
+        self.programs["ribbon"]=shaders.compileProgram(shaders.compileShader(RIBBON_VS,GL.GL_VERTEX_SHADER),shaders.compileShader(RIBBON_FS,GL.GL_FRAGMENT_SHADER),validate=False)
         GL.glEnable(GL.GL_DEPTH_TEST);GL.glDepthFunc(GL.GL_LEQUAL);GL.glEnable(GL.GL_PROGRAM_POINT_SIZE);GL.glDisable(GL.GL_CULL_FACE);GL.glEnable(GL.GL_MULTISAMPLE)
         self.rebuild_scene()
 
@@ -362,6 +364,19 @@ class GLMoleculeView(Gtk.GLArea):
         scale=self.get_scale_factor()
         GL.glViewport(0,0,*self._viewport_size())
         GL.glClearColor(*self.bg,1);GL.glClear(GL.GL_COLOR_BUFFER_BIT|GL.GL_DEPTH_BUFFER_BIT)
+        if not self._programs_validated:
+            # macOS validates the active framebuffer and VAO as well as shaders.
+            # GTK attaches its framebuffer before emitting the render signal.
+            previous_vao=int(GL.glGetIntegerv(GL.GL_VERTEX_ARRAY_BINDING))
+            vao=GL.glGenVertexArrays(1)
+            try:
+                GL.glBindVertexArray(vao)
+                for program in self.programs.values():
+                    program.check_validate()
+                self._programs_validated=True
+            finally:
+                GL.glBindVertexArray(previous_vao)
+                GL.glDeleteVertexArrays(1,[vao])
         if not self.molecule:return True
         model,view,proj=self._matrices()
         temp=[]

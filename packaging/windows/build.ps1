@@ -10,6 +10,9 @@ function Checked([string]$Exe,[string[]]$Arguments) {
 }
 $gtkPython=Join-Path $MsysRoot 'ucrt64\bin\python.exe'
 $env:PATH="$(Join-Path $MsysRoot 'ucrt64\bin');$env:PATH"
+# Exercise the GTK suite with the same separate chemistry interpreter used by the app.
+$env:NEXUM_CHEMISTRY_PYTHON=$SciencePython
+Checked $gtkPython @('-m','unittest','discover','-s','tests','-v')
 Checked $SciencePython @('-m','pip','install','CairoSVG==2.9.1','Pillow==12.3.0')
 Checked $SciencePython @('packaging/build_icons.py')
 Checked $SciencePython @('-m','PyInstaller','--noconfirm','--clean','--onedir','--name','NexumChemistry','--paths','.', '--collect-all','rdkit','--collect-all','gemmi','packaging/worker_entry.py')

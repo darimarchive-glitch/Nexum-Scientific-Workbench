@@ -2,7 +2,7 @@ name: Build desktop installers
 on:
   push:
     branches: [main]
-    paths: ["nexum/**", "packaging/**", "requirements.txt", ".github/workflows/packages.yml"]
+    paths: ["nexum/**", "packaging/**", "requirements.txt", "tests/**", ".github/workflows/packages.yml"]
   pull_request:
     paths: ['packaging/**', '.github/workflows/packages.yml']
   workflow_dispatch:

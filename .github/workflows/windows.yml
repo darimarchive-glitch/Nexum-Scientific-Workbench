@@ -1,7 +1,8 @@
 name: Windows and scientific regressions
 on:
   push:
-    branches: [main, 'feat/windows-native']
+    branches: [main]
+    paths: ['nexum/**', 'tests/**', 'requirements.txt', 'scripts/windows/**', 'packaging/windows/**', '.github/workflows/windows.yml']
   pull_request:
   workflow_dispatch:
 permissions:

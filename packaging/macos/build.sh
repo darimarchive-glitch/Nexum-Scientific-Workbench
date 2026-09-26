@@ -16,8 +16,12 @@ python -m pip freeze > "build/macos/python-$arch.txt"
 DYLD_LIBRARY_PATH="$CONDA_PREFIX/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
   python -m PyInstaller --noconfirm --clean packaging/macos/Nexum.spec
 app="$PWD/dist/Nexum.app"
-env -u PYTHONPATH -u PYTHONHOME -u GI_TYPELIB_PATH -u DYLD_LIBRARY_PATH -u DYLD_FALLBACK_LIBRARY_PATH -u GTK_DATA_PREFIX -u GSETTINGS_SCHEMA_DIR \
-  PATH="/usr/bin:/bin:/usr/sbin:/sbin" NEXUM_SELF_TEST_LOG="$PWD/build/macos/self-test.log" "$app/Contents/MacOS/Nexum" --self-test
+if ! env -u PYTHONPATH -u PYTHONHOME -u GI_TYPELIB_PATH -u DYLD_LIBRARY_PATH -u DYLD_FALLBACK_LIBRARY_PATH -u GTK_DATA_PREFIX -u GSETTINGS_SCHEMA_DIR \
+  PATH="/usr/bin:/bin:/usr/sbin:/sbin" NEXUM_SELF_TEST_LOG="$PWD/build/macos/self-test.log" "$app/Contents/MacOS/Nexum" --self-test; then
+  cat build/macos/self-test.log
+  exit 1
+fi
+cat build/macos/self-test.log
 codesign --verify --deep --strict --verbose=2 "$app"
 # An optional Developer ID identity is picked up by the spec. No credentials are stored here.
 if [[ -n ${NEXUM_MAC_NOTARY_PROFILE:-} ]]; then

@@ -355,7 +355,7 @@ class MoleculeTests(unittest.TestCase):
             "atoms": [{"element": "O"}] + [{"element": "C"}] * 3,
             "bonds": [[0, i, 1] for i in range(1, 4)],
         }
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex((ValueError, RuntimeError), "Valência ou aromaticidade inválida"):
             molecules.chemistry("builder", g)
 
     def test_conformers_have_relative_energies(self):

@@ -5,6 +5,7 @@ import tempfile
 import time
 from pathlib import Path
 import unittest
+import uuid
 from unittest.mock import patch
 
 try:
@@ -33,7 +34,7 @@ class LaboratoryGtkTests(unittest.TestCase):
         )
         self.patch.start()
         self.addCleanup(self.patch.stop)
-        self.app = Adw.Application(application_id="io.github.nexum.LaboratoryTest")
+        self.app = Adw.Application(application_id="io.github.nexum.LaboratoryTest.t" + uuid.uuid4().hex)
         self.app.register(None)
         self.main = MainWindow(self.app)
         with patch("nexum.ui.laboratory.data_dir", return_value=Path(self.folder.name)):

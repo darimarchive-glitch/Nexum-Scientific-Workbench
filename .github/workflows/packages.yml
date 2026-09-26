@@ -10,7 +10,7 @@ permissions:
   contents: read
 concurrency:
   group: desktop-packages-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   scientific:
     runs-on: ubuntu-24.04

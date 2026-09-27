@@ -51,7 +51,7 @@ class StructurePage(Gtk.Box):
         controls.append(fit);viewer_overlay.add_overlay(controls)
         self.empty=Adw.StatusPage(title="Estruturas 3D",description="Pesquise uma molécula ou macromolécula para explorar sua estrutura em 3D.",icon_name="applications-science-symbolic");viewer_overlay.add_overlay(self.empty)
         paned.set_start_child(viewer_overlay)
-        self.inspector=self._build_inspector();paned.set_end_child(self.inspector);paned.set_position(980)
+        self.inspector=self._build_inspector();paned.set_end_child(self.inspector);paned.set_position(max(400,self.window.get_default_size()[0]-340))
         self.paned=paned;self.viewer_overlay=viewer_overlay;self.append(paned)
 
     def _build_inspector(self):

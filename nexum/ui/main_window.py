@@ -29,6 +29,10 @@ CSS=b"""
 class MainWindow(Adw.ApplicationWindow):
     def __init__(self,application):
         super().__init__(application=application);self.set_title("Nexum");self.set_default_size(1440,900);self.set_size_request(860,600)
+        monitors=self.get_display().get_monitors()
+        if monitors.get_n_items():
+            geometry=monitors.get_item(0).get_geometry()
+            self.set_default_size(max(860,min(1440,geometry.width-48)),max(600,min(900,geometry.height-80)))
         provider=Gtk.CssProvider();provider.load_from_data(CSS);Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(),provider,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         from nexum.branding import install_icons
         install_icons()
@@ -38,6 +42,10 @@ class MainWindow(Adw.ApplicationWindow):
         self.overlay=Adw.ToastOverlay();toolbar=Adw.ToolbarView();self.overlay.set_child(toolbar);self.set_content(self.overlay)
         header=Adw.HeaderBar();brand=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=0);b=Gtk.Label(label="NEXUM",xalign=0);b.add_css_class("heading");sub=Gtk.Label(label="Scientific Workbench",xalign=0);sub.add_css_class("caption");brand.append(b);brand.append(sub);header.pack_start(Gtk.Image.new_from_icon_name("io.github.nexum.ScientificWorkbench"));header.pack_start(brand)
         self.stack=Adw.ViewStack();self.stack.set_hexpand(True);self.stack.set_vexpand(True);switcher=Adw.ViewSwitcher();switcher.set_stack(self.stack);switcher.set_policy(Adw.ViewSwitcherPolicy.WIDE);header.set_title_widget(switcher);toolbar.add_top_bar(header)
+        compact=Adw.Breakpoint.new(Adw.BreakpointCondition.parse("max-width: 1100px"))
+        compact.add_setter(switcher,"policy",Adw.ViewSwitcherPolicy.NARROW)
+        compact.add_setter(brand,"visible",False)
+        self.add_breakpoint(compact)
         self.home=HomePage(self);self.calc=CalculatorPage(self,self.history);self.struct=StructurePage(self);self.exp=ExperimentsPage(self);self.hist=HistoryPage(self.history)
         self.stack.add_titled_with_icon(self.home,"home","Início","go-home-symbolic")
         self.stack.add_titled_with_icon(self.calc,"calculators","Calculadoras","accessories-calculator-symbolic")

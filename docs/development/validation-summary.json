@@ -1,5 +1,5 @@
 {
-  "version": "7.0.0-preview.1",
+  "version": "7.0.0-preview.2",
   "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
   "python": "3.12.14",
   "dependencies": {
@@ -10,7 +10,7 @@
     "Pillow": "12.3.0",
     "PyOpenGL": "3.1.10"
   },
-  "tests": 274,
+  "tests": 276,
   "passed": 254,
   "skipped": [
     {
@@ -66,6 +66,10 @@
       "reason": "GTK4/libadwaita com sessão gráfica indisponível"
     },
     {
+      "test": "test_appearance_preference_saved_and_restored (test_laboratory_gtk.LaboratoryGtkTests.test_appearance_preference_saved_and_restored)",
+      "reason": "GTK4/libadwaita com sessão gráfica indisponível"
+    },
+    {
       "test": "test_autorecovery_validated_roundtrip (test_laboratory_gtk.LaboratoryGtkTests.test_autorecovery_validated_roundtrip)",
       "reason": "GTK4/libadwaita com sessão gráfica indisponível"
     },
@@ -79,6 +83,10 @@
     },
     {
       "test": "test_pending_notes_survive_other_actions_and_undo (test_laboratory_gtk.LaboratoryGtkTests.test_pending_notes_survive_other_actions_and_undo)",
+      "reason": "GTK4/libadwaita com sessão gráfica indisponível"
+    },
+    {
+      "test": "test_presets_preserve_global_theme_and_match_sidebar (test_laboratory_gtk.LaboratoryGtkTests.test_presets_preserve_global_theme_and_match_sidebar)",
       "reason": "GTK4/libadwaita com sessão gráfica indisponível"
     },
     {
@@ -96,5 +104,5 @@
   ],
   "failures": 0,
   "errors": 0,
-  "seconds": 8.55
+  "seconds": 12.18
 }

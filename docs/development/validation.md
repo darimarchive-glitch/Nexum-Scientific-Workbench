@@ -1,12 +1,12 @@
-# Validação — Nexum 7.0.0-preview.1
+# Validação — Nexum 7.0.0-preview.2
 
-Validação local executada em 26 de setembro de 2026, em Linux x86_64, Python 3.12.14. A atualização foi publicada no GitHub; as verificações nativas de CI estão registradas abaixo.
+Validação local executada em 27 de setembro de 2026, em Linux x86_64, Python 3.12.14. A atualização foi publicada no GitHub; as verificações nativas de CI estão registradas abaixo.
 
 ## Resultado da suíte local
 
-- **274 testes descobertos**.
+- **276 testes descobertos**.
 - **254 aprovados**.
-- **20 ignorados** por indisponibilidade de Cairo ou de GTK4/libadwaita com display.
+- **22 ignorados** por indisponibilidade de Cairo ou de GTK4/libadwaita com display.
 - **0 falhas e 0 erros**.
 
 Casos ignorados não são contados como aprovados. O resumo estruturado está em `validation-summary.json`, nesta pasta.

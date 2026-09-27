@@ -78,6 +78,10 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
             while time.monotonic() < deadline:
                 GLib.MainContext.default().iteration(False)
                 time.sleep(.005)
+            monitor=window.get_display().get_monitor_at_surface(window.get_surface())
+            if monitor:
+                geometry=monitor.get_geometry()
+                assert window.get_width() <= max(860,geometry.width), "Window exceeds monitor width"
             if errors:
                 raise RuntimeError("Falha em callback GTK/OpenGL") from errors[0][1]
             if window.struct.viewer.get_error():

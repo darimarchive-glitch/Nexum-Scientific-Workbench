@@ -2,6 +2,7 @@
 
 ## 7.0.0-preview.2 — aparência
 
+- Janela inicial respeita o tamanho do monitor; navegação compacta em larguras menores.
 - Tema global Sistema/Claro/Escuro com preferência persistida.
 - Presets moleculares preservam o tema e atualizam o painel lateral.
 - Comparações 3D acompanham o tema; fundo usa a cor do GTK.

@@ -41,7 +41,7 @@ class MainWindow(Adw.ApplicationWindow):
         self.history=HistoryStore(data_dir()/"history.sqlite3")
         self.overlay=Adw.ToastOverlay();toolbar=Adw.ToolbarView();self.overlay.set_child(toolbar);self.set_content(self.overlay)
         header=Adw.HeaderBar();brand=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=0);b=Gtk.Label(label="NEXUM",xalign=0);b.add_css_class("heading");sub=Gtk.Label(label="Scientific Workbench",xalign=0);sub.add_css_class("caption");brand.append(b);brand.append(sub);header.pack_start(Gtk.Image.new_from_icon_name("io.github.nexum.ScientificWorkbench"));header.pack_start(brand)
-        self.stack=Adw.ViewStack();self.stack.set_hexpand(True);self.stack.set_vexpand(True);switcher=Adw.ViewSwitcher();switcher.set_stack(self.stack);switcher.set_policy(Adw.ViewSwitcherPolicy.WIDE);header.set_title_widget(switcher);toolbar.add_top_bar(header)
+        self.stack=Adw.ViewStack();self.stack.set_hhomogeneous(False);self.stack.set_vhomogeneous(False);self.stack.set_hexpand(True);self.stack.set_vexpand(True);switcher=Adw.ViewSwitcher();switcher.set_stack(self.stack);switcher.set_policy(Adw.ViewSwitcherPolicy.WIDE);header.set_title_widget(switcher);toolbar.add_top_bar(header)
         compact=Adw.Breakpoint.new(Adw.BreakpointCondition.parse("max-width: 1100px"))
         compact.add_setter(switcher,"policy",Adw.ViewSwitcherPolicy.NARROW)
         compact.add_setter(brand,"visible",False)

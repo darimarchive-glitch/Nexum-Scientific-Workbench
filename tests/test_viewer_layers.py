@@ -42,7 +42,9 @@ class ViewerLayers(unittest.TestCase):
     def test_stale_search_does_not_replace_new_results(self):
         from nexum.ui.structures_page import StructurePage
         from nexum.core.structures import StructureSuggestion
-        page=StructurePage(Mock())
+        window=Mock()
+        window.get_default_size.return_value=(976,688)
+        page=StructurePage(window)
         page.search_generation=2
         page._show_results([StructureSuggestion("PubChem","962","Água")],2)
         first=page.results.get_first_child()

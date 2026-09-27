@@ -28,7 +28,6 @@ class StructurePage(Gtk.Box):
         self.set_hexpand(True);self.set_vexpand(True)
         self.window=window;self.cache=cache_dir()/"structures";self.selected_suggestion=None;self.search_source="Todos";self.search_timer=0;self._fullscreen=False;self.search_generation=0
         self.viewer=GLMoleculeView();self.viewer.selection_callback=self._atom_selected
-        style=Adw.StyleManager.get_default();self.viewer.set_dark(style.get_dark());style.connect("notify::dark",lambda *_:self.viewer.set_dark(style.get_dark()))
         self._build_searchbar();self._build_workspace()
 
     def _build_searchbar(self):
@@ -49,8 +48,7 @@ class StructurePage(Gtk.Box):
         viewer_overlay=Gtk.Overlay();viewer_overlay.set_hexpand(True);viewer_overlay.set_vexpand(True);viewer_overlay.set_child(self.viewer)
         controls=Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=6);controls.set_halign(Gtk.Align.START);controls.set_valign(Gtk.Align.START);controls.set_margin_top(12);controls.set_margin_start(12);controls.add_css_class("floating-toolbar")
         fit=Gtk.Button(icon_name="zoom-fit-best-symbolic");fit.set_tooltip_text("Reenquadrar");fit.connect("clicked",lambda *_:self.viewer.fit())
-        reset=Gtk.Button(icon_name="view-refresh-symbolic");reset.set_tooltip_text("Restaurar câmera");reset.connect("clicked",lambda *_:self.viewer.fit())
-        controls.append(fit);controls.append(reset);viewer_overlay.add_overlay(controls)
+        controls.append(fit);viewer_overlay.add_overlay(controls)
         self.empty=Adw.StatusPage(title="Estruturas 3D",description="Pesquise uma molécula ou macromolécula para explorar sua estrutura em 3D.",icon_name="applications-science-symbolic");viewer_overlay.add_overlay(self.empty)
         paned.set_start_child(viewer_overlay)
         self.inspector=self._build_inspector();paned.set_end_child(self.inspector);paned.set_position(980)

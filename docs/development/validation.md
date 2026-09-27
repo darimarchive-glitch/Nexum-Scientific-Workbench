@@ -49,7 +49,8 @@ Compilação sintática Python, sintaxe dos scripts shell, catálogo automático
 
 - [Windows: regressões e interface GTK](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/36236515520): aprovado após corrigir o isolamento dos testes GTK e a expectativa de exceção do motor em subprocesso.
 - [Instaladores Windows e Flatpak](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/36236234219): ambos os jobs aprovados. O Windows instalou o EXE, verificou os atalhos e executou a cópia instalada com PATH restrito. O Linux instalou o Flatpak, verificou os atalhos e executou a interface e o laboratório em sessão gráfica de CI.
-- macOS: a primeira compilação identificou dependências de introspecção ausentes. As correções fazem parte do ambiente de build; a homologação do aplicativo ainda depende de uma execução aprovada.
+- [Release preview.1: todos os pacotes aprovados](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/36279427899): Windows, Flatpak, macOS Apple Silicon e Intel. O aplicativo macOS empacotado passou pelo self-test sem as variáveis do ambiente de desenvolvimento; a assinatura ad hoc foi verificada. Não houve notarização Apple.
+- Preview.2 acrescenta regressões para preferência de tema, presets, painel lateral e comparação; o estado de sua execução deve ser consultado no CI.
 
 ## Limites concretos
 

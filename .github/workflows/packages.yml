@@ -147,4 +147,4 @@ jobs:
             echo "Release already exists; refusing to replace published binaries." >&2
             exit 1
           fi
-          gh release create "$tag" --target "$GITHUB_SHA" --title "Nexum $version" --prerelease --notes-file docs/releases/7.0.0-preview.1.md release-assets/*
+          gh release create "$tag" --target "$GITHUB_SHA" --title "Nexum $version" --prerelease --notes-file "docs/releases/$version.md" release-assets/*

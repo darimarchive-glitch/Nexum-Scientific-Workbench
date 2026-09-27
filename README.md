@@ -5,14 +5,14 @@
 
 **Scientific Workbench — explore a química, compreenda o modelo, examine o resultado.**
 
-Versão **7.0.0-preview.1** · aplicação desktop · interface em português brasileiro
+Versão **7.0.0-preview.2** · aplicação desktop · interface em português brasileiro
 </div>
 
 <!-- nexum-catalog:start -->
 **43 calculadoras · 12 áreas científicas · 10 bancadas · 5 ferramentas de análise de dados · 16 recursos de laboratório**
 <!-- nexum-catalog:end -->
 
-Este pacote contém o projeto atualizado e os procedimentos de compilação. É uma **prévia de desenvolvimento**: os testes automatizados e as limitações efetivamente verificadas estão em [Validação](docs/development/validation.md). Não inclui instaladores certificados para os três sistemas. Os instaladores aprovados pela compilação e pelos testes nativos serão disponibilizados em [Releases](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases). A publicação no Flathub é uma etapa separada.
+Este pacote contém o projeto atualizado e os procedimentos de compilação. É uma **prévia de desenvolvimento**: os testes automatizados e as limitações efetivamente verificadas estão em [Validação](docs/development/validation.md). Os instaladores da preview.1 passaram pela compilação e pelos testes nativos em Windows, Linux e macOS e estão disponíveis em [Releases](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases). A publicação no Flathub é uma etapa separada.
 
 ## O que você pode fazer
 
@@ -25,6 +25,8 @@ Este pacote contém o projeto atualizado e os procedimentos de compilação. É 
 - Salvar projetos com caderno, análises e cenas; exportar CSV, figuras, relatórios e apresentações.
 
 Na tela inicial, clique em **Abrir Laboratório**. O laboratório também tem um botão na barra superior. Comece pelos seis projetos de exemplo em **Projeto e caderno**; os dados desses exemplos são identificados como simulados.
+
+O menu no canto superior direito reúne sessões e **Tema → Seguir o sistema / Claro / Escuro**. A escolha vale para o aplicativo e para os visualizadores 3D.
 
 ## Novidades desta prévia
 
@@ -47,18 +49,18 @@ As contagens vêm dos registros do código e podem ser atualizadas por `python s
 
 | Sistema | Formato previsto | Situação desta entrega |
 | --- | --- | --- |
-| Linux | `.flatpak`, x86_64 ou aarch64 conforme o ambiente de compilação | Fluxo de pacote independente preservado e atualizado; compilação e teste do binário ainda necessários. |
+| Linux | `.flatpak`, x86_64 ou aarch64 conforme o ambiente de compilação | Pacote x86_64 da preview.1 compilado, instalado e testado em CI. |
 | Windows | Instalador `.exe`, x86_64 | Pipeline com GTK, motor químico separado, atalhos e fallback gráfico preservado; compilação e teste da cópia instalada aprovados no CI. |
-| macOS | `.app` dentro de `.dmg`, Apple Silicon e Intel em builds separados | Suporte de caminhos e receita de compilação acrescentados; execução nativa, assinatura e notarização ainda não verificadas. |
+| macOS | `.app` dentro de `.dmg`, Apple Silicon e Intel em builds separados | Preview.1 compilada e testada nas duas arquiteturas; sem assinatura Developer ID ou notarização Apple. |
 
 O Flatpak não depende de uma distribuição específica, mas exige Flatpak funcional, runtime compatível, arquitetura correspondente e suporte gráfico. **Pacote Flatpak independente e publicação no Flathub são etapas distintas.** Consulte [Distribuição](docs/distribution/README.md) e as [condições para o Flathub](docs/distribution/flathub.md).
 
 Os nomes seguem um padrão, por exemplo:
 
-- `Nexum-7.0.0-preview.1-source.zip`
-- `Nexum-7.0.0-preview.1-windows-x86_64-setup.exe`
-- `Nexum-7.0.0-preview.1-linux-x86_64.flatpak`
-- `Nexum-7.0.0-preview.1-macos-arm64.dmg`
+- `Nexum-7.0.0-preview.2-source.zip`
+- `Nexum-7.0.0-preview.2-windows-x86_64-setup.exe`
+- `Nexum-7.0.0-preview.2-linux-x86_64.flatpak`
+- `Nexum-7.0.0-preview.2-macos-arm64.dmg`
 
 Esses nomes descrevem os artefatos produzidos pelos scripts; não significam que todos os binários acompanham o ZIP de código.
 

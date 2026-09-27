@@ -1,5 +1,13 @@
 # Histórico de alterações
 
+## 7.0.0-preview.2 — aparência
+
+- Tema global Sistema/Claro/Escuro com preferência persistida.
+- Presets moleculares preservam o tema e atualizam o painel lateral.
+- Comparações 3D acompanham o tema; fundo usa a cor do GTK.
+- Sessões e aparência reunidas no menu; botão redundante de câmera removido.
+- Regressões GTK e captura da janela nos dois temas no CI Windows.
+
 ## 7.0.0-preview.1 — desenvolvimento
 
 - Laboratório integrado com projetos, caderno, recuperação, dados originais e desfazer/refazer.
@@ -8,10 +16,10 @@
 - Processos estacionários simples, investigações, cenas, GIF, apresentações e relatórios.
 - Modelos de incerteza correlacionada, Monte Carlo, sensibilidade e distribuição ácido–base.
 - Nomes de pacotes centralizados, documentação reorganizada e publicador obsoleto removido.
-- Caminhos macOS e receita nativa .app/.dmg; sem binário macOS homologado nesta entrega.
+- Aplicativos nativos e instaladores verificados em CI: Windows, Flatpak e macOS Intel/Apple Silicon.
 - Identidade legada preservada; distribuição Flatpak independente diferenciada de submissão ao Flathub.
 
-O estado dos testes está em [Validação](docs/development/validation.md). Esta versão é uma prévia; não foi publicada remotamente.
+O estado dos testes está em [Validação](docs/development/validation.md). Esta versão é uma prévia; foi publicada no GitHub.
 
 
 - Bancadas de titulação, Daniell, calorimetria, equilíbrio, Beer–Lambert, cinética e decaimento refeitas em Cairo, com os valores ligados aos elementos do desenho.

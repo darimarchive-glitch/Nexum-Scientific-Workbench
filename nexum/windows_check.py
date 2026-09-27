@@ -93,8 +93,21 @@ ATOM 1 C CA . ALA A 1 1 0 0 0 1 20 1 A 1
             from nexum.ui.session_actions import snapshot,restore
             output=Path(os.environ.get("NEXUM_RENDER_DIR",folder))/"visual-checks";output.mkdir(parents=True,exist_ok=True)
             viewer=window.struct.viewer
-            viewer.set_dark(False);viewer.export_png(output/"vdw-light.png")
-            viewer.set_dark(True);viewer.export_png(output/"vdw-dark.png")
+            for theme in ("light", "dark"):
+                window.appearance.select(theme, persist=False)
+                # Allow native GTK style transitions and a complete frame before capture.
+                loop = GLib.MainLoop()
+                GLib.timeout_add(600, lambda: (loop.quit(), False)[1])
+                loop.run()
+                assert viewer.dark == (theme == "dark")
+                found, background = viewer.get_style_context().lookup_color("window_bg_color")
+                if found:
+                    assert numpy.allclose(viewer.bg, (background.red, background.green, background.blue))
+                viewer.export_png(output / ("vdw-" + theme + ".png"))
+                if sys.platform == "win32" and os.environ.get("NEXUM_RENDER_DIR"):
+                    from PIL import ImageGrab
+                    ImageGrab.grab().save(output / ("application-" + theme + ".png"))
+            window.appearance.select("system", persist=False)
             viewer.surface_mesh=molecular_surface(molecule,"vdw",resolution=24)
             viewer.clip_enabled=True;viewer.export_png(output/"surface-cut.png")
             viewer.make_current();assert GL.glGetError()==GL.GL_NO_ERROR

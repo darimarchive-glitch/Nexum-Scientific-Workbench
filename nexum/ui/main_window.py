@@ -32,6 +32,8 @@ class MainWindow(Adw.ApplicationWindow):
         provider=Gtk.CssProvider();provider.load_from_data(CSS);Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(),provider,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         from nexum.branding import install_icons
         install_icons()
+        from .appearance import Appearance
+        self.appearance=Appearance(self,data_dir()/"appearance.json")
         self.history=HistoryStore(data_dir()/"history.sqlite3")
         self.overlay=Adw.ToastOverlay();toolbar=Adw.ToolbarView();self.overlay.set_child(toolbar);self.set_content(self.overlay)
         header=Adw.HeaderBar();brand=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=0);b=Gtk.Label(label="NEXUM",xalign=0);b.add_css_class("heading");sub=Gtk.Label(label="Scientific Workbench",xalign=0);sub.add_css_class("caption");brand.append(b);brand.append(sub);header.pack_start(Gtk.Image.new_from_icon_name("io.github.nexum.ScientificWorkbench"));header.pack_start(brand)

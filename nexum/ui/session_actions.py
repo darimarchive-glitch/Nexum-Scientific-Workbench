@@ -1,5 +1,5 @@
 """Versioned sessions: JSON only, validated before replacing the workspace."""
-from gi.repository import Gtk,Adw
+from gi.repository import Gtk,Adw,Gio
 import numpy as np
 from nexum.catalog import ANALYSES
 from nexum.core.data_analysis import write_session,read_session,xy_data
@@ -84,5 +84,11 @@ def add_actions(window,header):
             restore(window,previous);raise
         window.toast('Sessão restaurada.')
     def load(*_):choose(window,'Abrir sessão Nexum',opened)
-    for icon,title,callback in [('document-save-symbolic','Salvar sessão completa',save),('document-open-symbolic','Abrir sessão',load)]:
-        button=Gtk.Button(icon_name=icon);button.set_tooltip_text(title);button.connect('clicked',callback);header.pack_end(button)
+    menu=Gio.Menu();sessions=Gio.Menu()
+    for name,title,callback in [('open-session','Abrir sessão',load),('save-session','Salvar sessão completa',save)]:
+        action=Gio.SimpleAction.new(name,None);action.connect('activate',callback);window.add_action(action)
+        sessions.append(title,'win.'+name)
+    menu.append_section(None,sessions)
+    menu.append_submenu('Tema',window.appearance.menu())
+    button=Gtk.MenuButton(icon_name='open-menu-symbolic',menu_model=menu)
+    button.set_tooltip_text('Sessões e aparência');header.pack_end(button)

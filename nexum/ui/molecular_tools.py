@@ -179,7 +179,7 @@ class MolecularTools(Gtk.Box):
         if not self.reference:raise ValueError('Fixe uma referência primeiro.')
         dialog=Adw.Window(transient_for=self.window,title='Comparar estruturas',default_width=1100,default_height=650);box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL);box.append(Adw.HeaderBar());box.append(Gtk.Label(label='Rotação e zoom vinculados; enquadramentos independentes.'));row=Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=8);views=[]
         for state in (self.reference,self.snapshot()):
-            column=Gtk.Box(orientation=Gtk.Orientation.VERTICAL);column.set_hexpand(True);column.append(Gtk.Label(label=state['molecule']['name']));view=GLMoleculeView();view.set_dark(self.viewer.dark);self.restore_view(view,state);column.append(view);row.append(column);views.append(view)
+            column=Gtk.Box(orientation=Gtk.Orientation.VERTICAL);column.set_hexpand(True);column.append(Gtk.Label(label=state['molecule']['name']));view=GLMoleculeView();self.restore_view(view,state);column.append(view);row.append(column);views.append(view)
         for i,view in enumerate(views):
             def sync(source,target=views[1-i]):target.rot_x=source.rot_x;target.rot_y=source.rot_y;target.zoom=source.zoom;target.queue_render()
             view.camera_callback=sync

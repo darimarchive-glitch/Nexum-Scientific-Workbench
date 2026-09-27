@@ -67,6 +67,46 @@ class LaboratoryGtkTests(unittest.TestCase):
             faulthandler.dump_traceback()
         self.assertFalse(self.lab.busy)
 
+    def test_presets_preserve_global_theme_and_match_sidebar(self):
+        from nexum.ui.gl_viewer import GLMoleculeView
+        from nexum.ui.structures_page import REPRESENTATIONS
+        comparison = GLMoleculeView()
+        style = Adw.StyleManager.get_default()
+        previous = style.get_color_scheme()
+        self.addCleanup(style.set_color_scheme, previous)
+        for theme, dark in [("light", False), ("dark", True), ("light", False)]:
+            self.main.appearance.select(theme, persist=False)
+            self.assertEqual(comparison.dark, dark)
+            for preset in range(3):
+                self.lab.visual_preset.set_selected(preset)
+                self.lab.apply_visual_preset()
+                view = self.main.struct.viewer
+                self.assertEqual(view.dark, dark)
+                self.assertEqual(style.get_dark(), dark)
+                self.assertEqual(view.representation, "sticks" if preset == 2 else "ball-stick")
+                self.assertEqual(REPRESENTATIONS[self.main.struct.rep.get_selected()][1], view.representation)
+                self.assertEqual(self.main.struct.influence.get_active(), preset == 1)
+                self.assertEqual(view.show_influence, preset == 1)
+                self.assertAlmostEqual(view.influence_opacity, .38 if preset == 1 else .22)
+
+    def test_appearance_preference_saved_and_restored(self):
+        import json
+        from nexum.ui.appearance import Appearance
+        path = Path(self.folder.name) / "appearance.json"
+        style = Adw.StyleManager.get_default()
+        self.addCleanup(style.set_color_scheme, style.get_color_scheme())
+        self.main.appearance.select("dark")
+        self.assertEqual(json.loads(path.read_text())["appearance"], "dark")
+        other = Adw.ApplicationWindow(application=self.app)
+        try:
+            appearance = Appearance(other, path)
+            self.assertEqual(appearance.action.get_state().get_string(), "dark")
+            path.write_text('{"appearance": []}')
+            appearance = Appearance(other, path)
+            self.assertEqual(appearance.action.get_state().get_string(), "system")
+        finally:
+            other.destroy()
+
     def test_all_examples_refresh_and_transfer_analysis(self):
         for i in range(6):
             self.lab.example_select.set_selected(i)

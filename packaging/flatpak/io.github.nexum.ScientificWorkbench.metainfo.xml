@@ -22,5 +22,5 @@
   <keywords><keyword>Chemistry</keyword><keyword>Química</keyword><keyword>Molecules</keyword><keyword>Moléculas</keyword><keyword>Uncertainty</keyword></keywords>
   <content_rating type="oars-1.1"/>
   <recommends><control>pointing</control><control>keyboard</control><display_length compare="ge">1280</display_length></recommends>
-  <releases><release version="7.0.0-preview.1" date="2026-09-26" type="development"><description><p>Integrated laboratory, uncertainty and speciation tools, portable projects and macOS packaging preparation.</p></description></release></releases>
+  <releases><release version="7.0.0-preview.2" date="2026-09-27" type="development"><description><p>Application-wide appearance preference, synchronized molecular views and clearer session controls.</p></description></release><release version="7.0.0-preview.1" date="2026-09-26" type="development"><description><p>Integrated laboratory, uncertainty and speciation tools, portable projects and macOS packaging preparation.</p></description></release></releases>
 </component>

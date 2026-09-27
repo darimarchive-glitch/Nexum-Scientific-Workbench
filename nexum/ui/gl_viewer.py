@@ -212,8 +212,17 @@ class GLMoleculeView(Gtk.GLArea):
         scroll=Gtk.EventControllerScroll.new(Gtk.EventControllerScrollFlags.VERTICAL);scroll.connect("scroll",self._scroll);self.add_controller(scroll)
         click=Gtk.GestureClick.new();click.connect("released",self._click);self.add_controller(click)
 
+        from .appearance import follow_theme
+        follow_theme(self)
+
+    def sync_theme(self):
+        from gi.repository import Adw
+        self.set_dark(Adw.StyleManager.get_default().get_dark())
+        self._follow_background = True
+
     def set_dark(self,dark:bool):
-        self.dark=bool(dark);self.bg=(0.105,0.105,0.105) if self.dark else (0.965,0.961,0.949);self.queue_render()
+        self._follow_background = False
+        self.dark=bool(dark);self.bg=(0.141,0.141,0.141) if self.dark else (0.980,0.980,0.980);self.queue_render()
 
     def set_fov(self,degrees:float):
         self.fov_deg=clamp_float(float(degrees),26.0,62.0);self.queue_render()
@@ -361,6 +370,10 @@ class GLMoleculeView(Gtk.GLArea):
 
     def _render(self,area,context):
         if self.get_error():return False
+        if self._follow_background:
+            found, color = self.get_style_context().lookup_color("window_bg_color")
+            if found:
+                self.bg = (color.red, color.green, color.blue)
         scale=self.get_scale_factor()
         GL.glViewport(0,0,*self._viewport_size())
         GL.glClearColor(*self.bg,1);GL.glClear(GL.GL_COLOR_BUFFER_BIT|GL.GL_DEPTH_BUFFER_BIT)

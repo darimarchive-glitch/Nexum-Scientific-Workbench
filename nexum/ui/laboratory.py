@@ -1609,7 +1609,7 @@ class Laboratory(Adw.Window):
         self.visual_preset = dropdown(
             box,
             "Aparência",
-            ["Padrão", "Volume atômico em destaque", "Bastões e fundo escuro"],
+            ["Padrão", "Volume atômico em destaque", "Bastões"],
         )
         buttons(box, self, [("Aplicar aparência", self.apply_visual_preset)])
         box.append(
@@ -1692,18 +1692,15 @@ class Laboratory(Adw.Window):
         )
 
     def apply_visual_preset(self):
-        v = self.main.struct.viewer
+        from .structures_page import REPRESENTATIONS
+        controls = self.main.struct
         i = self.visual_preset.get_selected()
-        v.show_influence = i == 1
-        v.influence_opacity = 0.38 if i == 1 else 0.22
-        if i == 2:
-            v.set_dark(True)
-            v.representation = "sticks"
-        else:
-            v.set_dark(Adw.StyleManager.get_default().get_dark())
-            v.representation = "ball-stick"
-        v.rebuild_scene()
-        v.queue_render()
+        representation = "sticks" if i == 2 else "ball-stick"
+        # Update the public controls so their callbacks and the renderer agree.
+        controls.rep.set_selected(next(j for j, row in enumerate(REPRESENTATIONS) if row[1] == representation))
+        controls.influence.set_active(i == 1)
+        controls.influence_opacity.set_value(38 if i == 1 else 22)
+        controls.viewer.sync_theme()
         self.show_viewer()
 
     def extensions_page(self):

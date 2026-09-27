@@ -1,6 +1,6 @@
 # macOS: compilação e verificação
 
-**Estado:** compilação nativa em CI para Apple Silicon e Intel configurada. As primeiras execuções detectaram dependências de introspecção GTK ausentes; o ambiente foi corrigido. A release só disponibiliza DMGs após a verificação do aplicativo empacotado. Assinatura Developer ID e notarização exigem credenciais do responsável pelo projeto.
+**Estado:** os DMGs da preview.1 foram compilados e testados em CI nativo para Apple Silicon e Intel e estão nas Releases. O self-test exercitou o aplicativo empacotado e a assinatura ad hoc foi verificada. Assinatura Developer ID e notarização não foram realizadas; exigem credenciais do responsável pelo projeto.
 
 ## Implementação
 

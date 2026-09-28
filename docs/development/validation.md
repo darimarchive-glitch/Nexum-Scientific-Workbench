@@ -50,7 +50,9 @@ Compilação sintática Python, sintaxe dos scripts shell, catálogo automático
 - [Windows: regressões e interface GTK](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/36236515520): aprovado após corrigir o isolamento dos testes GTK e a expectativa de exceção do motor em subprocesso.
 - [Instaladores Windows e Flatpak](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/36236234219): ambos os jobs aprovados. O Windows instalou o EXE, verificou os atalhos e executou a cópia instalada com PATH restrito. O Linux instalou o Flatpak, verificou os atalhos e executou a interface e o laboratório em sessão gráfica de CI.
 - [Release preview.1: todos os pacotes aprovados](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/36279427899): Windows, Flatpak, macOS Apple Silicon e Intel. O aplicativo macOS empacotado passou pelo self-test sem as variáveis do ambiente de desenvolvimento; a assinatura ad hoc foi verificada. Não houve notarização Apple.
-- Preview.2 acrescenta regressões para preferência de tema, presets, painel lateral e comparação; o estado de sua execução deve ser consultado no CI.
+- [Preview.2: instaladores e publicação aprovados](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/36314373112): Windows, Flatpak, macOS Apple Silicon e Intel. Release publicada em 27 de setembro de 2026.
+- [Preview.2: regressões Windows e científicas aprovadas](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/runs/36314373183): inclui preferência de tema, presets, controles laterais, comparação 3D e limites da janela.
+- Capturas nativas `application-light.png` e `application-dark.png`, no artefato `Nexum-visual-checks` dessa execução, inspecionadas em 28 de setembro: tema uniforme e painel do visualizador sem corte horizontal em tela de 1024 × 768. Essa inspeção cobre a página Estruturas 3D, não uma auditoria visual completa de todas as ferramentas.
 
 ## Limites concretos
 

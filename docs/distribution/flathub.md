@@ -4,9 +4,11 @@ O projeto mantém um fluxo de **Flatpak independente**. Ele foi preparado para d
 
 O manifesto em `packaging/flatpak/` pertence a esse fluxo independente. **Não é um manifesto aprovado, pronto ou elegível para submissão ao Flathub.** Não há publicação na loja nem PR de submissão nesta entrega.
 
+A [auditoria de preparação](flathub-audit.md) registra os arquivos reais, as evidências de execução e as lacunas verificadas em 28/09/2026.
+
 ## Restrição atual relevante
 
-As regras oficiais consultadas em 26/09/2026 estabelecem que:
+As regras oficiais consultadas em 28/09/2026 estabelecem que:
 
 - o uso de material gerado por IA na aplicação deve ser declarado, com partes afetadas e extensão aproximada;
 - manifestos do Flathub não podem conter conteúdo gerado ou assistido por IA;
@@ -20,7 +22,7 @@ A receita atual usa wheels para gerar o bundle independente. As regras atuais do
 
 O mantenedor precisa definir a identidade vinculada à conta/domínio correto, disponibilizar fontes e dependências verificáveis, cumprir o build sem rede, registrar screenshots reais, validar AppStream, testar acessibilidade e portais e sustentar manutenção. O arquivo MetaInfo desta árvore melhora os metadados do pacote independente, mas não certifica atendimento a todos os critérios da loja.
 
-Evite mudar a ID da aplicação depois de adotada por usuários. A ID legada deste projeto não comprova controle do namespace; a nova conta pretendida pelo mantenedor ainda não foi informada.
+Evite mudar a ID da aplicação depois de adotada por usuários. A ID legada deste projeto não comprova controle do namespace; o repositório de destino confirmado é `darimarchive-glitch/Nexum-Scientific-Workbench`, administrado nesta colaboração pela conexão Juarchive. Isso não comprova controle do namespace legado `nexum`.
 
 ## Referências
 

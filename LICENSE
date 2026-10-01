@@ -1,21 +1,168 @@
-MIT License
+NEXUM PROPRIETARY LICENSE
+Version 1.0 — Effective October 1, 2026
 
 Copyright (c) 2026 Davi P Souza
+All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+IMPORTANT: Nexum is proprietary, source-available software. The availability of
+source code in a public repository does not make the Software open source and
+does not grant rights beyond those expressly stated in this License.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. DEFINITIONS
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+"Software" means the Nexum Scientific Workbench software, source code, object
+code, binaries, documentation, artwork, project files, and other materials
+distributed with this License, excluding Third-Party Components.
+
+"Licensor" means Davi P Souza, the copyright holder of the portions of the
+Software owned by the Licensor.
+
+"User" means the individual or entity receiving or using the Software.
+
+"Third-Party Components" means libraries, runtimes, assets, datasets, or other
+materials owned by third parties and distributed under their own terms.
+
+2. OWNERSHIP
+
+The Software is licensed, not sold. Except for Third-Party Components and any
+material for which the Licensor does not own the necessary rights, all
+copyright and other applicable intellectual-property rights in the Software
+remain with the Licensor.
+
+No rights are granted by implication, estoppel, or otherwise.
+
+3. LIMITED PERMISSION TO USE
+
+Subject to this License, the Licensor grants an individual User a limited,
+non-exclusive, non-transferable, non-sublicensable permission to:
+
+a. download an official copy of the Software;
+b. install and run the Software for personal use, personal study, education, or
+   evaluation; and
+c. make copies strictly necessary to install, run, or back up that authorized
+   copy.
+
+This permission does not include institutional, organizational, commercial,
+production, resale, hosted-service, or revenue-generating use unless the
+Licensor gives separate written authorization.
+
+4. RESTRICTIONS
+
+Except where mandatory law expressly provides otherwise, the User may not,
+without prior written permission from the Licensor:
+
+a. copy, republish, mirror, distribute, redistribute, transmit, sell, rent,
+   lease, sublicense, or otherwise make the Software available to third
+   parties;
+b. modify, adapt, translate, merge, port, transform, or create derivative works
+   based on the Software;
+c. publish or distribute modified or unmodified source code derived from the
+   Software;
+d. incorporate the Software or substantial portions of it into another
+   application, library, product, service, course package, or commercial
+   offering;
+e. use the Software to provide a hosted service, software-as-a-service
+   offering, paid consulting deliverable, laboratory service, or other service
+   for third parties;
+f. remove, alter, conceal, or misrepresent copyright, authorship, trademark,
+   attribution, or license notices;
+g. represent a fork, modified build, or derivative product as an official Nexum
+   release;
+h. reverse engineer, decompile, or disassemble distributed binaries except to
+   the limited extent such restriction is prohibited by mandatory law; or
+i. use the source code as a dataset to train or fine-tune a machine-learning
+   model, or systematically reproduce the Software through automated code
+   generation, without prior written authorization.
+
+5. AUTHORIZED DISTRIBUTION CHANNELS
+
+The Licensor may authorize specific stores, package repositories, mirrors,
+continuous-integration services, or hosting providers to reproduce and
+distribute official copies of the Software. Such authorization applies only to
+the scope expressly approved by the Licensor and does not create redistribution
+rights for other parties.
+
+Technical copies made by service providers used by the Licensor are permitted
+only as necessary to operate those services.
+
+6. COMMERCIAL AND INSTITUTIONAL LICENSING
+
+Commercial, institutional, laboratory, organizational, government, classroom
+deployment, redistribution, integration, OEM, or hosted-service rights require
+a separate written license from the Licensor.
+
+A separate license may grant additional rights and may include fees, usage
+limits, support, update rights, deployment limits, or other terms.
+
+7. CONTRIBUTIONS
+
+Unless a separate written agreement states otherwise, submitting code or other
+copyrightable material for inclusion in Nexum constitutes a representation that
+the contributor has the right to submit it and grants the Licensor a perpetual,
+worldwide, irrevocable, non-exclusive, royalty-free license to reproduce,
+modify, prepare derivative works from, distribute, sublicense, and relicense
+that contribution as part of Nexum, including in proprietary and commercial
+releases.
+
+Submission of a contribution does not grant the contributor any ownership in
+the rest of Nexum.
+
+8. THIRD-PARTY COMPONENTS
+
+Third-Party Components are governed by their respective licenses. This License
+does not replace, restrict, or expand rights granted by those third-party
+licenses. Where required, their copyright notices and license terms must be
+preserved.
+
+9. PREVIOUSLY PUBLISHED VERSIONS
+
+Some earlier versions, commits, or portions of Nexum were published under the
+MIT License. Nothing in this License revokes rights that were validly granted
+under the MIT License for material as it was released under those terms.
+
+This Proprietary License applies prospectively to new material and releases
+distributed under it, subject to any continuing rights arising from prior
+licenses, third-party licenses, and contributor rights.
+
+10. NO TRADEMARK LICENSE
+
+"Nexum", "Nexum Scientific Workbench", associated logos, and other project
+identifiers are not licensed for use as trademarks, product names, or branding
+for derivative or competing products except with prior written authorization.
+
+11. TERMINATION
+
+Any permission granted by this License terminates automatically if the User
+materially breaches its terms. Upon termination, the User must stop exercising
+rights granted solely by this License and delete unauthorized copies, except
+where retention is required by law.
+
+Termination does not affect rights that cannot legally be terminated or rights
+previously granted under a different applicable license.
+
+12. DISCLAIMER OF WARRANTY
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS" AND
+"AS AVAILABLE", WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, ACCURACY, RELIABILITY, OR NON-INFRINGEMENT.
+
+THE SOFTWARE IS A SCIENTIFIC AND EDUCATIONAL TOOL. RESULTS MUST BE REVIEWED
+WITH APPROPRIATE PROFESSIONAL OR SCIENTIFIC JUDGMENT BEFORE THEY ARE USED IN
+SAFETY-CRITICAL, REGULATORY, CLINICAL, INDUSTRIAL, OR OTHER HIGH-CONSEQUENCE
+CONTEXTS.
+
+13. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE LICENSOR SHALL NOT BE LIABLE FOR
+ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTIAL, OR SIMILAR
+DAMAGES, OR FOR LOSS OF DATA, PROFITS, REVENUE, BUSINESS, OR USE, ARISING FROM
+OR RELATED TO THE SOFTWARE OR THIS LICENSE.
+
+14. RESERVATION OF RIGHTS
+
+Any use not expressly permitted by this License is reserved to the Licensor.
+
+For permissions or licensing requests, contact the project maintainer through
+the official Nexum repository:
+https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench

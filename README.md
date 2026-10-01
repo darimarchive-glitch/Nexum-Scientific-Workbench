@@ -115,6 +115,15 @@ Execute em uma sessão gráfica para incluir os testes GTK. Casos ignorados por 
 | `tests/` | Referências numéricas, regressões, persistência e integração gráfica. |
 | `docs/` | Guias de uso, ciência, desenvolvimento e distribuição. |
 
+## Licença
+
+O Nexum é **software proprietário com código-fonte disponível para inspeção**. A presença do código em um repositório público não concede permissão geral para copiar, modificar, redistribuir, incorporar o código em outro produto ou explorá-lo comercialmente.
+
+A licença atual permite a indivíduos instalar e executar cópias oficiais para uso pessoal, estudo, educação e avaliação. Uso institucional, comercial, laboratorial, organizacional, redistribuição, integração em outros produtos e serviços hospedados exigem autorização separada do mantenedor.
+
+Consulte [LICENSE](LICENSE) para os termos completos. Versões ou trechos que tenham sido publicados anteriormente sob a licença MIT continuam sujeitos aos direitos que foram validamente concedidos naquela publicação; a mudança de licença não é retroativa.
+
+
 ## Ciência e interpretação
 
 A arquitetura separa entrada, modelo, cálculo, diagnóstico e apresentação. O Nexum não identifica automaticamente uma molécula a partir de um espectro, não transforma MMFF/UFF em cálculo quântico e não apresenta uma aproximação geométrica como densidade eletrônica. Os modelos precisam ser usados dentro de suas hipóteses.

@@ -4,8 +4,8 @@
   <name>Nexum</name>
   <summary>Explore chemistry through calculations, molecular structures and data</summary>
   <summary xml:lang="pt-BR">Explore química com cálculos, estruturas moleculares e dados</summary>
-  <metadata_license>MIT</metadata_license>
-  <project_license>MIT</project_license>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LicenseRef-proprietary=https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/blob/main/LICENSE</project_license>
   <developer id="io.github.nexum"><name>Davi P Souza</name></developer>
   <description>
     <p>Nexum is a scientific workbench for chemical calculations, molecular visualization and educational experiments.</p>

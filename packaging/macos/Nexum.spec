@@ -24,7 +24,8 @@ exe=EXE(pyz,a.scripts,[],exclude_binaries=True,name='Nexum',console=False,
 coll=COLLECT(exe,a.binaries,a.datas,name='Nexum')
 app=BUNDLE(coll,name='Nexum.app',icon=str(root/'build/icons/nexum.icns'),bundle_identifier=APP_ID,
            version=VERSION.split('-')[0],info_plist={
-               'CFBundleDisplayName':'Nexum','CFBundleName':'Nexum','CFBundleVersion':'70002',
+               'CFBundleDisplayName':'Nexum','CFBundleName':'Nexum','CFBundleVersion':'70003',
                'CFBundleShortVersionString':VERSION.split('-')[0],
+               'NSHumanReadableCopyright':'Copyright © 2026 Davi P Souza. All rights reserved.',
                'NSHighResolutionCapable':True,'NSSupportsAutomaticGraphicsSwitching':True,
                'LSApplicationCategoryType':'public.app-category.education','LSMinimumSystemVersion':'13.0'})

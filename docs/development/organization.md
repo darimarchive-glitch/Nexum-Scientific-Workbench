@@ -1,10 +1,11 @@
 # Organização, limpeza e migração
 
-A limpeza desta entrega foi aplicada à cópia de distribuição do projeto. Não remove documentos enviados pelo mantenedor nem apaga trabalhos de outras pastas. Não houve alteração remota no GitHub.
+A organização do repositório prioriza uma árvore única e verificável para desenvolvimento, empacotamento e distribuição. Histórico útil permanece em `docs/releases/`; referências operacionais antigas não devem aparecer como instruções atuais.
 
 ## Critérios
 
 - Remover artefatos temporários: bytecode, caches, logs soltos, ambientes virtuais, pastas de build e resultados de tentativas.
+- Evitar versões antigas hardcoded em empacotadores, documentação corrente e metadados.
 - Preservar código ativo, exemplos executáveis, testes, dados de referência, identidade visual utilizada e documentação científica substantiva.
 - Substituir relatórios de preparação duplicados e contagens antigas pelo registro atual de validação.
 - Remover o publicador antigo que referenciava IDs de jobs, hashes e instaladores fixos da versão 6.8.1.

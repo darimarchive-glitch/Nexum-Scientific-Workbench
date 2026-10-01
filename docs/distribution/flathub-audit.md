@@ -1,5 +1,7 @@
 # Auditoria de preparação para o Flathub
 
+> **Registro histórico:** esta auditoria retrata a preview.2 em 28 de setembro de 2026. Ela é preservada para rastreabilidade e não descreve, sozinha, o estado da release estável 7.0.0. As lacunas de identidade, screenshots e submissão ao Flathub continuam devendo ser verificadas separadamente.
+
 Data: 28 de setembro de 2026. Base examinada: `c5d35fda97a7b177d2a3ac5f98a1f2016ad934a2`, versão `7.0.0-preview.2`.
 
 Este documento registra uma auditoria técnica do projeto feita com assistência de IA. Não é um manifesto, um pacote de submissão ou um texto para copiar em um pull request do Flathub. A preparação completa para a loja ainda está pendente. Consulte também as [restrições e referências oficiais](flathub.md).

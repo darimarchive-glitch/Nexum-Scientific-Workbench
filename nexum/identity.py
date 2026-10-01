@@ -5,7 +5,7 @@ import re
 APP_NAME = "Nexum"
 APP_DESCRIPTION = "Scientific Workbench"
 APP_ID = "io.github.nexum.ScientificWorkbench"  # Legacy ID: retain installed-user continuity.
-VERSION = "7.0.0-preview.2"
+VERSION = "7.0.0"
 PROJECT_EXTENSION = ".nexum7"
 
 

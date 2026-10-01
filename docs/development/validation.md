@@ -1,6 +1,8 @@
-# Validação — Nexum 7.0.0-preview.2
+# Validação — Nexum 7.0.0
 
-Validação local executada em 27 de setembro de 2026, em Linux x86_64, Python 3.12.14. A atualização foi publicada no GitHub; as verificações nativas de CI estão registradas abaixo.
+A série 7.0.0 é promovida a estável sem alterar os algoritmos científicos entre a preview.2 e a promoção: a mudança inclui versão, licença, documentação e empacotamento. O snapshot local abaixo foi executado em 27 de setembro de 2026, em Linux x86_64 com Python 3.12.14; a publicação da release estável é condicionada a uma nova execução do pipeline nativo no commit da release.
+
+O arquivo `validation-summary.json` preserva intencionalmente a identificação `7.0.0-preview.2`, pois registra aquele ensaio específico e não deve ser rebatizado retroativamente.
 
 ## Resultado da suíte local
 
@@ -58,7 +60,7 @@ Compilação sintática Python, sintaxe dos scripts shell, catálogo automático
 
 Os testes gráficos nativos de CI complementam os testes locais ignorados. Eles não substituem a avaliação manual da disposição visual, dos diálogos, de acessibilidade e da experiência de uso em computadores reais. Não se afirma assinatura comercial, notarização Apple, aprovação no Flathub ou compatibilidade universal de GPU.
 
-A release exige que todos os jobs de empacotamento passem. Consulte [as execuções](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/workflows/packages.yml) e [os downloads publicados](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases) para o estado atual dos binários.
+A release estável só é publicada quando todos os jobs científicos e de empacotamento do commit correspondente passam. Consulte [as execuções](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/actions/workflows/packages.yml) e [os downloads publicados](https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases) para o estado atual dos binários.
 
 ## Como repetir
 

@@ -1,4 +1,4 @@
-"""Nexum advanced scientific backend (v6.5).
+"""Nexum advanced scientific backend.
 
 Numerical algorithms are independent of the UI. Advanced solvers return
 convergence/residual diagnostics so a displayed number is always traceable to

@@ -1,5 +1,17 @@
 # Histórico de alterações
 
+## 7.0.0 — estável
+
+- Primeira release estável da série 7.
+- Versão, metadados, nomes de artefatos e empacotadores alinhados em `7.0.0`.
+- Pipeline de release passa a distinguir automaticamente versões estáveis de previews/RCs.
+- Release só é publicada após testes científicos e builds nativos de Windows, Flatpak e macOS.
+- Instalador Windows passa a exibir a licença proprietária; DMG macOS inclui uma cópia visível da licença.
+- Licença do projeto promovida para proprietária/source-available, preservando direitos já concedidos em versões anteriormente publicadas sob MIT.
+- README, documentação de distribuição, suporte, segurança e licenciamento comercial reorganizados para refletir o estado atual.
+- Referências internas antigas do motor v6.5 removidas do código ativo sem alterar os algoritmos científicos.
+- `CFBundleVersion` do macOS avançado para 70003, mantendo a progressão após a preview.2.
+
 ## 7.0.0-preview.2 — aparência
 
 - Janela inicial respeita o tamanho do monitor; navegação compacta em larguras menores.
@@ -9,92 +21,42 @@
 - Sessões e aparência reunidas no menu; botão redundante de câmera removido.
 - Regressões GTK e captura da janela nos dois temas no CI Windows.
 
-## 7.0.0-preview.1 — desenvolvimento
+## 7.0.0-preview.1 — laboratório integrado
 
 - Laboratório integrado com projetos, caderno, recuperação, dados originais e desfazer/refazer.
 - Editor 2D/3D, conformeros, alinhamento RMSD e atribuições espectrais manuais.
-- Importação tabular/JCAMP explícito, fluxos reutilizáveis, planejamento fatorial e qualidade.
+- Importação tabular/JCAMP, fluxos reutilizáveis, planejamento fatorial e qualidade.
 - Processos estacionários simples, investigações, cenas, GIF, apresentações e relatórios.
 - Modelos de incerteza correlacionada, Monte Carlo, sensibilidade e distribuição ácido–base.
 - Nomes de pacotes centralizados, documentação reorganizada e publicador obsoleto removido.
 - Aplicativos nativos e instaladores verificados em CI: Windows, Flatpak e macOS Intel/Apple Silicon.
-- Identidade legada preservada; distribuição Flatpak independente diferenciada de submissão ao Flathub.
 
-O estado dos testes está em [Validação](docs/development/validation.md). Esta versão é uma prévia; foi publicada no GitHub.
+## 6.8.1 — compatibilidade gráfica no Windows
 
+- Fallback Mesa/llvmpipe para máquinas em que o OpenGL nativo não inicializa corretamente.
+- Diagnósticos gráficos e validação da cópia instalada.
+- Consulte [notas 6.8.1](docs/releases/6.8.1.md).
 
-- Bancadas de titulação, Daniell, calorimetria, equilíbrio, Beer–Lambert, cinética e decaimento refeitas em Cairo, com os valores ligados aos elementos do desenho.
-- Erlenmeyer com enchimento calculado pela geometria cônica, indicadores e ponto da titulação no gráfico.
-- Remoção dos botões redundantes de equilíbrio e Beer–Lambert; atualização explícita ao editar.
-- Reprodução, pausa, avanço manual e navegação no tempo compartilham uma sessão; trocar parâmetros reinicia a trajetória.
-- Curvas calculadas uma vez por configuração e linhas de medição reaproveitadas entre quadros.
-- Entradas inválidas são indicadas na página e desabilitam a reprodução; nenhuma medição antiga é apresentada como atual.
-- Corrente zero, fonte apagada, reagente ausente, esgotamento de Cu²⁺ e meia-vida infinita tratados explicitamente.
-- Correção de cancelamento numérico no cálculo do pH após excesso de base.
-- Nomenclatura do registro numérico padronizada como `ScientificEngine` / `default_engine` em `core/engine.py` e `core/advanced/engine.py`; imports e documentação atualizados.
-- Testes científicos existentes preservados; novos testes de comportamento, Cairo e GTK.
+## 6.8.0 — distribuição desktop
 
----
+- Instalador Windows e bundle Flatpak com identidade visual e atalhos.
+- Ferramentas de moléculas, análise, experimentos e busca em português consolidadas.
+- Consulte [notas 6.8.0](docs/releases/6.8.0.md).
 
-# Nexum Scientific Workbench v6.5 — Scientific Engine
+## 6.6 — bancadas e comportamento
 
-## Escopo desta versão
+- Bancadas de titulação, Daniell, calorimetria, equilíbrio, Beer–Lambert, cinética e decaimento refeitas em Cairo.
+- Reprodução, pausa, avanço manual e navegação temporal passam a compartilhar uma sessão.
+- Entradas inválidas deixam de exibir medições antigas como atuais.
+- Casos-limite de corrente, reagentes, Cu²⁺ e meia-vida tratados explicitamente.
+- Correção de cancelamento numérico no cálculo de pH após excesso de base.
+- Registro numérico padronizado como `ScientificEngine` / `default_engine`.
 
-Nenhuma reformulação visual. A interface GNOME da v6.0 é preservada. A v6.5 trabalha exclusivamente no backend científico e na rastreabilidade dos cálculos.
+## 6.5 — Scientific Engine
 
-## Novo motor científico
-
-- `ScientificEngine` + `SolverSpec` + `CalculationTrace`.
-- Presets são formalmente apenas entradas; nenhum contrato de solver possui resposta esperada embutida.
-- Rastreamento de entradas, modelo, equações, hipóteses, validade, tempo e diagnósticos numéricos.
-
-## Soluções e equilíbrio
-
-- Debye–Hückel limite/estendido e Davies.
-- Força iônica auto-consistente para especiação poliprótica.
-- Solver genérico de complexação por constantes globais de formação.
-- Equilíbrio multirreacional ideal por minimização de Gibbs.
-- Gradiente analítico + refinamento Newton de afinidades, corrigindo falsa convergência próxima à fronteira de não negatividade.
-
-## Gases e fases
-
-- Peng–Robinson puro e mistura.
-- Coeficientes de fugacidade por componente.
-- Rachford–Rice.
-- Flash TP `φ-φ` iterativo com balanço material e resíduo de fugacidade.
-
-## Cinética
-
-- Redes arbitrárias de ação das massas por ODE.
-- Reversibilidade.
-- Arrhenius calculado a partir de A/Ea/T.
-- Diagnóstico de invariantes estequiométricos.
-
-## Eletroquímica
-
-- Butler–Volmer.
-- Inversão de Butler–Volmer.
-- Eletrodo polarizado com `η + iR`.
-- Cottrell.
-
-## Metrologia e espectroscopia
-
-- GUM matricial.
-- Monte Carlo multivariado.
-- Covariância validada como simétrica e semidefinida positiva.
-- Regressão ponderada.
-- Beer multicomponente LS/NNLS com condicionamento.
-
-## Experimentos
-
-- Nova camada `advanced/protocols.py`: trajetórias calculadas quadro a quadro a partir de controles reais.
-- Testes metamórficos garantem que mudanças de parâmetros alterem estados por meio do modelo, e não por resultados pré-selecionados.
-
-## Dependências
-
-- SciPy passa a ser dependência explícita da v6.5.
-
-## Testes
-
-- v6.0: 100 testes.
-- v6.5: 134 testes.
+- `ScientificEngine`, `SolverSpec` e `CalculationTrace`.
+- Debye–Hückel, Davies, especiação poliprótica, complexação e equilíbrio por minimização de Gibbs.
+- Peng–Robinson, Rachford–Rice e flash TP φ-φ.
+- Redes cinéticas por ODE, Arrhenius e invariantes estequiométricos.
+- Butler–Volmer, Cottrell, GUM matricial, Monte Carlo, regressão ponderada e Beer multicomponente.
+- SciPy tornou-se dependência explícita.

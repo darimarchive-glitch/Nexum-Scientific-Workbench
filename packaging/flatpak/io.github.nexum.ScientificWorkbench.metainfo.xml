@@ -2,18 +2,19 @@
 <component type="desktop-application">
   <id>io.github.nexum.ScientificWorkbench</id>
   <name>Nexum</name>
-  <summary>Explore chemistry through calculations, molecular structures and data</summary>
-  <summary xml:lang="pt-BR">Explore química com cálculos, estruturas moleculares e dados</summary>
+  <summary>Explore chemistry with data</summary>
+  <summary xml:lang="pt-BR">Explore química com dados</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>LicenseRef-proprietary=https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/blob/main/LICENSE</project_license>
   <developer id="io.github.nexum"><name>Davi P Souza</name></developer>
   <description>
-    <p>Nexum is a scientific workbench for chemical calculations, molecular visualization and educational experiments.</p>
-    <p>The laboratory combines portable projects, data import, molecular editing, analysis workflows, experimental design and reports. Model assumptions and limitations accompany results.</p>
+    <p>Nexum combines chemical calculations, molecular visualization, experimental data analysis, quality tools, uncertainty models and scientific reports in a desktop workbench.</p>
+    <p>The application documents model assumptions and limitations alongside results and keeps original imported data separate from processed series.</p>
+    <p>The application interface is currently available in Brazilian Portuguese.</p>
   </description>
   <description xml:lang="pt-BR">
-    <p>O Nexum reúne cálculos químicos, visualização molecular e experimentos didáticos.</p>
-    <p>O laboratório integra projetos portáteis, importação de dados, edição molecular, fluxos de análise, planejamento experimental e relatórios. Resultados mostram as hipóteses e limitações do modelo.</p>
+    <p>O Nexum reúne cálculos químicos, visualização molecular, análise de dados experimentais, qualidade, modelos de incerteza e relatórios científicos em uma bancada desktop.</p>
+    <p>O aplicativo apresenta hipóteses e limitações dos modelos junto dos resultados e mantém os dados importados originais separados das séries processadas.</p>
   </description>
   <launchable type="desktop-id">io.github.nexum.ScientificWorkbench.desktop</launchable>
   <url type="homepage">https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench</url>
@@ -22,5 +23,16 @@
   <keywords><keyword>Chemistry</keyword><keyword>Química</keyword><keyword>Molecules</keyword><keyword>Moléculas</keyword><keyword>Uncertainty</keyword></keywords>
   <content_rating type="oars-1.1"/>
   <recommends><control>pointing</control><control>keyboard</control><display_length compare="ge">1280</display_length></recommends>
-  <releases><release version="7.0.0-preview.2" date="2026-09-27" type="development"><description><p>Application-wide appearance preference, synchronized molecular views and clearer session controls.</p></description></release><release version="7.0.0-preview.1" date="2026-09-26" type="development"><description><p>Integrated laboratory, uncertainty and speciation tools, portable projects and macOS packaging preparation.</p></description></release></releases>
+  <releases>
+    <release version="7.0.0" date="2026-10-01" type="stable">
+      <url type="details">https://github.com/darimarchive-glitch/Nexum-Scientific-Workbench/releases/tag/v7.0.0</url>
+      <description><p>Stable 7.0 release with the integrated laboratory, molecular workspace, data workflows, uncertainty tools and verified native packaging.</p></description>
+    </release>
+    <release version="7.0.0-preview.2" date="2026-09-27" type="development">
+      <description><p>Application-wide appearance preference, synchronized molecular views and clearer session controls.</p></description>
+    </release>
+    <release version="7.0.0-preview.1" date="2026-09-26" type="development">
+      <description><p>Integrated laboratory, uncertainty and speciation tools, portable projects and macOS packaging preparation.</p></description>
+    </release>
+  </releases>
 </component>

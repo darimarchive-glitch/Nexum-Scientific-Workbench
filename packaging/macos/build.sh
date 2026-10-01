@@ -34,6 +34,7 @@ fi
 stage=$(mktemp -d "${TMPDIR:-/tmp}/nexum-dmg.XXXXXX")
 trap 'rm -rf "$stage"' EXIT
 cp -R "$app" "$stage/Nexum.app"
+cp LICENSE "$stage/LICENSE.txt"
 ln -s /Applications "$stage/Applications"
 hdiutil create -ov -volname Nexum -srcfolder "$stage" -format UDZO "dist/$artifact"
 if [[ -n ${NEXUM_MAC_SIGN_IDENTITY:-} ]]; then codesign --sign "$NEXUM_MAC_SIGN_IDENTITY" --timestamp "dist/$artifact"; fi

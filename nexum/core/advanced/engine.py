@@ -130,7 +130,7 @@ class ScientificEngine:
 
 
 def default_engine() -> ScientificEngine:
-    """Build the v6.5 advanced backend registry.
+    """Build the advanced scientific backend registry.
 
     Imports are local so light-weight parts of Nexum can still start if an
     optional scientific dependency is being diagnosed by the installer.

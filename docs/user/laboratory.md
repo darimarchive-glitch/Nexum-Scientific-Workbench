@@ -59,7 +59,7 @@ Adicione etapas, mude sua ordem e execute na série selecionada ou em todas. As 
 
 **Qualidade:** informe valor alvo, σ de referência e, se houver, os dois limites de especificação. O aplicativo não escolhe critérios de aceitação. Um ponto fora de ±3σ não é automaticamente uma amostra fora da especificação.
 
-**Processos:** cada operação recebe saídas anteriores pelos nomes. O divisor fornece `nome` e `nome:rest`. Uma corrente não pode ser consumida duas vezes; use um divisor. A mistura conserva massa e usa cp constante. A conversão A→B usa razão mássica 1:1 e não representa um reator estequiométrico geral. As operações são adicionadas por formulário; o fluxograma é desenhado a partir delas, sem edição por arrastar/conectar nesta prévia.
+**Processos:** cada operação recebe saídas anteriores pelos nomes. O divisor fornece `nome` e `nome:rest`. Uma corrente não pode ser consumida duas vezes; use um divisor. A mistura conserva massa e usa cp constante. A conversão A→B usa razão mássica 1:1 e não representa um reator estequiométrico geral. As operações são adicionadas por formulário; o fluxograma é desenhado a partir delas, sem edição por arrastar/conectar na versão atual.
 
 ## Modelos e incerteza
 

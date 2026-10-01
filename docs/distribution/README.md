@@ -1,31 +1,49 @@
 # Distribuição
 
-O nome para o público é **Nexum**, com a descrição **Scientific Workbench**. A versão e os nomes dos artefatos vêm de `nexum/identity.py`. Não acrescente “FINAL”, “novo”, “corrigido”, nomes de distribuição Linux ou números de tentativa ao nome público do programa.
+O nome público é **Nexum** e a descrição é **Scientific Workbench**. A versão e os nomes dos artefatos vêm de `nexum/identity.py`; não mantenha números de versão duplicados em scripts quando a identidade central puder ser usada.
 
-| Artefato | Padrão |
-| --- | --- |
-| Fonte | `Nexum-VERSAO-source.zip` |
-| Windows | `Nexum-VERSAO-windows-x86_64-setup.exe` |
-| Linux | `Nexum-VERSAO-linux-ARQUITETURA.flatpak` |
-| macOS | `Nexum-VERSAO-macos-ARQUITETURA.dmg` |
-| Integridade | `SHA256SUMS.txt` na release; `.sha256` no build local macOS |
+## Artefatos da release estável
 
-A extensão de projeto é `.nexum7`. Os fluxos reutilizáveis usam `.nexumflow`.
+| Plataforma | Artefato | Validação no pipeline |
+| --- | --- | --- |
+| Windows x86_64 | `Nexum-VERSAO-windows-x86_64-setup.exe` | bundle, instalador, atalhos e self-test da cópia instalada |
+| Linux x86_64 | `Nexum-VERSAO-linux-x86_64.flatpak` | build, instalação, launcher e self-test dentro do sandbox |
+| macOS arm64 | `Nexum-VERSAO-macos-arm64.dmg` | build nativo, bundle e self-test |
+| macOS x86_64 | `Nexum-VERSAO-macos-x86_64.dmg` | build nativo, bundle e self-test |
+| Integridade | `SHA256SUMS.txt` | gerado a partir dos artefatos que serão publicados |
+
+A extensão de projeto é `.nexum7`. Fluxos reutilizáveis usam `.nexumflow`.
+
+## Regra de publicação
+
+`.github/workflows/packages.yml` executa a validação científica e compila os pacotes nativos. A release só é criada após o sucesso de todos os jobs. Versões com sufixo, como `-preview.1` ou `-rc.1`, são publicadas como pre-release; versões sem sufixo, como `7.0.0`, são publicadas como estáveis.
+
+Uma release já publicada não tem seus binários substituídos automaticamente. Novas alterações exigem nova versão quando precisarem ser distribuídas.
 
 ## Compilação local
 
-- Windows: `packaging/windows/build.ps1`, em Windows, com MSYS2 UCRT64, CPython e Inno Setup; fornece dependências no bundle e testa a cópia instalada.
-- Linux: `bash packaging/flatpak/build.sh`, com Flatpak e flatpak-builder, runtime GNOME 50; resolve wheels no SDK, registra hashes e compila sem rede na etapa do builder. O script produz um pacote independente, não uma submissão ao Flathub.
-- macOS: `bash packaging/macos/build.sh`, dentro do ambiente conda em um Mac; produz aplicativo e DMG da arquitetura nativa.
+- Windows: `packaging/windows/build.ps1`, em Windows, com MSYS2 UCRT64, CPython e Inno Setup.
+- Linux: `bash packaging/flatpak/build.sh`, com Flatpak e flatpak-builder, runtime GNOME 50.
+- macOS: `bash packaging/macos/build.sh`, dentro do ambiente conda em um Mac da arquitetura alvo.
 
-O bundle Flatpak pode ser instalado com `flatpak install --user CAMINHO.flatpak`. O nome no menu é Nexum; iniciar pela linha de comando continua possível com `flatpak run io.github.nexum.ScientificWorkbench`. Caso o ambiente não atualize seus atalhos, use `nexum-repair-shortcut.sh` fornecido pelo build Linux.
+## Licença nos pacotes
 
-## Identidade técnica e futura conta
+O Windows inclui `LICENSE.txt` no bundle e o instalador apresenta a licença. O Flatpak instala a licença em `/app/share/nexum/LICENSE`. O DMG inclui `LICENSE.txt` ao lado do aplicativo, e o bundle macOS também carrega a cópia empacotada pelo PyInstaller.
 
-A ID existente `io.github.nexum.ScientificWorkbench` foi preservada para não fragmentar os diretórios de dados de usuários da versão anterior. Ela **não demonstra controle do namespace `nexum` no GitHub**. Antes da publicação em uma loja, escolha uma identidade que corresponda a uma conta/repositório ou domínio controlado por você e estabeleça uma migração dos dados Flatpak.
+Isso não substitui as licenças de dependências de terceiros, que continuam regidas pelos próprios termos.
 
-A mudança deve ser coordenada em `nexum/identity.py`, arquivos `.desktop`, `.metainfo.xml`, nome e conteúdo do manifesto Flatpak, verificações de atalhos e scripts de instalação. O identificador de upgrade do Inno Setup foi preservado para instalações Windows existentes. IDs internos não precisam ser tão curtos quanto o nome exibido.
+## Assinatura e distribuição pública
 
-O workflow `packages.yml` compila e verifica os pacotes nativos e publica a prévia somente após o sucesso de todos os jobs. O antigo publicador com hashes, versões e IDs de jobs fixos foi removido. Uma release já publicada não tem seus binários substituídos automaticamente.
+Os pacotes públicos atuais não configuram Authenticode no Windows. No macOS, Developer ID e notarização só são usados quando as credenciais apropriadas são fornecidas fora do repositório; sem elas, o build usa assinatura ad hoc.
 
-O runtime do pacote independente foi atualizado de GNOME 49 para 50. O bundle foi compilado, instalado e testado no CI. Referência: [GNOME, recomendação de migração para o runtime 50](https://thisweek.gnome.org/posts/2026/03/twig-242/).
+Essas limitações devem ser informadas ao usuário e tratadas antes de uma distribuição comercial ampla que exija uma cadeia de confiança de plataforma.
+
+## Identidade técnica
+
+A ID `io.github.nexum.ScientificWorkbench` foi preservada para continuidade das instalações existentes. Ela não demonstra controle do namespace `nexum` no GitHub. Uma futura mudança de ID precisa ser coordenada com migração dos dados do sandbox e dos identificadores de pacote.
+
+A mudança deve abranger `nexum/identity.py`, arquivos `.desktop`, MetaInfo, manifesto Flatpak, atalhos e scripts de instalação. O identificador de upgrade do Inno Setup permanece estável para não quebrar instalações Windows existentes.
+
+## Flathub
+
+O bundle Flatpak independente não equivale à publicação no Flathub. Consulte [preparação](flathub.md) e a [auditoria histórica](flathub-audit.md) antes de iniciar uma submissão.

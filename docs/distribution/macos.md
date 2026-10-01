@@ -1,6 +1,6 @@
 # macOS: compilação e verificação
 
-**Estado:** os DMGs da preview.2 foram compilados e testados em CI nativo para Apple Silicon e Intel e estão nas Releases. O self-test exercitou o aplicativo empacotado e a assinatura ad hoc foi verificada. Assinatura Developer ID e notarização não foram realizadas; exigem credenciais do responsável pelo projeto.
+**Estado:** o pipeline da série 7.0 compila DMGs nativos separados para Apple Silicon e Intel e executa o self-test do aplicativo empacotado antes da publicação. A release estável só é criada quando os dois jobs passam. Assinatura Developer ID e notarização não estão configuradas no repositório público; sem essas credenciais o build usa assinatura ad hoc e o macOS pode exibir aviso de desenvolvedor não identificado.
 
 ## Implementação
 

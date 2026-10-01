@@ -24,25 +24,37 @@ O vocabulário inicial contém 21 compostos, não todo o PubChem. Para registros
 
 ## Windows
 
-`packaging/windows/build.ps1` cria dois bundles PyInstaller: interface GTK e motor químico CPython. O worker empacotado é chamado por JSON, sem interpretador externo instalado. Em seguida executa o autoteste do aplicativo congelado e compila um instalador Inno Setup por usuário, com desinstalador e atalhos. A instalação não exige Python, MSYS2 ou privilégios de administrador no computador final.
+`packaging/windows/build.ps1` cria dois bundles PyInstaller: interface GTK e motor químico CPython. O worker empacotado é chamado por JSON, sem interpretador externo instalado. O instalador Inno Setup é produzido por usuário, inclui a licença proprietária, cria desinstalador e atalhos e não exige Python ou MSYS2 no computador final.
 
-O fluxo **Build desktop installers** em GitHub Actions prepara as dependências, verifica o bundle e disponibiliza `Nexum-Setup-6.8.0-x64.exe` como artefato se a compilação passar. O autoteste cobre GTK, OpenGL, RDKit, gemmi e histórico. Ainda é necessário testar instalação, atualização e desinstalação em um Windows limpo, sem ferramentas de desenvolvimento. Os pacotes não possuem assinatura digital configurada.
+O fluxo **Build desktop installers** executa testes, compila o bundle, instala o EXE gerado em uma pasta limpa e executa o self-test da cópia instalada com PATH restrito. O artefato segue o padrão `Nexum-<versão>-windows-x86_64-setup.exe`.
+
+Os binários públicos ainda não possuem assinatura Authenticode configurada. Isso não impede o teste funcional, mas pode gerar avisos do Windows e precisa ser tratado antes de uma distribuição comercial de maior escala.
 
 ## Linux / Flatpak
 
-Em Linux x86_64, execute `bash packaging/flatpak/build.sh` com Flatpak e flatpak-builder instalados. O script usa GNOME 49, resolve wheels com o Python do próprio SDK e faz a instalação das dependências offline no builder. O aplicativo próprio é distribuído como arquivo de bytecode, sem a árvore de arquivos `.py`. As dependências conservam os arquivos necessários de suas distribuições.
+Em Linux x86_64, execute `bash packaging/flatpak/build.sh` com Flatpak e flatpak-builder instalados. O script usa o runtime GNOME 50, resolve as dependências no SDK e compila o aplicativo para um bundle Flatpak independente. A etapa do builder roda sem rede depois que os insumos são preparados.
 
-Saída: `dist/Nexum-x86_64.flatpak`.
+Saída: `dist/Nexum-<versão>-linux-x86_64.flatpak`.
 
-Instalação pelo usuário: `flatpak install --user Nexum-x86_64.flatpak`.
+Instalação pelo usuário:
 
-Abertura: `flatpak run io.github.nexum.ScientificWorkbench`.
+```bash
+flatpak install --user ./Nexum-<versão>-linux-x86_64.flatpak
+```
 
-Acesso à rede atende PubChem/RCSB; acesso gráfico usa Wayland/X11 e DRI. Não concede acesso geral aos arquivos do computador. Histórico/cache seguem XDG dentro do sandbox. O bundle ainda depende do runtime Flatpak, obtido do Flathub. Este fluxo **não publica o aplicativo no Flathub**; submissão à loja exige metadados, revisão e um fluxo de distribuição apropriado. Os hashes dos wheels usados acompanham o bundle; o resolvedor ainda usa os intervalos do requirements.txt, portanto builds futuros podem selecionar versões diferentes.
+Abertura:
 
-## Código e distribuição
+```bash
+flatpak run io.github.nexum.ScientificWorkbench
+```
 
-Instaladores, bytecode e PyInstaller evitam entregar a árvore de desenvolvimento como interface ao usuário, mas permitem extração e engenharia reversa. Não são criptografia nem licenciamento. Segredos devem permanecer fora do programa distribuído. A licença existente do repositório não foi alterada; tampouco foram introduzidos pagamentos ou validação de licenças. Avisos/licenças das dependências devem acompanhar sua redistribuição.
+Acesso à rede atende buscas externas; acesso gráfico usa Wayland/X11 e DRI. O bundle não concede acesso geral à pasta pessoal. Histórico e cache seguem XDG dentro do sandbox. Este fluxo produz um pacote independente; publicação no catálogo Flathub continua sendo uma etapa separada.
+
+## Código, licença e distribuição
+
+Instaladores, bytecode e PyInstaller dificultam a exposição casual da árvore de desenvolvimento, mas não são criptografia nem impedem engenharia reversa. Segredos devem permanecer fora do aplicativo distribuído.
+
+A partir da série estável 7.0.0, o Nexum é distribuído sob licença proprietária. Uso institucional, comercial, laboratorial, organizacional, redistribuição, integração em outros produtos e serviços hospedados exigem autorização específica do mantenedor. Dependências de terceiros continuam sujeitas às respectivas licenças e avisos.
 
 ## Referências de empacotamento
 

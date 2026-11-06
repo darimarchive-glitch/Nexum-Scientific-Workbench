@@ -3,6 +3,8 @@
 
 # Nexum
 
+**Autor: Davi P. Souza**
+
 **Scientific Workbench — química, estruturas moleculares, dados experimentais e modelos rastreáveis.**
 
 Versão **7.0.0** · release estável · aplicação desktop · interface em português brasileiro
